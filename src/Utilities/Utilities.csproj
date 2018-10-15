@@ -10,7 +10,7 @@
     <Company />
     <Product />
     <RepositoryType>git</RepositoryType>
-    <PackageTags>collection, string,</PackageTags>
+    <PackageTags>collections; string; utilities</PackageTags>
     <PackageReleaseNotes>Intial release</PackageReleaseNotes>
   </PropertyGroup>
   

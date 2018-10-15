@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using static System.Linq.Expressions.ExpressionExtensions;
 using System.Threading.Tasks;
-#if NETSTANDARD1_1
+#if !NETSTANDARD1_0
 using System.Collections.Concurrent;
 #endif
 namespace System.Collections.Generic
