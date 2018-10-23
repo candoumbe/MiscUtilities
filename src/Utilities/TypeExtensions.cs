@@ -14,7 +14,7 @@ namespace System
         /// <param name="givenType"></param>
         /// <param name="genericType"></param>
         public static bool IsAssignableToGenericType(this Type givenType, Type genericType)
-        => givenType != null && genericType != null && givenType == genericType
+        => (givenType != null && genericType != null && givenType == genericType)
             || givenType.MapsToGenericTypeDefinition(genericType)
             || givenType.HasInterfaceThatMapsToGenericTypeDefinition(genericType)
             //|| givenType.GetTypeInfo().BaseType.IsAssignableToGenericType(genericType)
@@ -46,9 +46,8 @@ namespace System
         {
             bool hasCompilerGeneratedAttribute = type?.GetTypeInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any() ?? false;
             bool nameContainsAnonymousType = type?.FullName.Contains("AnonymousType") ?? false;
-            bool isAnonymousType = hasCompilerGeneratedAttribute && nameContainsAnonymousType;
 
-            return isAnonymousType;
+            return hasCompilerGeneratedAttribute && nameContainsAnonymousType;
         }
     }
 }

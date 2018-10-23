@@ -105,6 +105,7 @@ namespace System
                 regexOptions |= RegexOptions.IgnoreCase;
             }
             pattern = pattern.Replace("?", ".")
+                .Replace("|", @"\|")
                 .Replace("*", ".*");
 
             return Regex.IsMatch(input, $"{pattern}$", regexOptions);

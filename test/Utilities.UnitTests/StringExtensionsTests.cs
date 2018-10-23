@@ -61,6 +61,9 @@ namespace Utilities.UnitTests
         [InlineData("100-", "*-*", false, true)]
         [InlineData("100-200", "*-*", false, true)]
         [InlineData("100-200", "*-", false, false)]
+        [InlineData("Bruce|Dick", "*|*", false, true)]
+        [InlineData("Bruce|Dick", "*?|?*", false, true)]
+        [InlineData("Bruce", "*?|?*", false, false)]
         public void Like(string input, string pattern, bool ignoreCase, bool expectedResult)
         {
             _outputHelper.WriteLine($"input : '{input}'");
