@@ -3,6 +3,8 @@ using Xunit;
 using Xunit.Abstractions;
 using FluentAssertions;
 using Xunit.Categories;
+using Microsoft.Extensions.Primitives;
+using System.Collections.Generic;
 
 namespace Utilities.UnitTests
 {
@@ -21,10 +23,7 @@ namespace Utilities.UnitTests
 
         public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
 
-        public void Dispose()
-        {
-            _outputHelper = null;
-        }
+        public void Dispose() => _outputHelper = null;
 
         [Theory]
         [InlineData(null, null)]
@@ -38,6 +37,8 @@ namespace Utilities.UnitTests
         [InlineData(null, null)]
         [InlineData("startDate", "startDate")]
         [InlineData("StartDate", "startDate")]
+        [InlineData("Start Date", "startDate")]
+        [InlineData("start-date", "startDate")]
         public void ToCamelCase(string input, string expectedString)
             => input?.ToCamelCase()?.Should().Be(expectedString);
 
@@ -64,7 +65,11 @@ namespace Utilities.UnitTests
         [InlineData("Bruce|Dick", "*|*", false, true)]
         [InlineData("Bruce|Dick", "*?|?*", false, true)]
         [InlineData("Bruce", "*?|?*", false, false)]
-        public void Like(string input, string pattern, bool ignoreCase, bool expectedResult)
+        [InlineData("Batman", "Bat*man", false, true)]
+        [InlineData("Batman", "B[Aa]t*man", false, true)]
+        [InlineData("BAtman", "B[Aa]t*man", false, true)]
+        [InlineData("B[a]tman", @"B\[a\]t*man", false, true)]
+        public void StringLike(string input, string pattern, bool ignoreCase, bool expectedResult)
         {
             _outputHelper.WriteLine($"input : '{input}'");
             _outputHelper.WriteLine($"pattern : '{pattern}'");
@@ -75,6 +80,81 @@ namespace Utilities.UnitTests
 
             // Assert
             result.Should().Be(expectedResult);
+        }
+
+        public static IEnumerable<object[]> StringSegmentLikeCases
+        {
+            get
+            {
+                {
+                    StringSegment segment = new StringSegment("Bruce");
+
+                    yield return new object[]
+                    {
+                        (
+                            input : segment,
+                            pattern : "Bruce",
+                            ignoreCase : false,
+                            expected : true
+                        )
+                    };
+
+                    yield return new object[]
+                    {
+                        (
+                            input : segment,
+                            pattern : "bruce",
+                            ignoreCase : true,
+                            expected : true
+                        )
+                    };
+
+                    yield return new object[]
+                    {
+                        (
+                            input : segment,
+                            pattern : "bruce",
+                            ignoreCase : false,
+                            expected : false
+                        )
+                    };
+
+                    yield return new object[]
+                    {
+                        (
+                            input : segment,
+                            pattern : "*bruce",
+                            ignoreCase : true,
+                            expected : true
+                        )
+                    };
+
+                    yield return new object[]
+                    {
+                        (
+                            input : segment.Subsegment(0, 3),
+                            pattern : "*bru",
+                            ignoreCase : true,
+                            expected : true
+                        )
+                    };
+                }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(StringSegmentLikeCases))]
+        public void StringSegmentLike((StringSegment input, string pattern, bool ignoreCase, bool expectedResult) data)
+        {
+            _outputHelper.WriteLine($"input : '{data.input}'");
+            _outputHelper.WriteLine($"pattern : '{data.pattern}'");
+            _outputHelper.WriteLine($"Ignore case : '{data.ignoreCase}'");
+
+            // Act
+            bool result = data.input.Like(data.pattern, data.ignoreCase);
+
+            // Assert
+            result.Should().Be(data.expectedResult);
         }
 
         [Fact]

@@ -1,7 +1,12 @@
-﻿using System.Globalization;
+﻿#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
+using Microsoft.Extensions.Primitives;
+# endif
+using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using static System.Collections.Generic.EnumerableExtensions;
 using static System.Linq.Expressions.Expression;
 
@@ -50,9 +55,19 @@ namespace System
         public static string ToCamelCase(this string input)
         {
             StringBuilder sbResult = null;
-            if (input?.ToCharArray()?.AtLeastOnce() ?? false)
+            input = input ?? string.Empty;
+            string sanitizedInput
+#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
+             = new string(input
+#else
+            = new string(input.ToCharArray()
+#endif
+                .Where(character => char.IsLetterOrDigit(character) || character == '-' || char.IsWhiteSpace(character))
+                    .ToArray());
+
+            if (sanitizedInput != string.Empty)
             {
-                sbResult = new StringBuilder(input);
+                sbResult = new StringBuilder(sanitizedInput);
                 if (char.IsLetter(sbResult[0]))
                 {
                     sbResult[0] = char.ToLower(sbResult[0]);
@@ -67,7 +82,9 @@ namespace System
                 }
             }
 
-            return sbResult?.ToString() ?? string.Empty;
+            return (sbResult?.ToString() ?? string.Empty)
+                .Replace(" ", string.Empty)
+                .Replace("-", string.Empty);
         }
 
         /// <summary>
@@ -110,6 +127,28 @@ namespace System
 
             return Regex.IsMatch(input, $"{pattern}$", regexOptions);
         }
+
+#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
+        /// <summary>
+        /// Perfoms a VB "Like" comparison
+        /// </summary>
+        /// <param name="input">the <see cref="StringSegment"/> to test</param>
+        /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
+        /// <param name="ignoreCase"><c>true</c> to ignore case</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
+        public static bool Like(this StringSegment input, string pattern, bool ignoreCase) => Like(input.Value, pattern, ignoreCase);
+
+        /// <summary>
+        /// Perfoms a VB "Like" comparison
+        /// </summary>
+        /// <param name="input">the <see cref="StringSegment"/> to test</param>
+        /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
+        public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
+
+#endif
 
         /// <summary>
         /// Converts <paramref name="source"/> to its <see cref="LambdaExpression"/> equivalent

@@ -158,7 +158,6 @@ namespace Utilities.UnitTests
                 // Arrange
                 queryString?.Should().Match(expectedString);
             }
-
         }
     }
 }
