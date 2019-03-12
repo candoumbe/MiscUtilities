@@ -1,7 +1,7 @@
 ﻿#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
 using Microsoft.Extensions.Primitives;
-# endif
 using System.Globalization;
+# endif
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;

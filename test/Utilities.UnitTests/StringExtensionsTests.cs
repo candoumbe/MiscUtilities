@@ -69,6 +69,9 @@ namespace Utilities.UnitTests
         [InlineData("Batman", "B[Aa]t*man", false, true)]
         [InlineData("BAtman", "B[Aa]t*man", false, true)]
         [InlineData("B[a]tman", @"B\[a\]t*man", false, true)]
+        [InlineData("Zsasz","Zs[A-Z]sz", false, false)]
+        [InlineData("Zsasz","Zs[a-z]sz", false, true)]
+        [InlineData("Zsasz","Zs[A-Za-z]sz", false, true)]
         public void StringLike(string input, string pattern, bool ignoreCase, bool expectedResult)
         {
             _outputHelper.WriteLine($"input : '{input}'");
