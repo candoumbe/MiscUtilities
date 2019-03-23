@@ -148,6 +148,14 @@ namespace System
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
         public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
 
+        /// <summary>
+        /// Converts <paramref name="source"/> to its <see cref="LambdaExpression"/> equivalent
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
+        public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
 #endif
 
         /// <summary>
@@ -199,6 +207,11 @@ namespace System
         /// </summary>
         /// <param name="input">The string to transform</param>
         /// <returns>The lower-kebab-cased string</returns>
+        /// <example>
+        /// 
+        /// "JusticeLeague".ToLowerKebabCase() // "justice-league"
+        /// 
+        /// </example>
         public static string ToLowerKebabCase(this string input)
         {
             if (input == null)
@@ -228,7 +241,7 @@ namespace System
         public static string RemoveDiacritics(this string input)
         {
             string normalizedString = input.Normalize(NormalizationForm.FormD);
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder(input.Length);
 
             foreach (char c in normalizedString)
             {
@@ -241,6 +254,13 @@ namespace System
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
+
+        /// <summary>
+        /// Removes diacritics from <paramref name="input"/>
+        /// </summary>
+        /// <param name="input">where to remove diacritics</param>
+        /// <returns></returns>
+        public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
 
 #endif
 

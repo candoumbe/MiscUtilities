@@ -4,14 +4,15 @@
     <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard2.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
-    <Version>1.1.0.0</Version>
+    <Version>1.2.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Cyrille NDOUMBE</Authors>
     <Company />
     <Product />
     <RepositoryType>git</RepositoryType>
     <PackageTags>collections; string; utilities</PackageTags>
-    <PackageReleaseNotes>Added `Like` overload for `StringSegment`.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added `ToTitleCase` extension method for StringSegment
+Added `ToLambda` extension method for StringSegment</PackageReleaseNotes>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <PackageProjectUrl>https://github.com/candoumbe/Utilities</PackageProjectUrl>
