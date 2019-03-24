@@ -5,6 +5,7 @@ using FluentAssertions;
 using Xunit.Categories;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Utilities.UnitTests
 {
@@ -213,6 +214,22 @@ namespace Utilities.UnitTests
             action.Should().Throw<ArgumentNullException>().Which
                 .ParamName.Should()
                 .NotBeNullOrWhiteSpace();
+        }
+
+
+        [Theory]
+        [InlineData("Firstname", "x.Firstname")]
+        [InlineData("firstname", "x.Firstname")]
+        [InlineData(" firstname", "x.Firstname")]
+        public void ToLambda(string property, string expectedLambda)
+        {
+            // Arrange
+            LambdaExpression lambda = StringExtensions.ToLambda<SuperHero>(property);
+            string actual = lambda.Body.ToString();
+
+            // Assert
+            actual.Should()
+                .BeEquivalentTo(expectedLambda);
         }
     }
 }

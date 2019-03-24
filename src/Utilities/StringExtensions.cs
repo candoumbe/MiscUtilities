@@ -2,11 +2,11 @@
 using Microsoft.Extensions.Primitives;
 using System.Globalization;
 # endif
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using static System.Collections.Generic.EnumerableExtensions;
 using static System.Linq.Expressions.Expression;
 
@@ -173,7 +173,8 @@ namespace System
             }
 
             ParameterExpression pe = Parameter(typeof(TSource), "x");
-            string[] fields = source.Split(new[] { '.' });
+            IEnumerable<string> fields = source.Split(new[] { '.' })
+                .Select(item => item.Trim());
             MemberExpression property = null;
             foreach (string field in fields)
             {
