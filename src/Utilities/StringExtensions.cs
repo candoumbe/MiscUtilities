@@ -263,6 +263,104 @@ namespace System
         /// <returns></returns>
         public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
 
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
+        /// </summary>
+        /// <param name="input">The <see cref="StringSegment"/> where searching occurrences will be performed</param>
+        /// <param name="search">The searched element</param>
+        /// <param name="stringComparison"></param>
+        /// <returns>
+        /// A collection of all indexes in <paramref name="input"/> where <paramref name="search"/> is present.
+        /// </returns>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        public static IEnumerable<int> Occurrences(this StringSegment input, StringSegment search, StringComparison stringComparison = StringComparison.InvariantCulture)
+        {
+            int index,
+                newPos,
+                currentPos = 0;
+
+            if (input.Length == 0)
+            {
+                yield break;
+            }
+            else
+            {
+                string inputValue = input.Value;
+                int inputLength = input.Length;
+                string searchValue = search.Value;
+                int searchLength = searchValue.Length;
+                do
+                {
+                    index = inputValue.IndexOf(searchValue, currentPos, stringComparison);
+
+                    if (index != -1)
+                    {
+                        newPos = index + searchLength;
+                        yield return index;
+                        currentPos = newPos + 1;
+                    }
+                }
+                while (currentPos <= inputLength && index != -1);
+            }
+
+        }
+
+        /// <summary>
+        /// Gets a 0-based index of the first occurrence of <paramref name="search"/> in <paramref name="source"/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="search"></param>
+        /// <param name="stringComparison"></param>
+        /// <returns>
+        /// the index where <paramref name="search"/> 
+        /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>default(StringSegment)</c></exception>
+        public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.InvariantCulture)
+        {
+            if (search.Length == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(search), "Search cannot be empty");
+            }
+
+            using IEnumerator<int> enumerator = Occurrences(source, search, stringComparison).GetEnumerator();
+
+            return enumerator.MoveNext()
+                ? enumerator.Current
+                : -1;
+        }
+
+        /// <summary>
+        /// Gets a 0-based index of the first occurrence of <paramref name="search"/> in <paramref name="source"/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="search"></param>
+        /// <param name="stringComparison"></param>
+        /// <returns>the index where <paramref name="search"/> was found in <paramref name="source"/> or <c>-1</c> if no occurrence found</returns>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>default(StringSegment)</c></exception>
+        public static int LastOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.InvariantCulture)
+        {
+            if (search.Length == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(search), "Search cannot be empty");
+            }
+
+            using IEnumerator<int> enumerator = Occurrences(source, search, stringComparison).GetEnumerator();
+
+            int index = -1;
+            while (enumerator.MoveNext())
+            {
+                index = enumerator.Current;
+            }
+
+            return index;
+        }
+#endif
+
 #endif
 
     }
