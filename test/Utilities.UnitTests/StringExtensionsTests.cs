@@ -234,7 +234,6 @@ namespace Utilities.UnitTests
         }
 
 
-#if NETCOREAPP3_0
         public static IEnumerable<object[]> OccurrencesCases
         {
             get
@@ -243,7 +242,7 @@ namespace Utilities.UnitTests
                 {
                     "Firstname",
                     "z",
-                    StringComparison.InvariantCultureIgnoreCase,
+                    StringComparison.CurrentCulture,
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && !occurrences.Any()),
                     "There's no occurrence of the search element in the string"
                 };
@@ -252,7 +251,7 @@ namespace Utilities.UnitTests
                 {
                     string.Empty,
                     "z",
-                    StringComparison.InvariantCultureIgnoreCase,
+                    StringComparison.CurrentCulture,
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && !occurrences.Any()),
                     "The source element is empty"
                 };
@@ -261,7 +260,7 @@ namespace Utilities.UnitTests
                 {
                     "Firstname",
                     "F",
-                    StringComparison.InvariantCultureIgnoreCase,
+                    StringComparison.CurrentCulture,
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
                         occurrences != null && occurrences.Once()
                         && occurrences.Once(pos  => pos == 0)
@@ -273,7 +272,7 @@ namespace Utilities.UnitTests
                 {
                     "zsasz",
                     "z",
-                    StringComparison.InvariantCultureIgnoreCase,
+                    StringComparison.CurrentCulture,
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
                         occurrences != null && occurrences.Count() == 2
                         && occurrences.Once(pos => pos == 0)
@@ -286,7 +285,7 @@ namespace Utilities.UnitTests
 
         [Theory]
         [MemberData(nameof(OccurrencesCases))]
-        public void Occurrences(StringSegment source, string search, StringComparison stringComparison, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
+        public void Occurrences(string source, string search, StringComparison stringComparison, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
         {
             _outputHelper.WriteLine($"Source : '{source}'");
             _outputHelper.WriteLine($"Search : '{search}'");
@@ -316,7 +315,7 @@ namespace Utilities.UnitTests
 
         [Theory]
         [MemberData(nameof(FirstOccurrenceCases))]
-        public void FirstOccurrence(StringSegment source, string search, StringComparison stringComparison, int expected, string reason)
+        public void FirstOccurrence(string source, string search, StringComparison stringComparison, int expected, string reason)
         {
             _outputHelper.WriteLine($"Source : '{source}'");
             _outputHelper.WriteLine($"Search : '{search}'");
@@ -330,58 +329,60 @@ namespace Utilities.UnitTests
                 .Be(expected, reason);
         }
 
-        public static IEnumerable<object[]> FirstOccurrenceThrowsArgumentNullExceptionCases
-        {
-            get
-            {
-                yield return new object[]{ "", "search is empty"};
-                yield return new object[]{ null, "search is null"};
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(FirstOccurrenceThrowsArgumentNullExceptionCases))]
-        public void FirstOccurrence_should_throws_ArgumentOutOfRangeException_When_Search_Is_Empty(string search, string reason)
+        [Fact]
+        public void LastOccurrence_should_throws_ArgumentOutOfRangeException_When_Search_Is_Empty()
         {
             // Arrange
-            StringSegment source = "source";
-
-            _outputHelper.WriteLine($"Search : '{search}'");
+            string source = "source";
 
             // Act
-            Action action = () => source.FirstOccurrence(search);
+            Action action = () => source.LastOccurrence(string.Empty);
 
             // Assert
             action.Should()
-                .Throw<ArgumentOutOfRangeException>(reason);
-        }
-        
-        
-        public static IEnumerable<object[]> LastOccurrenceThrowsArgumentNullExceptionCases
-        {
-            get
-            {
-                yield return new object[]{ "", "search is empty"};
-                yield return new object[]{ null, "search is null"};
-            }
+                .Throw<ArgumentOutOfRangeException>();
         }
 
         [Theory]
-        [MemberData(nameof(LastOccurrenceThrowsArgumentNullExceptionCases))]
-        public void LastOccurrence_should_throws_ArgumentOutOfRangeException_When_Search_Is_Empty(string search, string reason)
+        [InlineData(null, "search", "Source is null")]
+        [InlineData("source", null, "Search is null")]
+        public void LastOccurrence_should_throws_ArgumentNullRangeException_When_Search_Is_Empty(string source, string search, string reason)
         {
-            // Arrange
-            StringSegment source = "source";
-
-            _outputHelper.WriteLine($"Search : '{search}'");
-
+            
             // Act
             Action action = () => source.LastOccurrence(search);
 
             // Assert
             action.Should()
-                .Throw<ArgumentOutOfRangeException>(reason);
+                .Throw<ArgumentNullException>(reason);
         }
-#endif
+        
+        [Fact]
+        public void FirstOccurrence_should_throws_ArgumentOutOfRangeException_When_Search_Is_Empty()
+        {
+            // Arrange
+            const string source = "source";
+
+            // Act
+            Action action = () => source.FirstOccurrence(string.Empty);
+
+            // Assert
+            action.Should()
+                .Throw<ArgumentOutOfRangeException>();
+        }
+
+        [Theory]
+        [InlineData(null, "search", "Source is null")]
+        [InlineData("source", null, "Search is null")]
+        public void FirstOccurrence_should_throws_ArgumentNullRangeException_When_Search_Is_Empty(string source, string search, string reason)
+        {
+            
+            // Act
+            Action action = () => source.FirstOccurrence(search);
+
+            // Assert
+            action.Should()
+                .Throw<ArgumentNullException>(reason);
+        }
     }
 }

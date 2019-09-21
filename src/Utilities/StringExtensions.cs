@@ -277,12 +277,7 @@ namespace System
         /// <remarks>
         /// 
         /// </remarks>
-#if NETSTANDARD1_0 || NETSTANDARD1_1
         public static IEnumerable<int> Occurrences(this string input, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
-#else
-        public static IEnumerable<int> Occurrences(this StringSegment input, StringSegment search, StringComparison stringComparison = StringComparison.InvariantCulture)
-
-#endif
         {
             int index,
                 newPos,
@@ -296,17 +291,9 @@ namespace System
             {
                 int inputLength = input.Length;
 
-#if !(NETSTANDARD1_0 ||  NETSTANDARD1_1)
-                string inputValue = input.Value;
-                string searchValue = search.Value;
-                int searchLength = searchValue.Length;
-#else
-                string inputValue = input;
-                string searchValue = search;
-#endif
                 do
                 {
-                    index = inputValue.IndexOf(searchValue, currentPos, stringComparison);
+                    index = input.IndexOf(search, currentPos, stringComparison);
 
                     if (index != -1)
                     {
@@ -330,14 +317,20 @@ namespace System
         /// the index where <paramref name="search"/> 
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>default(StringSegment)</c></exception>
-#if NETSTANDARD1_0 || NETSTANDARD1_1
+        /// <exception cref="ArgumentNullException">if <paramref="source"> or <paramref name="search"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int FirstOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
-#else
-        public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.CurrentCulture)
-
-#endif
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (search == null)
+            {
+                throw new ArgumentNullException(nameof(search));
+            }
+
             if (search.Length == 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(search), "Search cannot be empty");
@@ -353,18 +346,24 @@ namespace System
         /// <summary>
         /// Report a zero-based index of the last occurrence of <paramref name="search"/> in <paramref name="source"/>
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="search"></param>
+        /// <param name="source">string where to search for occurrence</param>
+        /// <param name="search">The text to search</param>
         /// <param name="stringComparison"></param>
         /// <returns>the index where <paramref name="search"/> was found in <paramref name="source"/> or <c>-1</c> if no occurrence found</returns>
-        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>default(StringSegment)</c></exception>
-#if NETSTANDARD1_0 || NETSTANDARD1_1
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <see cref="string.Empty"/></exception>
+        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="search"/> is <c>nuull</c></exception>
         public static int LastOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
-#else
-        public static int LastOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.CurrentCulture)
-
-#endif
         {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (search == null)
+            {
+                throw new ArgumentNullException(nameof(search));
+            }
+
             if (search.Length == 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(search), "Search cannot be empty");
@@ -380,6 +379,5 @@ namespace System
 
             return index;
         }
-
     }
 }
