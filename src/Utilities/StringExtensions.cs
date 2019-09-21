@@ -1,6 +1,6 @@
-﻿#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
+﻿using System.Globalization;
+#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
 using Microsoft.Extensions.Primitives;
-using System.Globalization;
 # endif
 using System.Collections.Generic;
 using System.Linq;
@@ -264,7 +264,7 @@ namespace System
         public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
 
 
-#if !NETSTANDARD2_0
+#endif
         /// <summary>
         /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
         /// </summary>
@@ -277,7 +277,12 @@ namespace System
         /// <remarks>
         /// 
         /// </remarks>
+#if NETSTANDARD1_0 || NETSTANDARD1_1
+        public static IEnumerable<int> Occurrences(this string input, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
+#else
         public static IEnumerable<int> Occurrences(this StringSegment input, StringSegment search, StringComparison stringComparison = StringComparison.InvariantCulture)
+
+#endif
         {
             int index,
                 newPos,
@@ -289,17 +294,23 @@ namespace System
             }
             else
             {
-                string inputValue = input.Value;
                 int inputLength = input.Length;
+
+#if !(NETSTANDARD1_0 ||  NETSTANDARD1_1)
+                string inputValue = input.Value;
                 string searchValue = search.Value;
                 int searchLength = searchValue.Length;
+#else
+                string inputValue = input;
+                string searchValue = search;
+#endif
                 do
                 {
                     index = inputValue.IndexOf(searchValue, currentPos, stringComparison);
 
                     if (index != -1)
                     {
-                        newPos = index + searchLength;
+                        newPos = index + search.Length;
                         yield return index;
                         currentPos = newPos + 1;
                     }
@@ -310,7 +321,7 @@ namespace System
         }
 
         /// <summary>
-        /// Gets a 0-based index of the first occurrence of <paramref name="search"/> in <paramref name="source"/>
+        /// Report a zero-based index of the first occurrence of <paramref name="search"/> in <paramref name="source"/>
         /// </summary>
         /// <param name="source"></param>
         /// <param name="search"></param>
@@ -320,7 +331,12 @@ namespace System
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>default(StringSegment)</c></exception>
-        public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.InvariantCulture)
+#if NETSTANDARD1_0 || NETSTANDARD1_1
+        public static int FirstOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
+#else
+        public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.CurrentCulture)
+
+#endif
         {
             if (search.Length == 0)
             {
@@ -335,14 +351,19 @@ namespace System
         }
 
         /// <summary>
-        /// Gets a 0-based index of the first occurrence of <paramref name="search"/> in <paramref name="source"/>
+        /// Report a zero-based index of the last occurrence of <paramref name="search"/> in <paramref name="source"/>
         /// </summary>
         /// <param name="source"></param>
         /// <param name="search"></param>
         /// <param name="stringComparison"></param>
         /// <returns>the index where <paramref name="search"/> was found in <paramref name="source"/> or <c>-1</c> if no occurrence found</returns>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>default(StringSegment)</c></exception>
-        public static int LastOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.InvariantCulture)
+#if NETSTANDARD1_0 || NETSTANDARD1_1
+        public static int LastOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
+#else
+        public static int LastOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = StringComparison.CurrentCulture)
+
+#endif
         {
             if (search.Length == 0)
             {
@@ -359,9 +380,6 @@ namespace System
 
             return index;
         }
-#endif
-
-#endif
 
     }
 }
