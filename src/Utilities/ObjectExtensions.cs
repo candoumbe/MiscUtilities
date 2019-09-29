@@ -7,6 +7,7 @@ using System.Reflection;
 using static Newtonsoft.Json.JsonConvert;
 using static Newtonsoft.Json.Formatting;
 using static Newtonsoft.Json.NullValueHandling;
+using Newtonsoft.Json.Converters;
 
 namespace System
 {
@@ -147,10 +148,19 @@ namespace System
         }
 
         /// <summary>
-        /// Converts <see cref="o"/> to its string representation
+        /// Converts <see cref="o"/> to its JSON representation
         /// </summary>
-        /// <param name="obj">The object to stringify</param>
+        /// <param name="obj">The object to jsonify</param>
         /// <returns></returns>
-        public static string Stringify(this object obj) => SerializeObject(obj, new JsonSerializerSettings { Formatting = Indented, NullValueHandling = Ignore, ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+        public static string Jsonify(this object obj) =>
+            SerializeObject(obj, new JsonSerializerSettings { Formatting = Indented, NullValueHandling = Ignore, ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Converters = new[] { new StringEnumConverter() } });
+
+        /// <summary>
+        /// Converts <see cref="o"/> to its JSON representation
+        /// </summary>
+        /// <param name="obj">The object to jsonify</param>
+        /// <returns></returns>
+        [Obsolete("Use Jsonify(object obj) instead")]
+        public static string Stringify(this object obj) => Jsonify(obj);
     }
 }

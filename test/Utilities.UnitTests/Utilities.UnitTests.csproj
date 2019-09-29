@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="../../core.props"/>
+  <Import Project="..\..\core.props"/>
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;netcoreapp2.1;netcoreapp3.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>

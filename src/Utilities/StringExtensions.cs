@@ -55,7 +55,7 @@ namespace System
         public static string ToCamelCase(this string input)
         {
             StringBuilder sbResult = null;
-            input = input ?? string.Empty;
+            input ??= string.Empty;
             string sanitizedInput
 #if !(NETSTANDARD1_0 || NETSTANDARD1_1)
              = new string(input
@@ -263,7 +263,6 @@ namespace System
         /// <returns></returns>
         public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
 
-
 #endif
         /// <summary>
         /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
@@ -304,7 +303,6 @@ namespace System
                 }
                 while (currentPos <= inputLength && index != -1);
             }
-
         }
 
         /// <summary>
