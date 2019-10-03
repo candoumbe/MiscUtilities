@@ -16,26 +16,24 @@ Deprecated Stringify extension method
 </PackageReleaseNotes>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
-    <PackageProjectUrl>https://github.com/candoumbe/Utilities</PackageProjectUrl>
+    <PackageProjectUrl>https://candoumbe.visualstudio.com/Utilities</PackageProjectUrl>
     <RepositoryUrl></RepositoryUrl>
   </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.Collections" Version="4.*" />
+    <PackageReference Include="System.Linq" Version="4.*" />
+    <PackageReference Include="System.Linq.Queryable" Version="4.*" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.*" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Concurrent" Version="4.*" />
+    <PackageReference Include="System.Linq.Parallel" Version="4.*" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.*" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.0.0-rc1.19456.10" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.*" />
   </ItemGroup>
 </Project>

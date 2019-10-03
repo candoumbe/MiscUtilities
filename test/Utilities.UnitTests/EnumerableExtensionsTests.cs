@@ -391,6 +391,36 @@ namespace Utilities.UnitTests
                 .ParamName.Should()
                 .NotBeNullOrWhiteSpace();
         }
+        
+        
+
+        [Fact]
+        public void ExactlyShouldThrowArgumentNullExceptionWhenCollectionIsNull()
+        {
+            // Act
+            IEnumerable<int> collection = null;
+
+            Action action = () => collection.Exactly(10);
+
+            // Assert
+            action.Should().Throw<ArgumentNullException>().Which
+                .ParamName.Should()
+                .NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public void ExactlyShouldThrowArgumentOutOfRangeCountIsNegative()
+        {
+            // Act
+            IEnumerable<int> collection = Enumerable.Empty<int>();
+
+            Action action = () => collection.Exactly(-10);
+
+            // Assert
+            action.Should().Throw<ArgumentOutOfRangeException>().Which
+                .ParamName.Should()
+                .NotBeNullOrWhiteSpace();
+        }
 
         [Theory]
         [InlineData(int.MinValue)]

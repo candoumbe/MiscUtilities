@@ -185,6 +185,32 @@ namespace System.Collections.Generic
                 ? !items.Any(predicate.Compile())
                 : items.Count(predicate.Compile()) == count;
         }
+        
+        /// <summary>
+        /// Tests if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements.
+        /// </summary>
+        /// <typeparam name="T">Type of the elements of</typeparam>
+        /// <param name="items">collection under test</param>
+        /// <param name="count">number of elements in <paramref name="items"/> that must match <paramref name="predicate"/> </param>
+        /// <returns><c>true</c> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements that match <paramref name="predicate"/> and <c>false</c> otherwise</returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="items"/> or <paramref name="predicate"/> are null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
+        public static bool Exactly<T>(this IEnumerable<T> items, int count)
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value");
+            }
+
+            return count == default
+                ? !items.Any()
+                : items.Count() == count;
+        }
 
         /// <summary>
         /// Tests if there are <paramref name="count"/> elements at most that match <paramref name="predicate"/>.
