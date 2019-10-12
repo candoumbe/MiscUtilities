@@ -192,10 +192,27 @@ namespace Utilities.UnitTests
         [InlineData("firstname", "firstname")]
         [InlineData("firstName", "first-name")]
         [InlineData("FirstName", "first-name")]
-        public void ToLowerKebabCase(string input, string expectedOutput)
+        [InlineData("first name", "first-name")]
+        [InlineData("first  name", "first-name")]
+        [InlineData(" first name", "first-name")]
+        [InlineData("first name ", "first-name")]
+        public void Slugify(string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
-            input.ToLowerKebabCase().Should().Be(expectedOutput);
+            input.Slugify().Should().Be(expectedOutput);
+        }
+
+        [Theory]
+        [InlineData("firstname", "firstname")]
+        [InlineData("firstName", "first_name")]
+        [InlineData("FirstName", "first_name")]
+        [InlineData("first_name", "first_name")]
+        [InlineData("first name", "first_name")]
+        [InlineData("first  name", "first_name")]
+        public void ToSnakeCase(string input, string expectedOutput)
+        {
+            _outputHelper.WriteLine($"input : '{input}'");
+            input.ToSnakeCase().Should().Be(expectedOutput);
         }
 
         [Fact]

@@ -213,7 +213,21 @@ namespace System
         /// "JusticeLeague".ToLowerKebabCase() // "justice-league"
         /// 
         /// </example>
-        public static string ToLowerKebabCase(this string input)
+        [Obsolete("Call string.Slugify() instead")]
+        public static string ToLowerKebabCase(this string input) => Slugify(input);
+
+        /// <summary>
+        /// Converts <see cref="input"/> to its lower kebab representation
+        /// 
+        /// </summary>
+        /// <param name="input">The string to transform</param>
+        /// <returns>The lower-kebab-cased string</returns>
+        /// <example>
+        /// 
+        /// "JusticeLeague".ToLowerKebabCase() // "justice-league"
+        /// 
+        /// </example>
+        public static string Slugify(this string input)
         {
             if (input == null)
             {
@@ -221,13 +235,92 @@ namespace System
             }
 
             StringBuilder sb = new StringBuilder(input.Length * 2);
-            foreach (char character in input)
+            input = input
+                .Trim()
+                .Replace("  ", " ");
+
+            for (int i = 0; i < input.Length; i++)
             {
-                if (char.IsUpper(character) && sb.Length > 0)
+                char character = input[i];
+
+                switch (character)
                 {
-                    sb.Append("-");
+                    case char c when char.IsWhiteSpace(c):
+                        if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
+                        {
+                            sb.Append("-");
+                        }
+                        break;
+                    case char c when char.IsUpper(c):
+                        if (i == 0)
+                        {
+                            sb.Append(char.ToLowerInvariant(c));
+                        }
+                        else if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
+                        {
+                            sb.Append("-");
+                            sb.Append(char.ToLowerInvariant(c));
+                        }
+                        break;
+                    default:
+                        sb.Append(char.ToLowerInvariant(character));
+                        break;
                 }
-                sb.Append(char.ToLower(character));
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Converts <see cref="input"/> to its snake_case equivalent
+        /// 
+        /// </summary>
+        /// <param name="input">The string to transform</param>
+        /// <returns>The snake-cased string</returns>
+        /// <example>
+        /// 
+        /// "JusticeLeague".ToSnakeCase() // "Justice_League"
+        /// 
+        /// </example>
+        public static string ToSnakeCase(this string input)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input), $"{nameof(input)} cannot be null");
+            }
+
+            StringBuilder sb = new StringBuilder(input.Length * 2);
+            input = input
+                .Trim()
+                .Replace("  ", " ");
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                char character = input[i];
+
+                switch (character)
+                {
+                    case char c when char.IsWhiteSpace(c):
+                        if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
+                        {
+                            sb.Append("_");
+                        }
+                        break;
+                    case char c when char.IsUpper(c):
+                        if (i == 0)
+                        {
+                            sb.Append(char.ToLowerInvariant(c));
+                        }
+                        else if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
+                        {
+                            sb.Append("_");
+                            sb.Append(char.ToLowerInvariant(c));
+                        }
+                        break;
+                    default:
+                        sb.Append(char.ToLowerInvariant(character));
+                        break;
+                }
             }
 
             return sb.ToString();
