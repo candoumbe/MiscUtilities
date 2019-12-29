@@ -2,7 +2,9 @@ variables :
     configuration: 'Release'
     Parameters.projects: '**/*.csproj'
     Parameters.projects.tests: '**/*Tests/*.csproj'
-    version: '1.0.0'
+    majorVersion: '1'
+    minorVersion: '0'
+    patchVersion: '0'
     projectName: 'Utilities'
     azureArtifactFeed: 'Utilities'
 
@@ -19,7 +21,7 @@ trigger:
   paths:
     exclude:
         - README.md
-        - docs/
+        - docs/*
 
 pool:
   name: Hosted VS2017
@@ -60,6 +62,9 @@ steps:
     command: pack
     nobuild: true
     versioningScheme: byPrereleaseNumber
+    majorVersion: '$(majorVersion)'
+    minorVersion: '$(minorVersion)'
+    patchVersion: '$(patchVersion)'
   condition: succeededOrFailed()
 
 - task: DotNetCoreCLI@2
