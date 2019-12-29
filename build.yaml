@@ -44,19 +44,10 @@ steps:
     version: 2.2.401
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
-  inputs:
-    command: restore
-    projects: '$(Parameters.projects)'
-    feedsToUse: config
-    nugetConfigPath: Nuget.config
-    verbosityRestore: Normal
-
-- task: DotNetCoreCLI@2
   displayName: 'dotnet build'
   inputs:
     projects: '$(Parameters.projects)'
-    arguments: '--no-restore -c $(configuration)'
+    arguments: '-c $(configuration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet test'
