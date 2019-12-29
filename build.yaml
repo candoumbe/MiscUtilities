@@ -4,7 +4,7 @@ variables :
     Parameters.projects.tests: '**/*Tests/*.csproj'
     version: '1.0.0'
     projectName: 'Utilities'
-    azureArtifactFeed: '/d192f2a9-5822-4570-b0d6-553bec034363'
+    azureArtifactFeed: 'Utilities'
 
 pr:
   - master
