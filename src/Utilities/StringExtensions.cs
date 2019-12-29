@@ -213,20 +213,6 @@ namespace System
         /// "JusticeLeague".ToLowerKebabCase() // "justice-league"
         /// 
         /// </example>
-        [Obsolete("Call string.Slugify() instead")]
-        public static string ToLowerKebabCase(this string input) => Slugify(input);
-
-        /// <summary>
-        /// Converts <see cref="input"/> to its lower kebab representation
-        /// 
-        /// </summary>
-        /// <param name="input">The string to transform</param>
-        /// <returns>The lower-kebab-cased string</returns>
-        /// <example>
-        /// 
-        /// "JusticeLeague".ToLowerKebabCase() // "justice-league"
-        /// 
-        /// </example>
         public static string Slugify(this string input)
         {
             if (input == null)

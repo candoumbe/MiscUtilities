@@ -162,18 +162,6 @@ namespace Utilities.UnitTests
             result.Should().Be(data.expectedResult);
         }
 
-        [Fact]
-        public void ToLowerKebabCase_Throws_ArgumentNullException()
-        {
-            // Act
-            Action act = () => StringExtensions.ToLowerKebabCase(null);
-
-            // Assert
-            act.Should().Throw<ArgumentNullException>().Which
-                .ParamName.Should()
-                .BeEquivalentTo("input");
-        }
-
         [Theory]
         [InlineData(null, "test")]
         [InlineData("test", null)]
@@ -293,7 +281,7 @@ namespace Utilities.UnitTests
                         && occurrences.Once(pos => pos == 0)
                         && occurrences.Once(pos  =>pos == 4)
                     ),
-                    "There is 2 occurrences of the search element in the string"
+                    "There are 2 occurrences of the search element in the string"
                 };
             }
         }
