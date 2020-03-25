@@ -700,79 +700,40 @@ namespace Utilities.UnitTests
                 .ThrowExactly<ArgumentOutOfRangeException>($"{nameof(EnumerableExtensions.AsAsyncEnumerable)} does not allow passing negative or null delay");
         }
 
-        public static IEnumerable<object[]> AsAsyncEnumerableReturnsFirstElementAfterMillisecondsDelayCases
+        public static IEnumerable<object[]> AsAsyncEnumerableRespectInputDataCases
         {
             get
             {
                 Faker faker = new Faker();
-                int casesCount = faker.Random.Number(min: 1, max: 10);
+                int casesCount = faker.Random.Number(min: 1, max: 20);
 
                 for (int i = 0; i < casesCount; i++)
                 {
-                    yield return new object[] { faker.Random.Number(min: 50, max: 1000) };
-                }
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(AsAsyncEnumerableReturnsFirstElementAfterMillisecondsDelayCases))]
-        public void AsAsyncEnumerable_Returns_First_Element_After_MillisecondsDelay(int millisecondsDelay)
-        {
-            // Arrange
-            int[] source = { 10 };
-
-            // Act
-            Func<Task> asAsyncEnumerable = async () =>
-            {
-                await foreach (int item in source.AsAsyncEnumerable(millisecondsDelay))
-                { }
-            };
-
-            asAsyncEnumerable.ExecutionTime().Should()
-                .BeGreaterOrEqualTo(millisecondsDelay.Milliseconds());
-        }
-
-        public static IEnumerable<object[]> AsAsyncEnumerableReturnsLastElementAfterMillisecondsDelayCases
-        {
-            get
-            {
-                Faker faker = new Faker();
-                int casesCount = faker.Random.Number(min: 1, max: 10);
-                int count = faker.Random.Number(min: 3, max: 12);
-
-                yield return new object[]
-                {
-                    2,
-                    faker.Random.Number(min: 10, max: 100)
-                };
-
-                for (int i = 0; i < casesCount; i++)
-                {
-                    yield return new object[] {
-                        count,
-                        faker.Random.Number(min: 50, max: 1000)
+                    int elementCount = faker.Random.Number(min: 10, max: 30);
+                    int[] inputs = faker.Random.Digits(elementCount);
+                    yield return new object[]
+                    {
+                        inputs
                     };
                 }
             }
         }
-
         [Theory]
-        [MemberData(nameof(AsAsyncEnumerableReturnsLastElementAfterMillisecondsDelayCases))]
-        public void AsAsyncEnumerable_Returns_Last_Element_After_MillisecondsDelay(int elementCount, int millisecondsDelay)
+        [MemberData(nameof(AsAsyncEnumerableRespectInputDataCases))]
+        public async Task AsAsyncEnumerableRespectInputData(int[] inputs)
         {
             // Arrange
-            Faker faker = new Faker();
-            int[] source = faker.Random.Digits(elementCount);
+            IList<int> output = new List<int>(inputs.Count());
 
             // Act
-            Func<Task> asAsyncEnumerable = async () =>
+            await foreach (int element in inputs.AsAsyncEnumerable())
             {
-                await foreach (int item in source.AsAsyncEnumerable(millisecondsDelay))
-                {}
-            };
+                output.Add(element);
+            }
 
-            asAsyncEnumerable.ExecutionTime().Should()
-                             .BeGreaterOrEqualTo((millisecondsDelay * elementCount).Milliseconds(),"Getting the last element of the enumeration should take");
+            // Assert
+            output.Should()
+                .BeEquivalentTo(inputs);
         }
 #endif
     }

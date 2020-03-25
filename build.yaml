@@ -54,7 +54,14 @@ steps:
   inputs:
     command: test
     projects: '$(Parameters.projects.tests)'
-    arguments: '--no-build -c $(configuration)'
+    arguments: '--no-build -c $(configuration) --logger trx --collect "Code coverage"'
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
 - task: nkdagility.gittasks.gitsync-task.gitsync@1
   displayName: 'Git Publish to https://$(github.apiKey)@github.com/candoumbe/$(projectName).git'
   inputs:
