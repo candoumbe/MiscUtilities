@@ -4,15 +4,14 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
-    <Version>2.0.0.0</Version>
+    <Version>2.0.1.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company />
     <Product />
     <RepositoryType>git</RepositoryType>
     <PackageTags>collections; string; utilities</PackageTags>
-    <PackageReleaseNotes>Breaking changes !!!
-Removed deprecated Stringify, ToLowerKebabCase extension methods</PackageReleaseNotes>
-    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <PackageReleaseNotes>Adds extension method to turn a IEnumerable&lt;T&gt; to an IAsyncEnumerable&lt;T&gt; (netstandard 2.1 support)</PackageReleaseNotes>
+    <AssemblyVersion>2.0.1.0</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <PackageProjectUrl>https://github.com/candoumbe/Utilities</PackageProjectUrl>
     <RepositoryUrl>https://github.com/candoumbe/Utilities</RepositoryUrl>

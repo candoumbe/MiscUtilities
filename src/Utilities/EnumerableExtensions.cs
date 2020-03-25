@@ -19,7 +19,7 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentNullException">if <paramref name="groups"/> is <c>null</c>.</exception>
         public static IDictionary<TKey, IEnumerable<TElement>> ToDictionary<TKey, TElement>(this IEnumerable<IGrouping<TKey, TElement>> groups)
         {
-            if (groups == null)
+            if (groups is null)
             {
                 throw new ArgumentNullException(nameof(groups));
             }
@@ -44,12 +44,12 @@ namespace System.Collections.Generic
         /// <returns><c>true</c> if <paramref name="items"/> does not contain exactly any element that fullfills <paramref name="predicate"/> and <c>false</c> otherwise.</returns>
         public static bool None<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
-            if (items == null)
+            if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            if (predicate == null)
+            if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
@@ -66,12 +66,12 @@ namespace System.Collections.Generic
         /// <returns><c>true</c> if <paramref name="items"/> contains exactly one element that fullfills <paramref name="predicate"/></returns>
         public static bool Once<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
-            if (items == null)
+            if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            if (predicate == null)
+            if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
@@ -88,12 +88,12 @@ namespace System.Collections.Generic
         /// <returns><c>true</c> if <paramref name="items"/> contains one or more one element that fullfills <paramref name="predicate"/></returns>
         public static bool AtLeastOnce<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
-            if (items == null)
+            if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            if (predicate == null)
+            if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
@@ -134,12 +134,12 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtLeast<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
         {
-            if (items == null)
+            if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            if (predicate == null)
+            if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
@@ -166,12 +166,12 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
         {
-            if (items == null)
+            if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            if (predicate == null)
+            if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
@@ -185,7 +185,7 @@ namespace System.Collections.Generic
                 ? !items.Any(predicate.Compile())
                 : items.Count(predicate.Compile()) == count;
         }
-        
+
         /// <summary>
         /// Tests if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements.
         /// </summary>
@@ -197,7 +197,7 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, int count)
         {
-            if (items == null)
+            if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
@@ -224,12 +224,12 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtMost<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
         {
-            if (items == null)
+            if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            if (predicate == null)
+            if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
@@ -396,5 +396,42 @@ namespace System.Collections.Generic
         }
 #endif
 
+#if NETSTANDARD2_1
+        /// <summary>
+        /// Converts a <see cref="IEnumerable{T}"/> to its <see cref="IAsyncEnumerable{T}"/> counterpart.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">
+        /// The collection to convert.
+        /// </param>
+        /// <param name="millisecondsDelay">
+        /// Delay between each iteration of <paramref name="source"/>.
+        /// The first element of source will be available after at least <paramref name="millisecondsDelay"/> milliseconds,
+        /// and then each one after <paramref name="millisecondsDelay"/> milliseconds.
+        /// </param>
+        /// <returns>
+        /// <see cref="IAsyncEnumerable{T}"/>
+        /// </returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="millisecondsDelay"/> is less than <c>0</c>.</exception>
+        public static async IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IEnumerable<T> source, int millisecondsDelay = 1)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (millisecondsDelay < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(millisecondsDelay), millisecondsDelay, "cannot be negative");
+            }
+
+            foreach (var item in source)
+            {
+                await Task.Delay(millisecondsDelay).ConfigureAwait(false);
+                yield return item;
+            }
+        }
+#endif
     }
 }
