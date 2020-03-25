@@ -55,25 +55,6 @@ steps:
     command: test
     projects: '$(Parameters.projects.tests)'
     arguments: '--no-build -c $(configuration)'
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet pack'
-  inputs:
-    command: pack
-    nobuild: true
-    versioningScheme: byPrereleaseNumber
-    majorVersion: '$(majorVersion)'
-    minorVersion: '$(minorVersion)'
-    patchVersion: '$(patchVersion)'
-  condition: succeededOrFailed()
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet push'
-  inputs:
-    command: push
-    publishVstsFeed: '$(azureArtifactFeed)'
-  enabled: true
-
 - task: nkdagility.gittasks.gitsync-task.gitsync@1
   displayName: 'Git Publish to https://$(github.apiKey)@github.com/candoumbe/$(projectName).git'
   inputs:
