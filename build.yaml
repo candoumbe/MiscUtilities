@@ -59,8 +59,9 @@ steps:
 - task: PublishTestResults@2
   displayName: 'Publish test results'
   inputs:
-    testRunner: VSTest
+    testRunner: xUnit
     testResultsFiles: '**/*.trx'
+    buildConfiguration: $(configuration)
 
 - task: nkdagility.gittasks.gitsync-task.gitsync@1
   displayName: 'Git Publish to https://$(github.apiKey)@github.com/candoumbe/$(projectName).git'
