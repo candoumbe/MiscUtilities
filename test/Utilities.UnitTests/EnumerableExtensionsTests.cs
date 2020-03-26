@@ -642,20 +642,11 @@ namespace Utilities.UnitTests
         [Fact]
         public void AsAsyncEnumerable_Throws_ArgumentNullException_When_Source_Is_Null()
         {
-            // Arrange
-            IEnumerable<int> source = null;
-
             // Act
-            Func<Task> asAsyncEnumerable = async () =>
-            {
-                await foreach (int item in source.AsAsyncEnumerable())
-                {
-
-                }
-            };
+            Action asAsyncEnumerableWithNullSource = () => EnumerableExtensions.AsAsyncEnumerable<int>(null);
 
             // Assert
-            asAsyncEnumerable.Should()
+            asAsyncEnumerableWithNullSource.Should()
                 .ThrowExactly<ArgumentNullException>($"{nameof(EnumerableExtensions.AsAsyncEnumerable)} does not allow to pass null");
         }
 
@@ -689,14 +680,10 @@ namespace Utilities.UnitTests
             _outputHelper.WriteLine($"Collection : {source.Jsonify()}");
 
             // Act
-            Func<Task> asAsyncEnumerable = async () =>
-            {
-                await foreach (int item in source.AsAsyncEnumerable(millisecondsDelay))
-                { }
-            };
+            Action asAsyncEnumerableWithInvalidDelay = () => source.AsAsyncEnumerable(millisecondsDelay);
 
             // Assert
-            asAsyncEnumerable.Should()
+            asAsyncEnumerableWithInvalidDelay.Should()
                 .ThrowExactly<ArgumentOutOfRangeException>($"{nameof(EnumerableExtensions.AsAsyncEnumerable)} does not allow passing negative or null delay");
         }
 
@@ -723,7 +710,7 @@ namespace Utilities.UnitTests
         public async Task AsAsyncEnumerableRespectInputData(int[] inputs)
         {
             // Arrange
-            IList<int> output = new List<int>(inputs.Count());
+            IList<int> output = new List<int>(inputs.Length);
 
             // Act
             await foreach (int element in inputs.AsAsyncEnumerable())

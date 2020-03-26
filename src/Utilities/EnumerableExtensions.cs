@@ -414,7 +414,7 @@ namespace System.Collections.Generic
         /// </returns>
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="millisecondsDelay"/> is less than <c>0</c>.</exception>
-        public static async IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IEnumerable<T> source, int millisecondsDelay = 1)
+        public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IEnumerable<T> source, int millisecondsDelay = 1)
         {
             if (source is null)
             {
@@ -426,11 +426,17 @@ namespace System.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(millisecondsDelay), millisecondsDelay, "cannot be negative");
             }
 
-            foreach (var item in source)
+            async IAsyncEnumerable<T> AsAsyncEnumerableIterator()
             {
-                await Task.Delay(millisecondsDelay).ConfigureAwait(false);
-                yield return item;
+                foreach (var item in source)
+                {
+                    await Task.Delay(millisecondsDelay).ConfigureAwait(false);
+                    yield return item;
+                }
             }
+
+            return AsAsyncEnumerableIterator();
+
         }
 #endif
     }
