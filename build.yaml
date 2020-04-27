@@ -10,14 +10,17 @@ variables :
 
 pr:
   - master
+  - release
 
 trigger:
   batch: true
   branches:
     include:
         - master
-        - features/*
-        - fixes/*
+        - feature/*
+        - fix/*
+        - hotfix/*
+        - release/*
   paths:
     exclude:
         - README.md
