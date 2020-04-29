@@ -38,12 +38,15 @@ namespace System.Collections.Generic
         /// <summary>
         /// Converts a dictionary to a "URL" friendly representation
         /// </summary>
-        /// <param name="dictionary">the dictionary to convert</param>
+        /// <param name="keyValues">the dictionary to convert</param>
         /// <returns></returns>
-        public static string ToQueryString(this IDictionary<string, object> dictionary)
+        public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (KeyValuePair<string, object> kv in dictionary.Where(kv => kv.Value != null))
+            IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues.Where(kv => kv.Value != null)
+                                                                                .OrderBy(kv => kv.Key)
+                                                                                .ThenBy(kv => kv.Value);
+            foreach (KeyValuePair<string, object> kv in localKeyValues)
             {
                 object value = kv.Value;
                 Type valueType = value.GetType();
