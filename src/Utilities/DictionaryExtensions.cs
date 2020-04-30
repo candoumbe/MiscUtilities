@@ -46,9 +46,16 @@ namespace System.Collections.Generic
             IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues.Where(kv => kv.Value != null)
                                                                                 .OrderBy(kv => kv.Key)
                                                                                 .ThenBy(kv => kv.Value);
+#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD2_0
             foreach (KeyValuePair<string, object> kv in localKeyValues)
+#else
+            foreach ((string key, object value) in localKeyValues)
+#endif
             {
+#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD2_0
                 object value = kv.Value;
+                string key = kv.Key;
+#endif
                 Type valueType = value.GetType();
                 TypeInfo valueTypeInfo = valueType.GetTypeInfo();
                 //The type of the value is a "simple" object
@@ -60,7 +67,7 @@ namespace System.Collections.Generic
                     }
 
                     sb
-                        .Append(Uri.EscapeDataString(kv.Key))
+                        .Append(Uri.EscapeDataString(key))
                         .Append("=");
 
                     // DateTime/DateTimeOffset should be encoded in ISO format
@@ -73,17 +80,17 @@ namespace System.Collections.Generic
                             sb.Append(date.ToString("s"));
                             break;
                         default:
-                            sb.Append(Uri.EscapeDataString(kv.Value.ToString()));
+                            sb.Append(Uri.EscapeDataString(value.ToString()));
                             break;
                     }
                 }
-                else if (value is IDictionary<string, object> subDictionary)
+                else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
                 {
                     subDictionary =  subDictionary
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3
                                     .AsParallel()
 #endif
-                                    .ToDictionary(x => $"{kv.Key}[{x.Key}]", x => x.Value);
+                                    .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
 
                     if (sb.Length > 0)
                     {
@@ -93,7 +100,7 @@ namespace System.Collections.Generic
                 }
                 else if (valueTypeInfo.BaseType == typeof(IEnumerable))
                 {
-                    IEnumerable enumerable = kv.Value as IEnumerable;
+                    IEnumerable enumerable = value as IEnumerable;
                     int itemPosition = 0;
                     Type elementType;
                     TypeInfo elementTypeInfo;
@@ -109,9 +116,9 @@ namespace System.Collections.Generic
                                 {
                                     sb.Append("&");
                                 }
-                                sb.Append(Uri.EscapeDataString($"{kv.Key}[{itemPosition}]"))
+                                sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
                                    .Append("=")
-                                   .Append(Uri.EscapeDataString(kv.Value.ToString()));
+                                   .Append(Uri.EscapeDataString(value.ToString()));
 
                                 itemPosition++;
                             }

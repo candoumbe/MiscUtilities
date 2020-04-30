@@ -14,7 +14,6 @@ using static System.StringSplitOptions;
 
 namespace Utilities.UnitTests
 {
-    
     /// <summary>
     /// unit tests for <see cref="DictionaryExtensions"/> methods.
     /// </summary>
@@ -43,7 +42,7 @@ namespace Utilities.UnitTests
 
                 yield return new object[]
                 {
-                    new Dictionary<string, object>{},
+                    new Dictionary<string, object>(),
                     (Expression<Func<string, bool>>)(x => x == string.Empty),
                 };
                 yield return new object[]
@@ -57,9 +56,9 @@ namespace Utilities.UnitTests
 
                 yield return new object[]
                 {
-                    new Dictionary<string, object>
+                    new []
                     {
-                        ["limit"] = null
+                        new KeyValuePair<string, object>("limit", null)
                     },
                     (Expression<Func<string, bool>>)(x => x == string.Empty)
                 };
@@ -130,18 +129,19 @@ namespace Utilities.UnitTests
 
                 yield return new object[]
                 {
-                    new Dictionary<string, object>{
-                        ["search"] = new Dictionary<string, object>
+                    new[]
+                    {
+                        new KeyValuePair<string, object>("search", new []
                         {
-                            ["page"] = 1,
-                            ["pageSize"] = 3,
-                            ["filter"] = new Dictionary<string, object>
+                            new KeyValuePair<string, object>("page", 1),
+                            new KeyValuePair<string, object>("pageSize", 3),
+                            new KeyValuePair<string, object>("filter", new []
                             {
-                                ["field"] = "firstname",
-                                ["op"] = "EqualTo",
-                                ["value"] = "Bruce"
-                            }
-                        },
+                                new KeyValuePair<string, object>("field", "firstname"),
+                                new KeyValuePair<string, object>("op", "EqualTo"),
+                                new KeyValuePair<string, object>("value", "Bruce"),
+                            })
+                        })
                     },
                     (Expression<Func<string, bool>>)( queryString =>
                         queryString != null
@@ -176,5 +176,4 @@ namespace Utilities.UnitTests
                         .Match(expectedString);
         }
     }
-    
 }
