@@ -191,7 +191,6 @@ namespace Utilities.UnitTests
                         && ((IDictionary<string, object>) x["Filter"]).ContainsKey("value")
                         && Equals(((IDictionary<string, object>) x["Filter"])["value"], "Bruce")
                     )
-
                 };
 
                 {

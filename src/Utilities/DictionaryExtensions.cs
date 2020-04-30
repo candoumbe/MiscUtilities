@@ -23,7 +23,6 @@ namespace System.Collections.Generic
             typeof(DateTimeOffset), typeof(DateTimeOffset?),
             typeof(Guid), typeof(Guid?),
             typeof(bool), typeof(bool?)
-
         };
 
         public static IEnumerable<Type> NumericTypes = new[]
