@@ -14,18 +14,16 @@ namespace Utilities.UnitTests
     /// Extensions methods for <see cref="object"/> type.
     /// </summary>
     [UnitTest]
-    [Feature("Object")]
-    public class ObjectExtensionsTests : IDisposable
+    [Feature(nameof(ObjectExtensions))]
+    public class ObjectExtensionsTests
     {
-        private ITestOutputHelper _outputHelper;
+        private readonly ITestOutputHelper _outputHelper;
 
         /// <summary>
         /// Builds a new <see cref="ObjectExtensionsTests"/> instance.
         /// </summary
         /// <param name="outputHelper"></param>
         public ObjectExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
-
-        public void Dispose() => _outputHelper = null;
 
         public static IEnumerable<object[]> ToQueryStringCases
         {
@@ -193,7 +191,6 @@ namespace Utilities.UnitTests
                         && ((IDictionary<string, object>) x["Filter"]).ContainsKey("value")
                         && Equals(((IDictionary<string, object>) x["Filter"])["value"], "Bruce")
                     )
-
                 };
 
                 {
