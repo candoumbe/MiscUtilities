@@ -410,8 +410,6 @@ namespace Utilities.UnitTests
                 .NotBeNullOrWhiteSpace();
         }
 
-
-
         [Fact]
         public void ExactlyShouldThrowArgumentNullExceptionWhenCollectionIsNull()
         {
@@ -684,7 +682,6 @@ namespace Utilities.UnitTests
             }
         }
 
-
         [Theory]
         [MemberData(nameof(AsAsyncEnumerableIncorrectMillisecondsDelayCases))]
         public void AsAsyncEnumerable_Throws_ArgumentOutOfRangeException_When_MillisecondsDelay_Is_Negative(int millisecondsDelay)
@@ -721,6 +718,7 @@ namespace Utilities.UnitTests
                 }
             }
         }
+
         [Theory]
         [MemberData(nameof(AsAsyncEnumerableRespectInputDataCases))]
         public async Task AsAsyncEnumerableRespectInputData(int[] inputs)

@@ -436,7 +436,6 @@ namespace System.Collections.Generic
             }
 
             return AsAsyncEnumerableIterator();
-
         }
 #endif
     }
