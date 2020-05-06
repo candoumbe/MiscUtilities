@@ -120,23 +120,23 @@ namespace System.Collections.Generic
         public static bool AtLeast<T>(this IEnumerable<T> items, int count) => AtLeast(items, True<T>(), count);
 
         /// <summary>
-        /// Tests if <paramref name="items"/> contains at least <paramref name="count"/> elements that match <paramref name="predicate"/>
+        /// Tests if <paramref name="source"/> contains at least <paramref name="count"/> elements that match <paramref name="predicate"/>
         /// </summary>
         /// <remarks>
         /// 
         /// </remarks>
         /// <typeparam name="T">Type of elements</typeparam>
-        /// <param name="items">the collection to test</param>
+        /// <param name="source">the collection to test</param>
         /// <param name="predicate">the predicate</param>
         /// <param name="count">the number of occurrence</param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains <paramref name="count"/> elements or more that match <paramref name="predicate"/></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="items"/> or <paramref name="predicate"/> are null</exception>
+        /// <returns><c>true</c> if <paramref name="source"/> contains <paramref name="count"/> elements or more that match <paramref name="predicate"/></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="predicate"/> are null</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
-        public static bool AtLeast<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
+        public static bool AtLeast<T>(this IEnumerable<T> source, Expression<Func<T, bool>> predicate, int count)
         {
-            if (items is null)
+            if (source is null)
             {
-                throw new ArgumentNullException(nameof(items));
+                throw new ArgumentNullException(nameof(source));
             }
 
             if (predicate is null)
@@ -150,8 +150,8 @@ namespace System.Collections.Generic
             }
 
             return count == 0
-                ? items != null
-                : items.Where(predicate.Compile()).Skip(count).Any();
+                ? source != null
+                : source.Where(predicate.Compile()).Skip(count - 1).Any();
         }
 
         /// <summary>

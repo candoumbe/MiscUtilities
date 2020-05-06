@@ -146,7 +146,7 @@ namespace Utilities.UnitTests
         }
 
         [Fact]
-        public void AtLeast_With_Predicate()
+        public void AtLeast_with_predicate()
         {
             // Arrange
             IEnumerable<int> source = Enumerable.Empty<int>();
@@ -156,7 +156,7 @@ namespace Utilities.UnitTests
         }
 
         [Fact]
-        public void AtLeast_WithNo_Predicate()
+        public void AtLeast_without_predicate()
         {
             // Arrange
             IEnumerable<int> source = Enumerable.Empty<int>();
@@ -178,8 +178,11 @@ namespace Utilities.UnitTests
 
         [Theory]
         [MemberData(nameof(AtLeastOnceWithPredicateThrowsArgumentNullExceptionCases))]
-        public void AtLeastOnceWithPredicateShouldThrowsArgumentNullException(IEnumerable<int> source, Expression<Func<int, bool>> predicate)
+        public void AtLeastOnce_With_Predicate_Should_Throws_ArgumentNullException(IEnumerable<int> source, Expression<Func<int, bool>> predicate)
         {
+            _outputHelper.WriteLine($"source is null : {source is null}");
+            _outputHelper.WriteLine($"predicate is null : {predicate is null}");
+
             // Act
             Action action = () => source.AtLeastOnce(predicate);
 
@@ -223,6 +226,13 @@ namespace Utilities.UnitTests
                     (Expression<Func<int, bool>>) (x => x ==3),
                     true
                 };
+
+                yield return new object[]
+                {
+                    new [] {1},
+                    (Expression<Func<int, bool>>)(x => x == 1),
+                    true
+                };
             }
         }
 
@@ -262,6 +272,12 @@ namespace Utilities.UnitTests
                 yield return new object[]
                 {
                     new []{ 1, 3 },
+                    true
+                };
+
+                yield return new object[]
+                {
+                    new [] {1},
                     true
                 };
             }
