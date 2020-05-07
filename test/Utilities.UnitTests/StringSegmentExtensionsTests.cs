@@ -6,9 +6,11 @@ using System.Linq.Expressions;
 using Xunit;
 using Xunit.Abstractions;
 using FluentAssertions;
+using Xunit.Categories;
 
 namespace Utilities.UnitTests
 {
+    [UnitTest]
     public class StringSegmentExtensionsTests
     {
         private readonly ITestOutputHelper _outputHelper;
@@ -25,7 +27,7 @@ namespace Utilities.UnitTests
                 yield return new object[]
                 {
                     "Firstname",
-                    'z',
+                    "z",
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && !occurrences.Any()),
                     "There's no occurrence of the search element in the string"
                 };
@@ -33,7 +35,7 @@ namespace Utilities.UnitTests
                 yield return new object[]
                 {
                     string.Empty,
-                    'z',
+                    "z",
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && !occurrences.Any()),
                     "The source element is empty"
                 };
@@ -41,9 +43,10 @@ namespace Utilities.UnitTests
                 yield return new object[]
                 {
                     "Firstname",
-                    'F',
+                    "F",
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
-                        occurrences != null && occurrences.Once()
+                        occurrences != null
+                        && occurrences.Exactly(1)
                         && occurrences.Once(pos  => pos == 0)
                     ),
                     "There is one occurrence of the search element in the string"
@@ -52,9 +55,10 @@ namespace Utilities.UnitTests
                 yield return new object[]
                 {
                     "zsasz",
-                    'z',
+                    "z",
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
-                        occurrences != null && occurrences.Exactly(2)
+                        occurrences != null
+                        && occurrences.Exactly(2)
                         && occurrences.Once(pos => pos == 0)
                         && occurrences.Once(pos  =>pos == 4)
                     ),
@@ -65,7 +69,7 @@ namespace Utilities.UnitTests
 
         [Theory]
         [MemberData(nameof(OccurrencesCases))]
-        public void Occurrences(StringSegment source, char search, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
+        public void Occurrences(StringSegment source, StringSegment search, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
         {
             _outputHelper.WriteLine($"Source : '{source.Value}'");
             _outputHelper.WriteLine($"Search : '{search}'");
@@ -78,6 +82,60 @@ namespace Utilities.UnitTests
             // Assert
             occurrences.Should()
                 .Match(expectation, reason);
+        }
+
+        public static IEnumerable<object[]> LastOccurrenceCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    "Firstname",
+                    "z",
+                    -1,
+                    StringComparison.OrdinalIgnoreCase,
+                    "There's no occurrence of the search element in the string"
+                };
+
+                yield return new object[]
+                {
+                    string.Empty,
+                    "z",
+                    -1,
+                    StringComparison.OrdinalIgnoreCase,
+                    "The source element is empty"
+                };
+
+                yield return new object[]
+                {
+                    "Firstname",
+                    "F",
+                    StringComparison.OrdinalIgnoreCase,
+                    0,
+                    "There is one occurrence of the search element in the string"
+                };
+
+                yield return new object[]
+                {
+                    "zsasz",
+                    "z",
+                    StringComparison.OrdinalIgnoreCase,
+                    4,
+                    "There is 2 occurrences of the search element in the string"
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(LastOccurrenceCases))]
+        public void LastOccurrence(StringSegment source, StringSegment search, StringComparison stringComparison, int expectation, string reason)
+        {
+            // Act
+            int actual = source.LastOccurrence(search, stringComparison);
+
+            // Assert
+            actual.Should()
+                  .Be(expectation, reason);
         }
     }
 }

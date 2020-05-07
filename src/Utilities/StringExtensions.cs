@@ -129,33 +129,6 @@ namespace System
         }
 
 #if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-        /// <summary>
-        /// Perfoms a VB "Like" comparison
-        /// </summary>
-        /// <param name="input">the <see cref="StringSegment"/> to test</param>
-        /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <param name="ignoreCase"><c>true</c> to ignore case</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
-        public static bool Like(this StringSegment input, string pattern, bool ignoreCase) => Like(input.Value, pattern, ignoreCase);
-
-        /// <summary>
-        /// Perfoms a VB "Like" comparison
-        /// </summary>
-        /// <param name="input">the <see cref="StringSegment"/> to test</param>
-        /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
-        public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
-
-        /// <summary>
-        /// Converts <paramref name="source"/> to its <see cref="LambdaExpression"/> equivalent
-        /// </summary>
-        /// <typeparam name="TSource"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
-        public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
 #endif
 
         /// <summary>
