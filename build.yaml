@@ -13,7 +13,6 @@ pr:
   - release
 
 trigger:
-  batch: true
   branches:
     include:
         - master
