@@ -7,6 +7,7 @@ using Xunit;
 using Xunit.Abstractions;
 using FluentAssertions;
 using Xunit.Categories;
+using Bogus;
 
 namespace Utilities.UnitTests
 {
@@ -141,8 +142,11 @@ namespace Utilities.UnitTests
         [Fact]
         public void LastOccurence_throws_ArgumentException_is_search_is_empty()
         {
+            // Arrange
+            Faker faker = new Faker();
+
             // Act
-            Action lastOccurrenceWithSearchEmpty = () => new StringSegment("Random").LastOccurrence(StringSegment.Empty);
+            Action lastOccurrenceWithSearchEmpty = () => new StringSegment(faker.Lorem.Word()).LastOccurrence(StringSegment.Empty);
 
             // Assert
             lastOccurrenceWithSearchEmpty.Should()
