@@ -26,24 +26,24 @@ namespace Utilities.UnitTests
             {
                 yield return new object[]
                 {
-                    "Firstname",
-                    "z",
+                    new StringSegment("Firstname"),
+                    new StringSegment("z"),
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && !occurrences.Any()),
                     "There's no occurrence of the search element in the string"
                 };
 
                 yield return new object[]
                 {
-                    string.Empty,
-                    "z",
+                    StringSegment.Empty,
+                    new StringSegment("z"),
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && !occurrences.Any()),
                     "The source element is empty"
                 };
 
                 yield return new object[]
                 {
-                    "Firstname",
-                    "F",
+                    new StringSegment("Firstname"),
+                    new StringSegment("F"),
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
                         occurrences != null
                         && occurrences.Exactly(1)
@@ -54,8 +54,8 @@ namespace Utilities.UnitTests
 
                 yield return new object[]
                 {
-                    "zsasz",
-                    "z",
+                    new StringSegment("zsasz"),
+                    new StringSegment("z"),
                     (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
                         occurrences != null
                         && occurrences.Exactly(2)
@@ -81,7 +81,7 @@ namespace Utilities.UnitTests
 
             // Assert
             occurrences.Should()
-                .Match(expectation, reason);
+                       .Match(expectation, reason);
         }
 
         public static IEnumerable<object[]> LastOccurrenceCases
@@ -90,26 +90,26 @@ namespace Utilities.UnitTests
             {
                 yield return new object[]
                 {
-                    "Firstname",
-                    "z",
-                    -1,
+                    new StringSegment("Firstname"),
+                    new StringSegment("z"),
                     StringComparison.OrdinalIgnoreCase,
+                    -1,
                     "There's no occurrence of the search element in the string"
                 };
 
                 yield return new object[]
                 {
-                    string.Empty,
-                    "z",
-                    -1,
+                    StringSegment.Empty,
+                    new StringSegment("z"),
                     StringComparison.OrdinalIgnoreCase,
+                    -1,
                     "The source element is empty"
                 };
 
                 yield return new object[]
                 {
-                    "Firstname",
-                    "F",
+                    new StringSegment("Firstname"),
+                    new StringSegment("F"),
                     StringComparison.OrdinalIgnoreCase,
                     0,
                     "There is one occurrence of the search element in the string"
@@ -117,8 +117,8 @@ namespace Utilities.UnitTests
 
                 yield return new object[]
                 {
-                    "zsasz",
-                    "z",
+                    new StringSegment("zsasz"),
+                    new StringSegment("z"),
                     StringComparison.OrdinalIgnoreCase,
                     4,
                     "There is 2 occurrences of the search element in the string"
@@ -136,6 +136,17 @@ namespace Utilities.UnitTests
             // Assert
             actual.Should()
                   .Be(expectation, reason);
+        }
+
+        [Fact]
+        public void LastOccurence_throws_ArgumentException_is_search_is_empty()
+        {
+            // Act
+            Action lastOccurrenceWithSearchEmpty = () => new StringSegment("Random").LastOccurrence(StringSegment.Empty);
+
+            // Assert
+            lastOccurrenceWithSearchEmpty.Should()
+                                         .Throw<ArgumentException>();
         }
     }
 }

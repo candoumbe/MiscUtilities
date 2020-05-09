@@ -72,19 +72,24 @@ namespace Microsoft.Extensions.Primitives
         /// the index where <paramref name="search"/> 
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref="source"> or <paramref name="search"/> is <c>null</c></exception>
-        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
+        /// <exception cref="ArgumentException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int LastOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = default)
         {
+            if (StringSegment.IsNullOrEmpty(search))
+            {
+                throw new ArgumentException(nameof(search));
+            }
+
             int index =-1,
                 offset = 0,
-                currentPos = source.Length - search.Length;
+                currentPos = source.LastIndexOf(search[0]);
 
             bool found = false;
 
-            while(!found && currentPos > 0)
+            while(!found && currentPos >= 0)
             {
-                found = source.Subsegment(currentPos).Equals(search, stringComparison);
+                StringSegment subSegment = source.Subsegment(currentPos, search.Length);
+                found = subSegment.Equals(search, stringComparison);
                 if (found)
                 {
                     index = currentPos;
