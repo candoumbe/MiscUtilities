@@ -9,14 +9,11 @@ variables :
     azureArtifactFeed: 'Utilities'
 
 pr:
-  autoCancel: true
-  branches:
-    include:
-      - master
-      - release
+  - master
+  - release
 
 trigger:
-  batch: false
+  batch: true
   branches:
     include:
         - master
@@ -30,11 +27,25 @@ trigger:
         - docs/*
 
 pool:
-  vmImage: windows-latest
+  name: Hosted VS2017
 #Your build pipeline references an undefined variable named ‘Parameters.projects’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
 #Your build pipeline references a secret variable named ‘github.apiKey’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
 
 steps:
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk 3.x'
+  inputs:
+    version: 3.x
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk 3.0.100'
+  inputs:
+    version: 3.0.100
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk 2.2.401'
+  inputs:
+    version: 2.2.401
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build'
   inputs:
@@ -63,3 +74,10 @@ steps:
   inputs:
     codeCoverageTool: Cobertura
     summaryFileLocation: $(Build.SourcesDirectory)\coverlet\reports\Cobertura.xml  
+
+
+- task: nkdagility.gittasks.gitsync-task.gitsync@1
+  displayName: 'Git Publish to https://$(github.apiKey)@github.com/candoumbe/$(projectName).git'
+  inputs:
+    GitRepoUrl: 'https://$(github.apiKey)@github.com/candoumbe/$(projectName).git'
+  condition: succeededOrFailed()
