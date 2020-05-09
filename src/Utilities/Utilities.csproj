@@ -13,8 +13,8 @@
     <PackageReleaseNotes>Adds extension method to turn a IEnumerable&lt;T&gt; to an IAsyncEnumerable&lt;T&gt; (netstandard 2.1 support)</PackageReleaseNotes>
     <AssemblyVersion>2.0.1.0</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
-    <PackageProjectUrl>https://github.com/candoumbe/Utilities</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/candoumbe/Utilities</RepositoryUrl>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://dev.azure.com/candoumbe/Utilities</RepositoryUrl>
   </PropertyGroup>
   
   <ItemGroup>
