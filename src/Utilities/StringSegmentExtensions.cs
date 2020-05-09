@@ -130,12 +130,13 @@ namespace Microsoft.Extensions.Primitives
                 {
                     index = input.IndexOf(search[0], currentPos);
 
-                    if (index != -1 && input.Subsegment(index, search.Length).Equals(stringComparison))
+                    if (index != -1 && input.Subsegment(index, search.Length).Equals(search, stringComparison))
                     {
                         yield return index;
-                        newPos = index + search.Length;
-                        currentPos = newPos + 1;
                     }
+
+                    newPos = index + search.Length;
+                    currentPos = newPos + 1;
                 }
                 while (currentPos <= inputLength && index != -1);
             }
