@@ -182,11 +182,12 @@ namespace System
         JsonSerializerOptions options = settings ?? new JsonSerializerOptions
         {
             IgnoreNullValues = true,
-            WriteIndented = true
+            WriteIndented = true,
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase
         };
         options.Converters.Add(new JsonStringEnumConverter());
 
-        return Serialize(obj, obj.GetType(), options);
+        return obj is null ? null : Serialize(obj, obj.GetType(), options);
     }
 #endif
 
