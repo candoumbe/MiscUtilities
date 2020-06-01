@@ -128,9 +128,6 @@ namespace System
             return Regex.IsMatch(input, $"{pattern}$", regexOptions);
         }
 
-#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-#endif
-
         /// <summary>
         /// Converts <paramref name="source"/> to its <see cref="LambdaExpression"/> equivalent
         /// </summary>

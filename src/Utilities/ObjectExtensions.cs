@@ -1,14 +1,21 @@
-﻿using Newtonsoft.Json;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+#if NEWTONSOFT_JSON
+using Newtonsoft.Json;
 using static Newtonsoft.Json.JsonConvert;
 using static Newtonsoft.Json.Formatting;
 using static Newtonsoft.Json.NullValueHandling;
 using Newtonsoft.Json.Converters;
+#else
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
+using static System.Text.Json.JsonSerializer;
+using static System.Text.Json.JsonSerializerOptions;
+#endif
 namespace System
 {
     public static class ObjectExtensions
@@ -24,7 +31,11 @@ namespace System
             // Don't serialize a null object, simply return the default for that object
             T clone = ReferenceEquals(source, default)
                 ? default
-                : DeserializeObject<T>(SerializeObject(source));
+#if NEWTONSOFT_JSON
+        : DeserializeObject<T>(SerializeObject(source));
+#else
+        : Deserialize<T>(Serialize<T>(source));
+#endif
 
             return clone;
         }
@@ -148,12 +159,36 @@ namespace System
         }
 
         /// <summary>
-        /// Converts <see cref="o"/> to its JSON representation
+        /// Converts <paramref name="obj"/> to its JSON representation using provided <paramref name="settings"/>.
         /// </summary>
-        /// <param name="obj">The object to jsonify</param>
-        /// <returns></returns>
-        public static string Jsonify(this object obj) =>
-            SerializeObject(obj, new JsonSerializerSettings { Formatting = Indented, NullValueHandling = Ignore, ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Converters = new[] { new StringEnumConverter() } });
+        /// <param name="obj">The object to "jsonify"</param>
+        /// <param name="settings">settings to use when serializing <paramref name="obj"/> to Json.</param>
+        /// <returns>Json representation</returns>
+#if NEWTONSOFT_JSON
+        public static string Jsonify(this object obj, JsonSerializerSettings settings = null)
+        {
+            JsonSerializerSettings options = settings ?? new JsonSerializerSettings
+            {
+                Formatting = Indented,
+                NullValueHandling = Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                Converters = new[] { new StringEnumConverter() }
+            };
+            return SerializeObject(obj, options);
+        }
+#else
+    public static string Jsonify(this object obj, JsonSerializerOptions settings = null)
+    {
+        JsonSerializerOptions options = settings ?? new JsonSerializerOptions
+        {
+            IgnoreNullValues = true,
+            WriteIndented = true
+        };
+        options.Converters.Add(new JsonStringEnumConverter());
+
+        return Serialize(obj, obj.GetType(), options);
+    }
+#endif
 
         /// <summary>
         /// Converts <see cref="o"/> to its JSON representation

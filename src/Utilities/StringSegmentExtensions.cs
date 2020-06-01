@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.Primitives
         public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = default)
         {
             using IEnumerator<int> enumerator = source.Occurrences(search, stringComparison)
-                                                 .GetEnumerator();
+                                                      .GetEnumerator();
 
             return enumerator.MoveNext()
                 ? enumerator.Current

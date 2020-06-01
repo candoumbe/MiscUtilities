@@ -10,15 +10,31 @@
     <Product />
     <RepositoryType>git</RepositoryType>
     <PackageTags>collections; string; utilities</PackageTags>
-    <PackageReleaseNotes>Adds extension method to turn a IEnumerable&lt;T&gt; to an IAsyncEnumerable&lt;T&gt; (netstandard 2.1 support)</PackageReleaseNotes>
+    <PackageReleaseNotes>Replaces Newtonsoft.Json with System.Text.Json when possible</PackageReleaseNotes>
     <AssemblyVersion>2.0.1.0</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://dev.azure.com/candoumbe/Utilities</RepositoryUrl>
   </PropertyGroup>
-  
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'netstandard1.1'">
+      <PropertyGroup>
+        <DefineConstants>NEWTONSOFT_JSON</DefineConstants>
+      </PropertyGroup>
+      <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="12.*" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <DefineConstants>SYSTEM_TEXT</DefineConstants>
+      </PropertyGroup>
+      <ItemGroup>
+        <PackageReference Include="System.Text.Json" Version="4.7.2" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.*" />
     <PackageReference Include="System.Collections" Version="4.*" />
     <PackageReference Include="System.Linq" Version="4.*" />
     <PackageReference Include="System.Linq.Queryable" Version="4.*" />
