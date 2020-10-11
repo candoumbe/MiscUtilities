@@ -59,7 +59,7 @@ namespace Utilities.UnitTests
                     new byte[]{1, 2, 3 },
                     new byte[]{1, 2, 3 },
                     true,
-                    "comparing arrays with same data in same order"
+                    "both arrays are of the same size and contains same data in the same order"
                 };
 
                 yield return new object[]
@@ -67,7 +67,7 @@ namespace Utilities.UnitTests
                     new byte[]{1, 2, 3 },
                     new byte[]{1, 3, 3 },
                     false,
-                    "comparing arrays of same length but different data"
+                    "both arrays are of the same size but the data at not the same at all positions"
                 };
 
                 yield return new object[]
@@ -75,7 +75,7 @@ namespace Utilities.UnitTests
                     new byte[]{1, 2, 3 },
                     new byte[]{1, 2, 3, 4 },
                     false,
-                    "comparing arrays of differrent lengths"
+                    "arrays are not of the same size"
                 };
 
                 yield return new object[]
