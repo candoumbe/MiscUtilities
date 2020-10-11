@@ -165,30 +165,13 @@ namespace System
         /// <param name="settings">settings to use when serializing <paramref name="obj"/> to Json.</param>
         /// <returns>Json representation</returns>
 #if NEWTONSOFT_JSON
-        public static string Jsonify(this object obj, JsonSerializerSettings settings = null)
-        {
-            JsonSerializerSettings options = settings ?? new JsonSerializerSettings
-            {
-                Formatting = Indented,
-                NullValueHandling = Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                Converters = new[] { new StringEnumConverter() }
-            };
-            return SerializeObject(obj, options);
-        }
+        public static string Jsonify(this object obj, JsonSerializerSettings settings = null) => settings is null
+                ? SerializeObject(obj)
+                : SerializeObject(obj, settings);
 #else
-    public static string Jsonify(this object obj, JsonSerializerOptions settings = null)
-    {
-        JsonSerializerOptions options = settings ?? new JsonSerializerOptions
-        {
-            IgnoreNullValues = true,
-            WriteIndented = true,
-            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase
-        };
-        options.Converters.Add(new JsonStringEnumConverter());
-
-        return obj is null ? null : Serialize(obj, obj.GetType(), options);
-    }
+        public static string Jsonify(this object obj, JsonSerializerOptions settings = null) => obj is null
+                ? null
+                : Serialize(obj, obj.GetType(), settings);
 #endif
 
         /// <summary>
