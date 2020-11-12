@@ -6,6 +6,8 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{84437349-B75A-4EE6-B99D-EB4718D9286D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		build.yaml = build.yaml
 		core.props = core.props
 		global.json = global.json
@@ -21,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "src\Utilities\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities.UnitTests", "test\Utilities.UnitTests\Utilities.UnitTests.csproj", "{07C41AF3-1F60-4940-9336-875A130660F9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{F676DA76-FC0E-492C-B01C-194DE15E25E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,8 @@ Global
 		{07C41AF3-1F60-4940-9336-875A130660F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07C41AF3-1F60-4940-9336-875A130660F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07C41AF3-1F60-4940-9336-875A130660F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F676DA76-FC0E-492C-B01C-194DE15E25E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F676DA76-FC0E-492C-B01C-194DE15E25E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
