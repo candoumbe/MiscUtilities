@@ -51,7 +51,7 @@ steps:
   inputs:
     command: test
     projects: '$(Parameters.projects.tests)'
-    arguments: '--no-build -c $(configuration) /p:CoverletOutput=$(Agent.TempDirectory)\ /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    arguments: '--no-build -c $(configuration) /p:CoverletOutput=$(Agent.TempDirectory)\$(TargetFramework)\ /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     
 - task: DotNetCoreCLI@2
   inputs:
