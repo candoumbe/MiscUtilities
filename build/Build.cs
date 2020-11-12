@@ -37,8 +37,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     {
         "docs/*",
         "README.md"
-    },
-    ImportVariableGroups = new[] { "Tokens" }
+    }
     )]
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
