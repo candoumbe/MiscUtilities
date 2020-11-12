@@ -14,9 +14,6 @@
 # </auto-generated>
 # ------------------------------------------------------------------------------
 
-variables:
-  - group: Tokens
-
 trigger:
   branches:
     include:
