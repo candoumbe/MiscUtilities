@@ -74,6 +74,8 @@ public class Build : NukeBuild
             SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
             TestDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
             EnsureCleanDirectory(OutputDirectory);
+            EnsureCleanDirectory(TestResultDirectory);
+            EnsureCleanDirectory(CoverageReportDirectory);
         });
 
     public Target Restore => _ => _
@@ -103,8 +105,8 @@ public class Build : NukeBuild
         .DependsOn(Compile)
         .Description("Run unit tests and collect code")
         .Partition(() => TestPartition)
-        .Produces(TestResultDirectory / "*.trx")
-        .Produces(TestResultDirectory / "*.xml")
+        .Produces(TestResultDirectory / "*-unit-test.*.trx")
+        .Produces(TestResultDirectory / "*-unit-test.*.xml")
         .Executes(() =>
         {
             Info("Start executing unit tests");
@@ -139,8 +141,8 @@ public class Build : NukeBuild
         .DependsOn(Compile)
         .Description("Run integration tests and collect code coverage")
         .Partition(() => TestPartition)
-        .Produces(TestResultDirectory / "*.trx")
-        .Produces(TestResultDirectory / "*.xml")
+        .Produces(TestResultDirectory / "*-integration.*.trx")
+        .Produces(TestResultDirectory / "*-integration.*.xml")
         .Executes(() =>
         {
             IEnumerable<Project> projects = Solution.GetProjects("*.IntegrationTests");
@@ -171,6 +173,8 @@ public class Build : NukeBuild
 
     public Target Tests => _ => _
         .DependsOn(UnitTests, IntegrationTests)
+        .Produces(TestResultDirectory / "*.xml")
+        .Produces(TestResultDirectory / "*.trx")
         .Executes(() =>
         {
         });
