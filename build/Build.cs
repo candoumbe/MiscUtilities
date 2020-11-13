@@ -104,7 +104,6 @@ public class Build : NukeBuild
     public Target UnitTests => _ => _
         .DependsOn(Compile)
         .Description("Run unit tests and collect code")
-        .Partition(() => TestPartition)
         .Produces(TestResultDirectory / "*-unit-test.*.trx")
         .Produces(TestResultDirectory / "*-unit-test.*.xml")
         .Executes(() =>
@@ -145,7 +144,6 @@ public class Build : NukeBuild
     public Target IntegrationTests => _ => _
         .DependsOn(Compile)
         .Description("Run integration tests and collect code coverage")
-        .Partition(() => TestPartition)
         .Produces(TestResultDirectory / "*-integration.*.trx")
         .Produces(TestResultDirectory / "*-integration.*.xml")
         .Executes(() =>
