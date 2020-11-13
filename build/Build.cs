@@ -86,6 +86,7 @@ public class Build : NukeBuild
             DotNetRestore(s => s
                 .SetProjectFile(Solution)
                 .SetIgnoreFailedSources(true)
+                .SetDisableParallel(false)
                 .When(IsLocalBuild && Interactive, _ => _.SetProperty("NugetInteractive", IsLocalBuild && Interactive))
             );
         });
@@ -161,14 +162,17 @@ public class Build : NukeBuild
         .Executes(() =>
         {
             IEnumerable<Project> projects = Solution.AllProjects
-                                                    .Where(csproj => csproj.Is(ProjectType.CSharpProject) && csproj.Name.Like("*Tests.csproj"));
+                                                    .Where(csproj => csproj.Is(ProjectType.CSharpProject) && !csproj.Name.Like("*Tests"));
+
+            projects.ForEach(csproj => Info(csproj));
+
             DotNetPack(s => s
                 .SetNoBuild(InvokedTargets.Contains(Compile))
                 .SetNoRestore(InvokedTargets.Contains(Restore))
                 .SetOutputDirectory(OutputDirectory)
                 .EnableIncludeSymbols()
                 .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj)
-                
+                                                         .SetConfiguration(Configuration)                
                 )
             );
         });
