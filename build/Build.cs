@@ -160,11 +160,16 @@ public class Build : NukeBuild
         .Produces(OutputDirectory / "*.nupkg")
         .Executes(() =>
         {
+            IEnumerable<Project> projects = Solution.AllProjects
+                                                    .Where(csproj => csproj.Is(ProjectType.CSharpProject) && csproj.Name.Like("*Tests.csproj"));
             DotNetPack(s => s
                 .SetNoBuild(InvokedTargets.Contains(Compile))
                 .SetNoRestore(InvokedTargets.Contains(Restore))
                 .SetOutputDirectory(OutputDirectory)
                 .EnableIncludeSymbols()
+                .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj)
+                
+                )
             );
         });
 
