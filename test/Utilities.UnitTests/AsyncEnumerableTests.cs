@@ -1,4 +1,4 @@
-﻿#if !(NETCOREAPP2_0 || NETCOREAPP2_1)
+﻿
 using FluentAssertions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,9 +25,6 @@ namespace Utilities.UnitTests
             // Assert
             count.Should()
                  .Be(0);
-            
         }
     }
 }
-
-#endif

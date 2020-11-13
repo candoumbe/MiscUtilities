@@ -194,6 +194,13 @@ public class Build : NukeBuild
             );
         });
 
+    public Target InstallSdks = _ => _
+        .OnlyWhenStatic(() => IsServerBuild)
+        .Executes(() =>
+        {
+
+        });
+
     protected override void OnTargetStart(string target)
     {
         Info($"Starting '{target}' task");

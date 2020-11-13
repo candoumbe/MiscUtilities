@@ -652,7 +652,6 @@ namespace Utilities.UnitTests
             source.None(predicate).Should().Be(expectedResult);
         }
 
-#if ! (NETCOREAPP2_0 || NETCOREAPP2_1) 
         [Fact]
         public void AsAsyncEnumerable_Throws_ArgumentNullException_When_Source_Is_Null()
         {
@@ -736,6 +735,5 @@ namespace Utilities.UnitTests
             output.Should()
                 .BeEquivalentTo(inputs);
         }
-#endif
     }
 }
