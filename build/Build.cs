@@ -141,54 +141,15 @@ public class Build : NukeBuild
             }
         });
 
-    public Target IntegrationTests => _ => _
-        .DependsOn(Compile)
-        .Description("Run integration tests and collect code coverage")
-        .Produces(TestResultDirectory / "*-integration.*.trx")
-        .Produces(TestResultDirectory / "*-integration.*.xml")
-        .Executes(() =>
-        {
-            IEnumerable<Project> projects = Solution.GetProjects("*.IntegrationTests");
-            IEnumerable<Project> testsProjects = TestPartition.GetCurrent(projects);
-
-            testsProjects.ForEach(project => Info(project));
-            
-            if (testsProjects.Any())
-            {
-                DotNetTest(s => s
-                        .SetConfiguration(Configuration)
-                        .ResetVerbosity()
-                        .EnableCollectCoverage()
-                        .SetNoBuild(InvokedTargets.Contains(Compile))
-                        .SetResultsDirectory(TestResultDirectory)
-                        .When(IsServerBuild, _ => _.SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
-                                                   .AddProperty("ExcludeByAttribute", "Obsolete")
-                                                   .EnableUseSourceLink()
-                        )
-                        .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
-                            .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting
-                                .SetFramework(framework)
-                                .SetLogger($"trx;LogFileName={ TestResultDirectory / $"{project.Name}-integration.{framework}.trx"}")
-                                .When(InvokedTargets.Contains(Coverage) || IsServerBuild, _ => _
-                                    .SetCoverletOutput(TestResultDirectory / $"{project.Name}-integration.{framework}.xml")))));
-
-                TestResultDirectory.GlobFiles("-integration.*.trx").ForEach(testFileResult =>
-                    AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.XUnit,
-                                                       title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
-                                                       files: new string[] { testFileResult })); 
-            }
-        });
-
     public Target Tests => _ => _
-        .DependsOn(UnitTests, IntegrationTests)
-        .Produces(TestResultDirectory / "*.xml")
-        .Produces(TestResultDirectory / "*.trx")
+        .DependsOn(UnitTests)
+        .Consumes(UnitTests)
         .Executes(() =>
         {
         });
 
     public Target Coverage => _ => _
-        .DependsOn(UnitTests, IntegrationTests)
+        .DependsOn(Tests)
         .Consumes(Tests)
         .Executes(() =>
         {
