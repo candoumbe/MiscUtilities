@@ -134,7 +134,7 @@ public class Build : NukeBuild
                 .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
                     .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting
                         .SetFramework(framework)
-                        .SetLogger($"trx;LogFileName={ TestResultDirectory / $"{project.Name}-unit-test.{framework}.trx"}")
+                        .SetLogger($"trx;LogFileName={project.Name}-unit-test.{framework}.trx")
                         .SetCoverletOutput(TestResultDirectory / $"{project.Name}-unit-test.xml"))
                     )
             );
