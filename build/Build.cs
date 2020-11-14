@@ -80,6 +80,7 @@ public class Build : NukeBuild
             EnsureCleanDirectory(OutputDirectory);
             EnsureCleanDirectory(TestResultDirectory);
             EnsureCleanDirectory(CoverageReportDirectory);
+            EnsureCleanDirectory(ArtifactsDirectory);
         });
 
     public Target Restore => _ => _
@@ -180,7 +181,9 @@ public class Build : NukeBuild
                 .EnableIncludeSymbols()
                 .SetOutputDirectory(ArtifactsDirectory)
                 .SetConfiguration(Configuration)
-                .SetVersion(GitVersion.NuGetVersionV2)
+                .SetAssemblyVersion(GitVersion.AssemblySemVer)
+                .SetFileVersion(GitVersion.AssemblySemFileVer)
+                .SetInformationalVersion(GitVersion.InformationalVersion)
                 .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj)
                 )
             );
@@ -198,12 +201,11 @@ public class Build : NukeBuild
 
     protected override void OnBuildInitialized()
     {
-
+        Info($"{nameof(BuildProjectDirectory)} : {BuildProjectDirectory}");
+        Info($"{nameof(GitVersion)} : {GitVersion.Jsonify()}");
     }
 
     protected override void OnBuildCreated()
     {
-        Info($"{nameof(BuildProjectDirectory)} : {BuildProjectDirectory}");
-        Info($"{nameof(GitVersion)} : {GitVersion.Jsonify()}");
     }
 }
