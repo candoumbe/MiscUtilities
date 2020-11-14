@@ -18,6 +18,8 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using Nuke.Common.Tools.GitVersion;
+using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
+using Nuke.Common.Tools.ReportGenerator;
 
 [AzurePipelines(
     AzurePipelinesImage.WindowsLatest,
@@ -154,9 +156,19 @@ public class Build : NukeBuild
     public Target Coverage => _ => _
         .DependsOn(Tests)
         .Consumes(Tests)
+        .Produces(CoverageReportDirectory)
         .Executes(() =>
         {
+            ReportGenerator(_ => _
+                .SetReports(TestResultDirectory / "*.xml")
+                .SetReportTypes(ReportTypes.HtmlInline_AzurePipelines)
+                .SetTargetDirectory(CoverageReportDirectory));
 
+            TestResultDirectory.GlobFiles("*.xml").ForEach(x =>
+                AzurePipelines?.PublishCodeCoverage(
+                    AzurePipelinesCodeCoverageToolType.Cobertura,
+                    x,
+                    CoverageReportDirectory));
         });
 
     public Target Pack => _ => _
@@ -177,6 +189,7 @@ public class Build : NukeBuild
 
             );
         });
+
 
     protected override void OnTargetStart(string target)
     {
