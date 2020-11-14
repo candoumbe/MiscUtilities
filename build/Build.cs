@@ -22,7 +22,7 @@ using Nuke.Common.Tools.GitVersion;
 [AzurePipelines(
     AzurePipelinesImage.UbuntuLatest,
     AzurePipelinesImage.WindowsLatest,
-    InvokedTargets = new[] { nameof(Pack) },
+    InvokedTargets = new[] { nameof(Tests), nameof(Pack) },
     NonEntryTargets = new[] { nameof(Restore) },
     ExcludedTargets = new[] { nameof(Clean) },
     PullRequestsAutoCancel = true,
@@ -70,6 +70,8 @@ public class Build : NukeBuild
     public AbsolutePath CompileOutputDirectory => OutputDirectory / "build";
 
     public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
+
+    public AbsolutePath BinDirectory => SourceDirectory / "bin";
 
     public Target Clean => _ => _
         .Before(Restore)
@@ -122,20 +124,18 @@ public class Build : NukeBuild
 
             testsProjects.ForEach(project => Info(project));
 
-            if (testsProjects.Any())
-            {
-                DotNetTest(s => s
-                         .SetConfiguration(Configuration)
-                         .ResetVerbosity()
-                         .EnableCollectCoverage()
-                         .SetNoBuild(InvokedTargets.Contains(Compile))
-                         .SetResultsDirectory(TestResultDirectory)
-                         .When(IsServerBuild, _ => _
-                             .SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
-                             .AddProperty("ExcludeByAttribute", "Obsolete")
-                             .EnableUseSourceLink()
-                         )
-                         .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
+            DotNetTest(s => s
+                            .SetConfiguration(Configuration)
+                            .ResetVerbosity()
+                            .EnableCollectCoverage()
+                            .SetNoBuild(InvokedTargets.Contains(Compile))
+                            .SetResultsDirectory(TestResultDirectory)
+                            .When(IsServerBuild, _ => _
+                                .SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
+                                .AddProperty("ExcludeByAttribute", "Obsolete")
+                                .EnableUseSourceLink()
+                            )
+                            .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
                             .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting
                                 .SetFramework(framework)
                                 .SetLogger($"trx;LogFileName={ TestResultDirectory / $"{project.Name}-unit-test.{framework}.trx"}")
@@ -144,17 +144,13 @@ public class Build : NukeBuild
 
                 TestResultDirectory.GlobFiles("*-unit-test.*.trx").ForEach(testFileResult =>
                     AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.XUnit,
-                                                       title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
-                                                       files: new string[] { testFileResult })); 
-            }
+                                                        title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
+                                                        files: new string[] { testFileResult })); 
+            
         });
 
     public Target Tests => _ => _
-        .DependsOn(UnitTests)
-        .Consumes(UnitTests)
-        .Executes(() =>
-        {
-        });
+        .DependsOn(UnitTests);
 
     public Target Coverage => _ => _
         .DependsOn(Tests)
@@ -175,10 +171,9 @@ public class Build : NukeBuild
             //                                                         && !csproj.Name.Like("_*"));
 
             //projects.ForEach(csproj => Info(csproj));
-
             DotNetPack(s => s
-                //.EnableIncludeSource()
-                //.EnableIncludeSymbols()
+                .EnableIncludeSource()
+                .EnableIncludeSymbols()
                 .SetOutputDirectory(ArtifactsDirectory)
                 .SetProject(Solution)
                 .SetConfiguration(Configuration)
@@ -186,6 +181,7 @@ public class Build : NukeBuild
                 .SetFileVersion(GitVersion.AssemblySemFileVer)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
                 //.CombineWith(projects, (cs, csproj) => cs.SetProject(csproj))
+
             );
         });
 
