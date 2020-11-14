@@ -151,7 +151,8 @@ public class Build : NukeBuild
         });
 
     public Target Tests => _ => _
-        .DependsOn(UnitTests);
+        .DependsOn(UnitTests)
+        .Triggers(Coverage);
 
     public Target Coverage => _ => _
         .DependsOn(Tests)
@@ -162,7 +163,8 @@ public class Build : NukeBuild
             ReportGenerator(_ => _
                 .SetReports(TestResultDirectory / "*.xml")
                 .SetReportTypes(ReportTypes.HtmlInline_AzurePipelines)
-                .SetTargetDirectory(CoverageReportDirectory));
+                .SetTargetDirectory(CoverageReportDirectory)
+                .SetFramework("net5.0"));
 
             TestResultDirectory.GlobFiles("*.xml").ForEach(x =>
                 AzurePipelines?.PublishCodeCoverage(
