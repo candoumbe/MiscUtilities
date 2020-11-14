@@ -20,9 +20,8 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using Nuke.Common.Tools.GitVersion;
 
 [AzurePipelines(
-    AzurePipelinesImage.UbuntuLatest,
     AzurePipelinesImage.WindowsLatest,
-    InvokedTargets = new[] { nameof(Tests), nameof(Pack) },
+    InvokedTargets = new[] { nameof(Pack) },
     NonEntryTargets = new[] { nameof(Restore) },
     ExcludedTargets = new[] { nameof(Clean) },
     PullRequestsAutoCancel = true,
@@ -143,7 +142,7 @@ public class Build : NukeBuild
                                     .SetCoverletOutput(TestResultDirectory / $"{project.Name}-unit-test.{framework}.xml")))));
 
                 TestResultDirectory.GlobFiles("*-unit-test.*.trx").ForEach(testFileResult =>
-                    AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.XUnit,
+                    AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,
                                                         title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
                                                         files: new string[] { testFileResult })); 
             
@@ -157,6 +156,7 @@ public class Build : NukeBuild
         .Consumes(Tests)
         .Executes(() =>
         {
+
         });
 
     public Target Pack => _ => _
@@ -165,12 +165,6 @@ public class Build : NukeBuild
         .Produces(ArtifactsDirectory / "*.nupkg")
         .Executes(() =>
         {
-            //IEnumerable<Project> projects = Solution.AllProjects
-            //                                        .Where(csproj => csproj.Is(ProjectType.CSharpProject)
-            //                                                         && !csproj.Name.Like("*Tests")
-            //                                                         && !csproj.Name.Like("_*"));
-
-            //projects.ForEach(csproj => Info(csproj));
             DotNetPack(s => s
                 .EnableIncludeSource()
                 .EnableIncludeSymbols()
@@ -180,7 +174,6 @@ public class Build : NukeBuild
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
                 .SetFileVersion(GitVersion.AssemblySemFileVer)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
-                //.CombineWith(projects, (cs, csproj) => cs.SetProject(csproj))
 
             );
         });
@@ -199,9 +192,5 @@ public class Build : NukeBuild
     {
         Info($"{nameof(BuildProjectDirectory)} : {BuildProjectDirectory}");
         Info($"{nameof(GitVersion)} : {GitVersion.Jsonify()}");
-    }
-
-    protected override void OnBuildCreated()
-    {
     }
 }
