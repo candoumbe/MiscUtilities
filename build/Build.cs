@@ -109,7 +109,7 @@ public class Build : NukeBuild
                 );
         });
 
-    public Target UnitTests => _ => _
+    public Target Tests => _ => _
         .DependsOn(Compile)
         .Description("Run unit tests and collect code")
         .Produces(TestResultDirectory / "*-unit-test.*.trx")
@@ -146,20 +146,17 @@ public class Build : NukeBuild
             
         });
 
-    public Target Tests => _ => _
-        .DependsOn(UnitTests)
-        .Triggers(Coverage);
-
     public Target Coverage => _ => _
         .DependsOn(Tests)
         .Consumes(Tests)
+        .TriggeredBy(Tests)
         .Produces(CoverageReportDirectory)
         .Executes(() =>
         {
             ReportGenerator(_ => _
                 .SetFramework("net5.0")
                 .SetReports(TestResultDirectory / "*.xml")
-                .SetReportTypes(ReportTypes.HtmlInline_AzurePipelines)
+                .SetReportTypes(ReportTypes.Badges, ReportTypes.HtmlChart, ReportTypes.HtmlInline_AzurePipelines_Dark)
                 .SetTargetDirectory(CoverageReportDirectory)
             );
 
