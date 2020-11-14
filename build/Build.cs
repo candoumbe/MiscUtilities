@@ -13,13 +13,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
-using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.IO.HttpTasks;
+using Nuke.Common.Tools.GitVersion;
 
 [AzurePipelines(
     AzurePipelinesImage.UbuntuLatest,
@@ -54,6 +52,7 @@ public class Build : NukeBuild
 
     [Solution] public readonly Solution Solution;
     [GitRepository] public readonly GitRepository GitRepository;
+    [GitVersion(UpdateAssemblyInfo = true, UpdateBuildNumber = true)] public readonly GitVersion GitVersion;
 
     [CI] public readonly AzurePipelines AzurePipelines;
 
@@ -62,13 +61,15 @@ public class Build : NukeBuild
     public AbsolutePath SourceDirectory => RootDirectory / "src";
     public AbsolutePath TestDirectory => RootDirectory / "test";
 
-    public AbsolutePath OutputDirectory => RootDirectory / ".output";
+    public AbsolutePath OutputDirectory => (AbsolutePath)(AzurePipelines?.AgentBuildDirectory ?? RootDirectory) / "output";
 
-    public AbsolutePath CoverageReportDirectory => OutputDirectory / ".coverage-report";
+    public AbsolutePath CoverageReportDirectory => OutputDirectory / "coverage-report";
 
-    public AbsolutePath TestResultDirectory => OutputDirectory / ".tests-results";
+    public AbsolutePath TestResultDirectory => OutputDirectory / "tests-results";
 
-    public AbsolutePath CompileOutputDirectory => OutputDirectory / ".build";
+    public AbsolutePath CompileOutputDirectory => OutputDirectory / "build";
+
+    public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
 
     public Target Clean => _ => _
         .Before(Restore)
@@ -85,7 +86,6 @@ public class Build : NukeBuild
         .DependsOn(Clean)
         .Executes(() =>
         {
-            
             DotNetRestore(s => s
                 .SetProjectFile(Solution)
                 .SetIgnoreFailedSources(true)
@@ -99,9 +99,12 @@ public class Build : NukeBuild
         .Executes(() =>
         {
             DotNetBuild(s => s
+                .SetNoRestore(InvokedTargets.Contains(Restore))
                 .SetConfiguration(Configuration)
                 .SetProjectFile(Solution)
-                .SetNoRestore(InvokedTargets.Contains(Restore))
+                .SetAssemblyVersion(GitVersion.AssemblySemVer)
+                .SetFileVersion(GitVersion.AssemblySemFileVer)
+                .SetInformationalVersion(GitVersion.InformationalVersion)
                 );
         });
 
@@ -162,30 +165,25 @@ public class Build : NukeBuild
     public Target Pack => _ => _
         .DependsOn(Tests, Compile)
         .Consumes(Compile)
-        .Produces(OutputDirectory / "*.nupkg")
+        .Produces(ArtifactsDirectory / "*.nupkg")
         .Executes(() =>
         {
             IEnumerable<Project> projects = Solution.AllProjects
                                                     .Where(csproj => csproj.Is(ProjectType.CSharpProject)
-                                                                     && !csproj.Name.Like("*Tests"));
+                                                                     && !csproj.Name.Like("*Tests")
+                                                                     && !csproj.Name.Like("_*"));
 
             projects.ForEach(csproj => Info(csproj));
 
             DotNetPack(s => s
                 .EnableIncludeSource()
                 .EnableIncludeSymbols()
-                .SetOutputDirectory(OutputDirectory)
+                .SetOutputDirectory(ArtifactsDirectory)
+                .SetConfiguration(Configuration)
+                .SetVersion(GitVersion.NuGetVersionV2)
                 .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj)
-                                                         .SetConfiguration(Configuration)
                 )
             );
-        });
-
-    public Target InstallSdks = _ => _
-        .OnlyWhenStatic(() => IsServerBuild)
-        .Executes(async () =>
-        {
-            //await HttpDownloadFileAsync($"")
         });
 
     protected override void OnTargetStart(string target)
@@ -200,6 +198,12 @@ public class Build : NukeBuild
 
     protected override void OnBuildInitialized()
     {
+
+    }
+
+    protected override void OnBuildCreated()
+    {
         Info($"{nameof(BuildProjectDirectory)} : {BuildProjectDirectory}");
+        Info($"{nameof(GitVersion)} : {GitVersion.Jsonify()}");
     }
 }

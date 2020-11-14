@@ -48,8 +48,8 @@ stages:
               script: './build.cmd UnitTests --skip'
           - task: PublishBuildArtifacts@1
             inputs:
-              artifactName: .tests-results
-              pathtoPublish: '.output/.tests-results'
+              artifactName: tests-results
+              pathtoPublish: 'output/tests-results'
       - job: Tests
         displayName: 'Tests'
         dependsOn: [ UnitTests ]
@@ -66,8 +66,8 @@ stages:
               script: './build.cmd Pack --skip'
           - task: PublishBuildArtifacts@1
             inputs:
-              artifactName: .output
-              pathtoPublish: '.output'
+              artifactName: artifacts
+              pathtoPublish: 'output/artifacts'
   - stage: windows_latest
     displayName: 'windows-latest'
     dependsOn: [  ]
@@ -90,8 +90,8 @@ stages:
               script: './build.cmd UnitTests --skip'
           - task: PublishBuildArtifacts@1
             inputs:
-              artifactName: .tests-results
-              pathtoPublish: '.output/.tests-results'
+              artifactName: tests-results
+              pathtoPublish: 'output/tests-results'
       - job: Tests
         displayName: 'Tests'
         dependsOn: [ UnitTests ]
@@ -108,5 +108,5 @@ stages:
               script: './build.cmd Pack --skip'
           - task: PublishBuildArtifacts@1
             inputs:
-              artifactName: .output
-              pathtoPublish: '.output'
+              artifactName: artifacts
+              pathtoPublish: 'output/artifacts'
