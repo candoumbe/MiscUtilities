@@ -177,15 +177,14 @@ public class Build : NukeBuild
             projects.ForEach(csproj => Info(csproj));
 
             DotNetPack(s => s
-                .EnableIncludeSource()
-                .EnableIncludeSymbols()
+                //.EnableIncludeSource()
+                //.EnableIncludeSymbols()
                 .SetOutputDirectory(ArtifactsDirectory)
                 .SetConfiguration(Configuration)
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
                 .SetFileVersion(GitVersion.AssemblySemFileVer)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
-                .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj)
-                )
+                .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj))
             );
         });
 
