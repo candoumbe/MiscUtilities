@@ -68,6 +68,8 @@ public class Build : NukeBuild
 
     public AbsolutePath TestResultDirectory => OutputDirectory / ".tests-results";
 
+    public AbsolutePath CompileOutputDirectory => OutputDirectory / ".build";
+
     public Target Clean => _ => _
         .Before(Restore)
         .Executes(() =>
@@ -170,8 +172,6 @@ public class Build : NukeBuild
             projects.ForEach(csproj => Info(csproj));
 
             DotNetPack(s => s
-                .SetNoBuild(InvokedTargets.Contains(Compile))
-                .SetNoRestore(InvokedTargets.Contains(Restore))
                 .EnableIncludeSource()
                 .EnableIncludeSymbols()
                 .SetOutputDirectory(OutputDirectory)
