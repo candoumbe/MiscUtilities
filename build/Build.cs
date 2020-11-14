@@ -60,6 +60,7 @@ public class Build : NukeBuild
     [Partition(10)] public readonly Partition TestPartition;
 
     public AbsolutePath SourceDirectory => RootDirectory / "src";
+
     public AbsolutePath TestDirectory => RootDirectory / "test";
 
     public AbsolutePath OutputDirectory => RootDirectory / "output";
@@ -112,7 +113,6 @@ public class Build : NukeBuild
         .Produces(TestResultDirectory / "*.xml")
         .Executes(() =>
         {
-            Info("Start executing unit tests");
             IEnumerable<Project> projects = Solution.GetProjects("*.UnitTests");
             IEnumerable<Project> testsProjects = TestPartition.GetCurrent(projects);
 
@@ -120,13 +120,12 @@ public class Build : NukeBuild
 
             DotNetTest(s => s
                 .SetConfiguration(Configuration)
-                .ResetVerbosity()
                 .EnableCollectCoverage()
+                .EnableUseSourceLink()
                 .SetNoBuild(InvokedTargets.Contains(Compile))
                 .SetResultsDirectory(TestResultDirectory)
                 .SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
                 .AddProperty("ExcludeByAttribute", "Obsolete")
-                .EnableUseSourceLink()
                 .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
                     .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting
                         .SetFramework(framework)
@@ -135,21 +134,16 @@ public class Build : NukeBuild
                     )
             );
 
-            TestResultDirectory.GlobFiles("*.trx").ForEach(testFileResult =>
-            {
-                AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,
-                                                   title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
-                                                   files: new string[] { testFileResult });
-
-                AzurePipelines?.UploadArtifacts(OutputDirectory, "tests-results", "tests");
-            });
-
-            
+            TestResultDirectory.GlobFiles("*.trx")
+                               .ForEach(testFileResult => AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,
+                                                                                             title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
+                                                                                             files: new string[] { testFileResult })
+            );
         });
 
     public Target Coverage => _ => _
         .DependsOn(Tests)
-        .Consumes(Tests)
+        .Consumes(Tests, TestResultDirectory)
         .TriggeredBy(Tests)
         .Produces(CoverageReportDirectory)
         .ProceedAfterFailure()
@@ -183,10 +177,8 @@ public class Build : NukeBuild
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
                 .SetFileVersion(GitVersion.AssemblySemFileVer)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
-
             );
         });
-
 
     protected override void OnTargetStart(string target)
     {
