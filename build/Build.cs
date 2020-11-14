@@ -68,11 +68,7 @@ public class Build : NukeBuild
 
     public AbsolutePath TestResultDirectory => OutputDirectory / "tests-results";
 
-    public AbsolutePath CompileOutputDirectory => OutputDirectory / "build";
-
     public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
-
-    public AbsolutePath BinDirectory => SourceDirectory / "bin";
 
     public Target Clean => _ => _
         .Before(Restore)
@@ -112,8 +108,8 @@ public class Build : NukeBuild
     public Target Tests => _ => _
         .DependsOn(Compile)
         .Description("Run unit tests and collect code")
-        .Produces(TestResultDirectory / "*-unit-test.*.trx")
-        .Produces(TestResultDirectory / "*-unit-test.*.xml")
+        .Produces(TestResultDirectory / "*.trx")
+        .Produces(TestResultDirectory / "*.xml")
         .Executes(() =>
         {
             Info("Start executing unit tests");
@@ -134,15 +130,20 @@ public class Build : NukeBuild
                 .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
                     .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting
                         .SetFramework(framework)
-                        .SetLogger($"trx;LogFileName={project.Name}-unit-test.{framework}.trx")
-                        .SetCoverletOutput(TestResultDirectory / $"{project.Name}-unit-test.xml"))
+                        .SetLogger($"trx;LogFileName={project.Name}.{framework}.trx")
+                        .SetCoverletOutput(TestResultDirectory / $"{project.Name}.xml"))
                     )
             );
 
-            TestResultDirectory.GlobFiles("*-unit-test.*.trx").ForEach(testFileResult =>
+            TestResultDirectory.GlobFiles("*.trx").ForEach(testFileResult =>
+            {
                 AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,
                                                    title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
-                                                   files: new string[] { testFileResult })); 
+                                                   files: new string[] { testFileResult });
+
+                AzurePipelines?.UploadArtifacts(OutputDirectory, "tests-results", "tests");
+            });
+
             
         });
 
@@ -151,6 +152,7 @@ public class Build : NukeBuild
         .Consumes(Tests)
         .TriggeredBy(Tests)
         .Produces(CoverageReportDirectory)
+        .ProceedAfterFailure()
         .Executes(() =>
         {
             ReportGenerator(_ => _
@@ -160,10 +162,10 @@ public class Build : NukeBuild
                 .SetTargetDirectory(CoverageReportDirectory)
             );
 
-            TestResultDirectory.GlobFiles("*.xml").ForEach(file =>
-                AzurePipelines?.PublishCodeCoverage(coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
-                                                    summaryFile: file,
-                                                    reportDirectory: CoverageReportDirectory));
+            TestResultDirectory.GlobFiles("*.xml")
+                               .ForEach(file => AzurePipelines?.PublishCodeCoverage(coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
+                                                                                    summaryFile: file,
+                                                                                    reportDirectory: CoverageReportDirectory));
         });
 
     public Target Pack => _ => _
