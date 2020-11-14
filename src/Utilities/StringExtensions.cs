@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
 #if !(NETSTANDARD1_0 || NETSTANDARD1_1)
+#if !NET5_0
 using Microsoft.Extensions.Primitives;
-# endif
+#endif
+#endif
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;

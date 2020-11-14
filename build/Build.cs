@@ -19,6 +19,7 @@ using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.IO.HttpTasks;
 
 [AzurePipelines(
     AzurePipelinesImage.UbuntuLatest,
@@ -61,11 +62,11 @@ public class Build : NukeBuild
     public AbsolutePath SourceDirectory => RootDirectory / "src";
     public AbsolutePath TestDirectory => RootDirectory / "test";
 
-    public AbsolutePath OutputDirectory => RootDirectory / "output";
+    public AbsolutePath OutputDirectory => RootDirectory / ".output";
 
-    public AbsolutePath CoverageReportDirectory => OutputDirectory / "coverage-report";
+    public AbsolutePath CoverageReportDirectory => OutputDirectory / ".coverage-report";
 
-    public AbsolutePath TestResultDirectory => OutputDirectory / "tests-results";
+    public AbsolutePath TestResultDirectory => OutputDirectory / ".tests-results";
 
     public Target Clean => _ => _
         .Before(Restore)
@@ -157,31 +158,34 @@ public class Build : NukeBuild
         });
 
     public Target Pack => _ => _
-        .DependsOn(Tests)
+        .DependsOn(Tests, Compile)
+        .Consumes(Compile)
         .Produces(OutputDirectory / "*.nupkg")
         .Executes(() =>
         {
             IEnumerable<Project> projects = Solution.AllProjects
-                                                    .Where(csproj => csproj.Is(ProjectType.CSharpProject) && !csproj.Name.Like("*Tests"));
+                                                    .Where(csproj => csproj.Is(ProjectType.CSharpProject)
+                                                                     && !csproj.Name.Like("*Tests"));
 
             projects.ForEach(csproj => Info(csproj));
 
             DotNetPack(s => s
                 .SetNoBuild(InvokedTargets.Contains(Compile))
                 .SetNoRestore(InvokedTargets.Contains(Restore))
-                .SetOutputDirectory(OutputDirectory)
+                .EnableIncludeSource()
                 .EnableIncludeSymbols()
+                .SetOutputDirectory(OutputDirectory)
                 .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj)
-                                                         .SetConfiguration(Configuration)                
+                                                         .SetConfiguration(Configuration)
                 )
             );
         });
 
     public Target InstallSdks = _ => _
         .OnlyWhenStatic(() => IsServerBuild)
-        .Executes(() =>
+        .Executes(async () =>
         {
-
+            //await HttpDownloadFileAsync($"")
         });
 
     protected override void OnTargetStart(string target)
