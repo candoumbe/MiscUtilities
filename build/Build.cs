@@ -81,9 +81,6 @@ public class Build : NukeBuild
             SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
             TestDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
             EnsureCleanDirectory(OutputDirectory);
-            EnsureCleanDirectory(TestResultDirectory);
-            EnsureCleanDirectory(CoverageReportDirectory);
-            EnsureCleanDirectory(ArtifactsDirectory);
         });
 
     public Target Restore => _ => _
@@ -126,27 +123,26 @@ public class Build : NukeBuild
             testsProjects.ForEach(project => Info(project));
 
             DotNetTest(s => s
-                            .SetConfiguration(Configuration)
-                            .ResetVerbosity()
-                            .EnableCollectCoverage()
-                            .SetNoBuild(InvokedTargets.Contains(Compile))
-                            .SetResultsDirectory(TestResultDirectory)
-                            .When(IsServerBuild, _ => _
-                                .SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
-                                .AddProperty("ExcludeByAttribute", "Obsolete")
-                                .EnableUseSourceLink()
-                            )
-                            .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
-                            .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting
-                                .SetFramework(framework)
-                                .SetLogger($"trx;LogFileName={ TestResultDirectory / $"{project.Name}-unit-test.{framework}.trx"}")
-                                .When(InvokedTargets.Contains(Coverage) || IsServerBuild, _ => _
-                                    .SetCoverletOutput(TestResultDirectory / $"{project.Name}-unit-test.{framework}.xml")))));
+                .SetConfiguration(Configuration)
+                .ResetVerbosity()
+                .EnableCollectCoverage()
+                .SetNoBuild(InvokedTargets.Contains(Compile))
+                .SetResultsDirectory(TestResultDirectory)
+                .SetCoverletOutputFormat(CoverletOutputFormat.cobertura)
+                .AddProperty("ExcludeByAttribute", "Obsolete")
+                .EnableUseSourceLink()
+                .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
+                    .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting
+                        .SetFramework(framework)
+                        .SetLogger($"trx;LogFileName={ TestResultDirectory / $"{project.Name}-unit-test.{framework}.trx"}")
+                        .SetCoverletOutput(TestResultDirectory / $"{project.Name}-unit-test.xml"))
+                    )
+            );
 
-                TestResultDirectory.GlobFiles("*-unit-test.*.trx").ForEach(testFileResult =>
-                    AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,
-                                                        title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
-                                                        files: new string[] { testFileResult })); 
+            TestResultDirectory.GlobFiles("*-unit-test.*.trx").ForEach(testFileResult =>
+                AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,
+                                                   title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
+                                                   files: new string[] { testFileResult })); 
             
         });
 
@@ -161,16 +157,16 @@ public class Build : NukeBuild
         .Executes(() =>
         {
             ReportGenerator(_ => _
+                .SetFramework("net5.0")
                 .SetReports(TestResultDirectory / "*.xml")
                 .SetReportTypes(ReportTypes.HtmlInline_AzurePipelines)
                 .SetTargetDirectory(CoverageReportDirectory)
-                .SetFramework("net5.0"));
+            );
 
-            TestResultDirectory.GlobFiles("*.xml").ForEach(x =>
-                AzurePipelines?.PublishCodeCoverage(
-                    AzurePipelinesCodeCoverageToolType.Cobertura,
-                    x,
-                    CoverageReportDirectory));
+            TestResultDirectory.GlobFiles("*.xml").ForEach(file =>
+                AzurePipelines?.PublishCodeCoverage(coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
+                                                    summaryFile: file,
+                                                    reportDirectory: CoverageReportDirectory));
         });
 
     public Target Pack => _ => _
