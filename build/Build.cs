@@ -169,22 +169,23 @@ public class Build : NukeBuild
         .Produces(ArtifactsDirectory / "*.nupkg")
         .Executes(() =>
         {
-            IEnumerable<Project> projects = Solution.AllProjects
-                                                    .Where(csproj => csproj.Is(ProjectType.CSharpProject)
-                                                                     && !csproj.Name.Like("*Tests")
-                                                                     && !csproj.Name.Like("_*"));
+            //IEnumerable<Project> projects = Solution.AllProjects
+            //                                        .Where(csproj => csproj.Is(ProjectType.CSharpProject)
+            //                                                         && !csproj.Name.Like("*Tests")
+            //                                                         && !csproj.Name.Like("_*"));
 
-            projects.ForEach(csproj => Info(csproj));
+            //projects.ForEach(csproj => Info(csproj));
 
             DotNetPack(s => s
                 //.EnableIncludeSource()
                 //.EnableIncludeSymbols()
                 .SetOutputDirectory(ArtifactsDirectory)
+                .SetProject(Solution)
                 .SetConfiguration(Configuration)
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
                 .SetFileVersion(GitVersion.AssemblySemFileVer)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
-                .CombineWith(projects, (cs, csproj) => cs.SetProject(csproj))
+                //.CombineWith(projects, (cs, csproj) => cs.SetProject(csproj))
             );
         });
 

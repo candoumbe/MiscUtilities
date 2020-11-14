@@ -1,4 +1,7 @@
+next-version: 1.0
 assembly-versioning-scheme: MajorMinorPatch
+assembly-file-versioning-scheme: MajorMinorPatchTag
+assembly-informational-format: '{InformationalVersion}'
 mode: ContinuousDelivery
 branches:
   master:
