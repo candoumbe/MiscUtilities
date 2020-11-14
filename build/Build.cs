@@ -52,7 +52,7 @@ public class Build : NukeBuild
 
     [Solution] public readonly Solution Solution;
     [GitRepository] public readonly GitRepository GitRepository;
-    [GitVersion(UpdateAssemblyInfo = true, UpdateBuildNumber = true)] public readonly GitVersion GitVersion;
+    [GitVersion(DisableOnUnix = false, UpdateAssemblyInfo = true, UpdateBuildNumber = true)] public readonly GitVersion GitVersion;
 
     [CI] public readonly AzurePipelines AzurePipelines;
 
