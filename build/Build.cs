@@ -61,7 +61,7 @@ public class Build : NukeBuild
     public AbsolutePath SourceDirectory => RootDirectory / "src";
     public AbsolutePath TestDirectory => RootDirectory / "test";
 
-    public AbsolutePath OutputDirectory => (AbsolutePath)(AzurePipelines?.AgentBuildDirectory ?? RootDirectory) / "output";
+    public AbsolutePath OutputDirectory => RootDirectory / "output";
 
     public AbsolutePath CoverageReportDirectory => OutputDirectory / "coverage-report";
 
