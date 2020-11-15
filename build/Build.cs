@@ -181,10 +181,4 @@ public class Build : NukeBuild
     {
         Info($"'{target}' task finished");
     }
-
-    protected override void OnBuildInitialized()
-    {
-        Info($"{nameof(BuildProjectDirectory)} : {BuildProjectDirectory}");
-        Info($"{nameof(GitVersion)} : {GitVersion.Jsonify()}");
-    }
 }
