@@ -8,18 +8,19 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.ReportGenerator;
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using Nuke.Common.Tools.GitVersion;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
-using Nuke.Common.Tools.ReportGenerator;
 
 [AzurePipelines(
     AzurePipelinesImage.WindowsLatest,
@@ -81,7 +82,6 @@ public class Build : NukeBuild
         });
 
     public Target Restore => _ => _
-        .DependsOn(Clean)
         .Executes(() =>
         {
             DotNetRestore(s => s
@@ -143,12 +143,26 @@ public class Build : NukeBuild
 
     public Target Coverage => _ => _
         .DependsOn(Tests)
-        .Consumes(Tests, TestResultDirectory)
+        .Consumes(Tests, TestResultDirectory / "*.xml")
         .TriggeredBy(Tests)
         .Produces(CoverageReportDirectory)
         .ProceedAfterFailure()
         .Executes(() =>
         {
+
+            // TODO remove this once https://github.com/nuke-build/nuke/issues/562 is solved !
+            AzurePipelines?.WriteCommand(command: "task.getArtifacts",
+                                         message: $"Download '{TestResultDirectory / "*xml"}' ",
+                                         dictionaryConfigurator: x =>
+                                         {
+                                             x.Add("buildType", "current");
+                                             x.Add("downloadType", "current");
+                                             x.Add("artifactName", "tests-results");
+                                             x.Add("downloadPath", TestResultDirectory);
+
+                                             return x;
+                                         });
+
             ReportGenerator(_ => _
                 .SetFramework("net5.0")
                 .SetReports(TestResultDirectory / "*.xml")
