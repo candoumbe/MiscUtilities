@@ -151,8 +151,9 @@ public class Build : NukeBuild
         {
 
             // TODO remove this once https://github.com/nuke-build/nuke/issues/562 is solved !
-            AzurePipelines?.WriteCommand(command: "task.getArtifacts",
-                                         message: $"Download '{TestResultDirectory / "*xml"}' ",
+
+            AzurePipelines?.WriteCommand(command: "artifact.download",
+                                         message: $"Download '{TestResultDirectory / "*xml"}'",
                                          dictionaryConfigurator: x =>
                                          {
                                              x.Add("buildType", "current");
