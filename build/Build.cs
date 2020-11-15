@@ -139,31 +139,8 @@ public class Build : NukeBuild
                                                                                              title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
                                                                                              files: new string[] { testFileResult })
             );
-        });
 
-    public Target Coverage => _ => _
-        .DependsOn(Tests)
-        .Consumes(Tests, TestResultDirectory / "*.xml")
-        .TriggeredBy(Tests)
-        .Produces(CoverageReportDirectory)
-        .ProceedAfterFailure()
-        .Executes(() =>
-        {
-
-            // TODO remove this once https://github.com/nuke-build/nuke/issues/562 is solved !
-
-            AzurePipelines?.WriteCommand(command: "artifact.download",
-                                         message: $"Download '{TestResultDirectory / "*xml"}'",
-                                         dictionaryConfigurator: x =>
-                                         {
-                                             x.Add("buildType", "current");
-                                             x.Add("downloadType", "current");
-                                             x.Add("artifactName", "tests-results");
-                                             x.Add("downloadPath", TestResultDirectory);
-
-                                             return x;
-                                         });
-
+            // TODO Move this to a separate "coverage" target once https://github.com/nuke-build/nuke/issues/562 is solved !
             ReportGenerator(_ => _
                 .SetFramework("net5.0")
                 .SetReports(TestResultDirectory / "*.xml")
