@@ -164,7 +164,6 @@ public class Build : NukeBuild
     public Target Pack => _ => _
         .DependsOn(Tests, Compile)
         .Consumes(Compile)
-        .OnlyWhenDynamic(() => GitRepository.Branch == MainBranch || IsLocalBuild)
         .Produces(ArtifactsDirectory / "*.nupkg")
         .Executes(() =>
         {
