@@ -213,7 +213,7 @@ namespace System.Collections.Generic
         }
 
         /// <summary>
-        /// Tests if there are <paramref name="count"/> elements at most that match <paramref name="predicate"/>.
+        /// Checks if there are <paramref name="count"/> elements at most that match <paramref name="predicate"/>.
         /// </summary>
         /// <typeparam name="T">Type of the elements of the collection to test</typeparam>
         /// <param name="items"></param>
@@ -241,6 +241,17 @@ namespace System.Collections.Generic
 
             return (count == 0 && items == Enumerable.Empty<T>()) || items.Count(predicate.Compile()) <= count;
         }
+
+        /// <summary>
+        /// Checks if <paramref name="items"/> contains <paramref name="count"/> elements or less.
+        /// </summary>
+        /// <typeparam name="T">Type of the elements of the collection to test</typeparam>
+        /// <param name="items"></param>
+        /// <param name="count">Number of elements that match <paramref name="predicate"/></param>
+        /// <returns><c>true</c> if there are 0 to <paramref name="count"/> elements and <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentNullException">if either <paramref name="items"/> or <paramref name="predicate"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
+        public static bool AtMost<T>(this IEnumerable<T> items, int count) => AtMost(items, True<T>(), count);
 
         /// <summary>
         /// Performs a cartesian product beetwen <paramref name="first"/> and <paramref name="second"/>.

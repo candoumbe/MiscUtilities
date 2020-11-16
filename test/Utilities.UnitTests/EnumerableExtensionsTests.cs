@@ -1,4 +1,6 @@
-﻿using Bogus;
+﻿using AutoFixture.Xunit2;
+
+using Bogus;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using System;
@@ -11,6 +13,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 using static Newtonsoft.Json.JsonConvert;
+using static System.Linq.Expressions.ExpressionExtensions;
 
 namespace Utilities.UnitTests
 {
@@ -19,8 +22,13 @@ namespace Utilities.UnitTests
     public class EnumerableExtensionsTests
     {
         private readonly ITestOutputHelper _outputHelper;
+        private readonly Faker _faker;
 
-        public EnumerableExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
+        public EnumerableExtensionsTests(ITestOutputHelper outputHelper)
+        {
+            _outputHelper = outputHelper;
+            _faker = new Faker();
+        }
 
         /// <summary>
         /// <see cref="Once(IEnumerable{int}, Expression{Func{int, bool}}, bool)"/> tests cases
@@ -167,13 +175,16 @@ namespace Utilities.UnitTests
         }
 
         [Fact]
-        public void AtMost()
+        public void AtMost_returns_true_when_the_collection_is_empty()
         {
             // Arrange
             IEnumerable<int> source = Enumerable.Empty<int>();
 
             // Act
-            source.AtMost(x => x == -1, 0).Should().BeTrue("an empty collection always has at most 0 items.");
+            bool actual = source.AtMost(0);
+            
+            // Assert
+            actual.Should().BeTrue("an empty collection always has at most 0 items.");
         }
 
         [Theory]
@@ -314,7 +325,7 @@ namespace Utilities.UnitTests
         [Theory]
         [MemberData(nameof(AtLeastOnceThrowsArgumentNullExceptionCases))]
         public void AtLeastOnceShouldThrowsArgumentNullException(IEnumerable<int> source, Expression<Func<int, bool>> predicate)
-            => AtLeastShouldThrowArgumentNullException(source, 1, predicate);
+            => AtLeast_Should_Throw_ArgumentNullException(source, 1, predicate);
 
         public static IEnumerable<object[]> AtLeastThrowsArgumentNullExceptionCases
         {
@@ -327,7 +338,7 @@ namespace Utilities.UnitTests
 
         [Theory]
         [MemberData(nameof(AtLeastThrowsArgumentNullExceptionCases))]
-        public void AtLeastShouldThrowArgumentNullException(IEnumerable<int> source, int count, Expression<Func<int, bool>> predicate)
+        public void AtLeast_Should_Throw_ArgumentNullException(IEnumerable<int> source, int count, Expression<Func<int, bool>> predicate)
         {
             // Act
             Action action = () => source.AtLeast(predicate, count);
@@ -339,15 +350,17 @@ namespace Utilities.UnitTests
         }
 
         [Theory]
-        [InlineData(int.MinValue)]
-        [InlineData(-1)]
-        public void AtLeastShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int count)
+        [InlineAutoData(int.MinValue, -1)]
+        public void AtLeastShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int min, int max, IEnumerable<int> items)
         {
+            // Arrange
+            int count = _faker.Random.Int(min, max);
+
             // Act
-            Action action = () => new[] { 1, 3, 5 }.AtLeast(x => x == 2, count);
+            Action action = () => items.AtLeast(count);
 
             // Assert
-            action.Should().Throw<ArgumentOutOfRangeException>($"{count} is not a valid value").Which
+            action.Should().Throw<ArgumentOutOfRangeException>($"{count} is outside the range of valid values").Which
                 .ParamName.Should()
                 .NotBeNullOrWhiteSpace();
         }
@@ -375,12 +388,14 @@ namespace Utilities.UnitTests
         }
 
         [Theory]
-        [InlineData(int.MinValue)]
-        [InlineData(-1)]
-        public void AtMostShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int count)
+        [InlineAutoData(int.MinValue, -1)]
+        public void AtMost_Should_Throw_ArgumentOutOfRangeException_When_Count_Is_Negative(int min, int max, IEnumerable<int> items)
         {
+            // Arrange
+            int count = _faker.Random.Int(min, max);
+
             // Act
-            Action action = () => new[] { 1, 3, 5 }.AtMost(x => x == 2, count);
+            Action action = () => items.AtMost(count);
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>($"{count} is not a valid value").Which
@@ -411,7 +426,7 @@ namespace Utilities.UnitTests
         }
 
         [Fact]
-        public void ExactlyShouldThrowArgumentNullExceptionWhenCollectionIsNull()
+        public void Exactly_should_throw_ArgumentNullException_when_collection_is_null()
         {
             // Act
             IEnumerable<int> collection = null;
@@ -734,6 +749,76 @@ namespace Utilities.UnitTests
             // Assert
             output.Should()
                 .BeEquivalentTo(inputs);
+        }
+
+        [Fact]
+        public void None_should_throw_ArgumentNullException_when_items_is_null()
+        {
+            // Act
+            Action none = () => EnumerableExtensions.None(null, True<int>());
+
+            // Assert
+            none.Should()
+                .ThrowExactly<ArgumentNullException>()
+                .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName));
+        }
+
+        [Theory]
+        [AutoData]
+        public void None_should_throw_ArgumentNullException_when_predicate_is_null(IEnumerable<int> items)
+        {
+            // Act
+            Action none = () => items.None(null);
+
+            // Assert
+            none.Should()
+                .ThrowExactly<ArgumentNullException>()
+                .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName));
+        }
+
+        [Fact]
+        public void ToDictionary_should_throw_ArgumentNullException_when_input_is_null()
+        {
+            // Act
+            Action toDictionaryWithNullInput = () => EnumerableExtensions.ToDictionary<int, int>(null);
+
+            // Assert
+            toDictionaryWithNullInput.Should()
+                                     .ThrowExactly<ArgumentNullException>()
+                                     .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName));
+        }
+
+        public static IEnumerable<object[]> ToDictionaryCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    Enumerable.Range(1, 10),
+                    (Func<int, bool>) (number => number % 2 == 0),
+                    (Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>>)(dictionary => dictionary.Exactly(2)
+                                                                                                && dictionary.Once(kv => kv.Key)
+                                                                                                && dictionary.Once(kv => !kv.Key)
+                                                                                                && dictionary[true].All(x => x % 2 == 0)
+                                                                                                && dictionary[false].All(x => x % 2 != 0)
+                    )
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ToDictionaryCases))]
+        public void ToDictionary_returns_a_dictionary(IEnumerable<int> values, Func<int, bool> keySelector, Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>> dictionaryExpectation)
+        {
+            // Arrange
+            IEnumerable<IGrouping<bool, int>> group = values.GroupBy(keySelector);
+
+            // Act
+            IDictionary<bool, IEnumerable<int>> dictionary = group.ToDictionary();
+
+            // Assert
+            dictionary.Should()
+                      .Match(dictionaryExpectation);
         }
     }
 }

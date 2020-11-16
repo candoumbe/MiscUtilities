@@ -248,9 +248,8 @@ namespace System
             }
 
             StringBuilder sb = new StringBuilder(input.Length * 2);
-            input = input
-                .Trim()
-                .Replace("  ", " ");
+            input = input.Trim()
+                         .Replace("  ", " ");
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -284,7 +283,7 @@ namespace System
             return sb.ToString();
         }
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1
+#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
         /// <summary>
         /// Removes diacritics from <paramref name="input"/>
         /// </summary>
@@ -306,15 +305,16 @@ namespace System
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
-
+#endif
+#if STRING_SEGMENT
         /// <summary>
         /// Removes diacritics from <paramref name="input"/>
         /// </summary>
         /// <param name="input">where to remove diacritics</param>
         /// <returns></returns>
         public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
-
 #endif
+
         /// <summary>
         /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
         /// </summary>

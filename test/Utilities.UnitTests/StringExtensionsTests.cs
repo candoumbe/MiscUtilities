@@ -11,10 +11,10 @@ using System.Linq;
 namespace Utilities.UnitTests
 {
     [UnitTest]
-    [Feature("String")]
-    public class StringExtensionsTests : IDisposable
+    [Feature(nameof(StringExtensions))]
+    public class StringExtensionsTests
     {
-        private ITestOutputHelper _outputHelper;
+        private readonly ITestOutputHelper _outputHelper;
 
         internal class SuperHero
         {
@@ -24,8 +24,6 @@ namespace Utilities.UnitTests
         }
 
         public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
-
-        public void Dispose() => _outputHelper = null;
 
         [Theory]
         [InlineData(null, null)]
@@ -176,6 +174,18 @@ namespace Utilities.UnitTests
                 .NotBeNullOrWhiteSpace();
         }
 
+        [Fact]
+        public void Slugify_throws_ArgumentNullException_when_input_is_null()
+        {
+            // Act
+            Action slugifyWithNull = () => StringExtensions.Slugify(null);
+
+            // Assert
+            slugifyWithNull.Should()
+                           .ThrowExactly<ArgumentNullException>()
+                           .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName));
+        }
+
         [Theory]
         [InlineData("firstname", "firstname")]
         [InlineData("firstName", "first-name")]
@@ -201,6 +211,18 @@ namespace Utilities.UnitTests
         {
             _outputHelper.WriteLine($"input : '{input}'");
             input.ToSnakeCase().Should().Be(expectedOutput);
+        }
+
+        [Fact]
+        public void ToSnakeCase_throws_ArgumentNullException_when_input_is_null()
+        {
+            // Act
+            Action toSnakeCaseWithNull = () => StringExtensions.ToSnakeCase(null);
+
+            // Assert
+            toSnakeCaseWithNull.Should()
+                               .ThrowExactly<ArgumentNullException>()
+                               .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName));
         }
 
         [Fact]
@@ -304,20 +326,10 @@ namespace Utilities.UnitTests
                 .Match(expectation, reason);
         }
 
-        public static IEnumerable<object[]> FirstOccurrenceCases
-        {
-            get
-            {
-                yield return new object[]
-                {
-                    "", "z", StringComparison.InvariantCulture, -1, "The source is empty"
-                };
-            }
-        }
-
         [Theory]
-        [MemberData(nameof(FirstOccurrenceCases))]
-        public void FirstOccurrence(string source, string search, StringComparison stringComparison, int expected, string reason)
+        [InlineData("", "z", StringComparison.InvariantCulture, -1)]
+        [InlineData("zsasz", "z", StringComparison.InvariantCulture, 0)]
+        public void FirstOccurrence(string source, string search, StringComparison stringComparison, int expected)
         {
             _outputHelper.WriteLine($"Source : '{source}'");
             _outputHelper.WriteLine($"Search : '{search}'");
@@ -328,7 +340,7 @@ namespace Utilities.UnitTests
 
             // Assert
             occurrence.Should()
-                .Be(expected, reason);
+                      .Be(expected);
         }
 
         [Fact]
@@ -358,6 +370,20 @@ namespace Utilities.UnitTests
                 .Throw<ArgumentNullException>(reason);
         }
 
+        [Theory]
+        [InlineData("", "a", StringComparison.OrdinalIgnoreCase, -1)]
+        [InlineData("a", "a", StringComparison.OrdinalIgnoreCase, 0)]
+        [InlineData("zsasz", "z", StringComparison.OrdinalIgnoreCase, 4)]
+        public void LastOccurrence_should_returns_expected_index(string source, string search, StringComparison stringComparison, int expected)
+        {
+            // Act
+            int actual = source.LastOccurrence(search, stringComparison);
+
+            // Assert
+            actual.Should()
+                  .Be(expected);
+        }
+
         [Fact]
         public void FirstOccurrence_should_throws_ArgumentOutOfRangeException_When_Search_Is_Empty()
         {
@@ -383,6 +409,19 @@ namespace Utilities.UnitTests
             // Assert
             action.Should()
                 .Throw<ArgumentNullException>(reason);
+        }
+
+        [Theory]
+        [InlineData("àâäéèêëïîôöùûüÿçÀÂÄÉÈÊËÏÎÔÖÙÛÜŸÇ",
+                    "aaaeeeeiioouuuycAAAEEEEIIOOUUUYC")]
+        public void RemoveDiacritics(string input, string expected)
+        {
+            // Act
+            string actual = input.RemoveDiacritics();
+
+            // Assert
+            actual.Should()
+                  .Be(expected);
         }
     }
 }

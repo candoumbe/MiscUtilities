@@ -28,11 +28,12 @@ using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
     NonEntryTargets = new[] { nameof(Restore) },
     ExcludedTargets = new[] { nameof(Clean) },
     PullRequestsAutoCancel = true,
-    PullRequestsBranchesInclude = new[] { "main" },
+    PullRequestsBranchesInclude = new[] { MainBranch },
     TriggerBranchesInclude = new[] {
-        "main",
-        "feature/*",
-        "fix/*"
+        MainBranch,
+        FeatureBranch + "/*",
+        SupportBranch + "/*",
+        HotfixBranch + "/*"
     },
     TriggerPathsExclude = new[]
     {
@@ -71,6 +72,12 @@ public class Build : NukeBuild
     public AbsolutePath TestResultDirectory => OutputDirectory / "tests-results";
 
     public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
+
+    public const string MainBranch = "main";
+    public const string FeatureBranch = "feature";
+    public const string HotfixBranch = "hotfix";
+    public const string ReleaseBranch = "release";
+    public const string SupportBranch = "support";
 
     public Target Clean => _ => _
         .Before(Restore)
@@ -157,6 +164,7 @@ public class Build : NukeBuild
     public Target Pack => _ => _
         .DependsOn(Tests, Compile)
         .Consumes(Compile)
+        .OnlyWhenDynamic(() => GitRepository.Branch == MainBranch || IsLocalBuild)
         .Produces(ArtifactsDirectory / "*.nupkg")
         .Executes(() =>
         {
@@ -169,6 +177,7 @@ public class Build : NukeBuild
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
                 .SetFileVersion(GitVersion.AssemblySemFileVer)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
+                .SetVersion(GitVersion.NuGetVersion)
             );
         });
 

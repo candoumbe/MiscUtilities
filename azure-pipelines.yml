@@ -19,7 +19,8 @@ trigger:
     include:
       - main
       - feature/*
-      - fix/*
+      - support/*
+      - hotfix/*
   paths:
     exclude:
       - docs/*

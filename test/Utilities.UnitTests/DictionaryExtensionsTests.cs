@@ -95,6 +95,15 @@ namespace Utilities.UnitTests
                 {
                     new Dictionary<string, object>
                     {
+                        ["date-with-offset"] = new DateTimeOffset(1.February(2010).Add(11.Hours()), 1.Hours())
+                    },
+                    (Expression<Func<string, bool>>)(x => "date-with-offset=2010-02-01T11:00:00".Equals(x))
+                };
+
+                yield return new object[]
+                {
+                    new Dictionary<string, object>
+                    {
                         ["offset"] = 3,
                         ["limit"] = 3
                     },
@@ -157,7 +166,7 @@ namespace Utilities.UnitTests
         }
 
         /// <summary>
-        /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString(IDictionary{string, object})"/>
+        /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString(IEnumerable{KeyValuePair{string, object}})"/>
         /// </summary>
         /// <param name="keyValues">dictionary to turn into query</param>
         /// <param name="expectedString"></param>
@@ -165,7 +174,7 @@ namespace Utilities.UnitTests
         [MemberData(nameof(ToQueryStringCases))]
         public void ToQueryString(IEnumerable<KeyValuePair<string, object>> keyValues, Expression<Func<string, bool>> expectedString)
         {
-            _outputHelper.WriteLine($"input : {SerializeObject(keyValues)}");
+            _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
 
             // Act
             string queryString = keyValues?.ToQueryString();
