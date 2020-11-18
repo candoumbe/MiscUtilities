@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -44,7 +45,7 @@ namespace System
         /// <returns><c>true</c>if <paramref name="type"/> is an anonymous type and <c>false</c> otherwise</returns>
         public static bool IsAnonymousType(this Type type)
         {
-            bool hasCompilerGeneratedAttribute = type?.GetTypeInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any() ?? false;
+            bool hasCompilerGeneratedAttribute = type?.GetTypeInfo()?.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false)?.AtLeastOnce() ?? false;
             bool nameContainsAnonymousType = type?.FullName.Contains("AnonymousType") ?? false;
 
             return hasCompilerGeneratedAttribute && nameContainsAnonymousType;

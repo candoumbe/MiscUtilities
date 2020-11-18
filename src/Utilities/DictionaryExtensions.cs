@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Text;
 
 namespace System.Collections.Generic
 {
@@ -41,7 +41,7 @@ namespace System.Collections.Generic
         /// <returns></returns>
         public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new ();
             IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues.Where(kv => kv.Value != null)
                                                                                 .OrderBy(kv => kv.Key)
                                                                                 .ThenBy(kv => kv.Value);
@@ -65,23 +65,9 @@ namespace System.Collections.Generic
                         sb.Append("&");
                     }
 
-                    sb
-                        .Append(Uri.EscapeDataString(key))
-                        .Append("=");
-
-                    // DateTime/DateTimeOffset should be encoded in ISO format
-                    switch (value)
-                    {
-                        case DateTime date:
-                            sb.Append(date.ToString("s"));
-                            break;
-                        case DateTimeOffset date:
-                            sb.Append(date.ToString("s"));
-                            break;
-                        default:
-                            sb.Append(Uri.EscapeDataString(value.ToString()));
-                            break;
-                    }
+                    sb.Append(Uri.EscapeDataString(key))
+                      .Append("=")
+                      .Append(ConvertValueToString(value));
                 }
                 else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
                 {
@@ -97,12 +83,12 @@ namespace System.Collections.Generic
                     }
                     sb.Append(ToQueryString(subDictionary));
                 }
-                else if (valueTypeInfo.BaseType == typeof(IEnumerable))
+                else if (value is IEnumerable enumerable)
                 {
-                    IEnumerable enumerable = value as IEnumerable;
                     int itemPosition = 0;
                     Type elementType;
                     TypeInfo elementTypeInfo;
+
                     foreach (object item in enumerable)
                     {
                         if (item != null)
@@ -115,9 +101,10 @@ namespace System.Collections.Generic
                                 {
                                     sb.Append("&");
                                 }
+
                                 sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
                                    .Append("=")
-                                   .Append(Uri.EscapeDataString(value.ToString()));
+                                   .Append(ConvertValueToString(item));
 
                                 itemPosition++;
                             }
@@ -127,6 +114,15 @@ namespace System.Collections.Generic
             }
 
             return sb.ToString();
+
+            static string ConvertValueToString(object value) => value switch
+            {
+                DateTime dateTime => dateTime.ToString("s"),
+                DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("s"),
+                int intValue => Convert.ToString(intValue),
+                long longValue => Convert.ToString(longValue),
+                _ => Uri.EscapeDataString(value.ToString())
+            };
         }
     }
 }

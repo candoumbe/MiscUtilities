@@ -110,8 +110,7 @@ namespace System
         /// </summary>
         /// <param name="obj">The object to convert</param>
         /// <returns>the query string representation preceeded with the "?" or an empty string</returns>
-        public static string ToQueryString(this object obj)
-            => DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject());
+        public static string ToQueryString(this object obj) => DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject());
 
         /// <summary>
         /// Performs a "safe cast" of the specified object to the specified type.
@@ -121,23 +120,18 @@ namespace System
         /// <param name="obj">The object to cast</param>
         /// <returns>The "safe cast" result</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="obj"/> is <c>null</c></exception>
-        public static TDest As<TSource, TDest>(this TSource obj) => (TDest)As(obj, typeof(TDest));
+        public static TDest As<TDest>(this object obj) => (TDest)As(obj, typeof(TDest));
 
         /// <summary>
         /// Performs a "safe cast" of <paramref name="obj"/> to the type <paramref name="targetType"/>.
         /// </summary>
         /// <typeparam name="TSource">type of the object to cast </param>
-        /// <param name="targetType">type to cast </param>
         /// <param name="obj">The object to cast</param>
+        /// <param name="targetType">type to cast </param>
         /// <returns>The "safe cast" result</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="obj"/> or <paramref name="targetType"/> is <c>null</c></exception>
-        public static object As<TSource>(this TSource obj, Type targetType)
+        /// <exception cref="ArgumentNullException"><paramref name="targetType"/> is <c>null</c></exception>
+        public static object As(this object obj, Type targetType)
         {
-            if (EqualityComparer<TSource>.Default.Equals(obj, default))
-            {
-                throw new ArgumentNullException(nameof(obj));
-            }
-
             if (targetType == null)
             {
                 throw new ArgumentNullException(nameof(targetType));
@@ -145,14 +139,17 @@ namespace System
 
             object safeCastResult = null;
 
-            Type sourceType = typeof(TSource);
-
-            if (targetType == sourceType || sourceType.GetTypeInfo().IsAssignableFrom(targetType.GetTypeInfo()))
+            if (obj is not null)
             {
-                ParameterExpression param = Expression.Parameter(obj.GetType());
-                Expression asExpression = Expression.TypeAs(param, targetType);
-                LambdaExpression expression = Expression.Lambda(asExpression, param);
-                safeCastResult = expression.Compile().DynamicInvoke(obj);
+                Type sourceType = obj.GetType();
+
+                if (targetType == sourceType || sourceType.GetTypeInfo().IsAssignableFrom(targetType.GetTypeInfo()))
+                {
+                    ParameterExpression param = Expression.Parameter(obj.GetType());
+                    Expression asExpression = Expression.TypeAs(param, targetType);
+                    LambdaExpression expression = Expression.Lambda(asExpression, param);
+                    safeCastResult = expression.Compile().DynamicInvoke(obj);
+                }
             }
 
             return safeCastResult;

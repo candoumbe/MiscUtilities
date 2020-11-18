@@ -227,5 +227,31 @@ namespace Utilities.UnitTests
             _outputHelper.WriteLine($"output : {SerializeObject(result)}");
             result.Should().Match(resultExpectation);
         }
+
+        public static IEnumerable<object[]> AsCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    null,
+                    typeof(string),
+                    (Expression<Func<object, bool>>)(result => result == null),
+                    $"{nameof(ObjectExtensions.As)} is null safe"
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AsCases))]
+        public void As_should_behave_as_expected(object source, Type targetType, Expression<Func<object, bool>> expectation, string reason)
+        {
+            // Act
+            object result = source.As(targetType);
+
+            // Assert
+            result.Should()
+                  .Match(expectation, reason);
+        }
     }
 }

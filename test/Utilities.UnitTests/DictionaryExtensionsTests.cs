@@ -19,16 +19,11 @@ namespace Utilities.UnitTests
     /// </summary>
     [UnitTest]
     [Feature("IDictionary")]
-    public class DictionaryExtensionsTests : IDisposable
+    public class DictionaryExtensionsTests
     {
-        private ITestOutputHelper _outputHelper;
+        private readonly ITestOutputHelper _outputHelper;
 
         public DictionaryExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
-
-        public void Dispose()
-        {
-            _outputHelper = null;
-        }
 
         public static IEnumerable<object[]> ToQueryStringCases
         {
@@ -160,6 +155,21 @@ namespace Utilities.UnitTests
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][field]")}=firstname")
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][op]")}=EqualTo")
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][value]")}=Bruce")
+                    )
+                };
+
+                yield return new object[]
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["name"] = new []{ 1, 5, 4 }
+                    },
+                    (Expression<Func<string, bool>>)( queryString =>
+                        queryString != null
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 3
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[0]")}=1")
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[1]")}=5")
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[2]")}=4")
                     )
                 };
             }

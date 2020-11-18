@@ -33,22 +33,6 @@ namespace Utilities.UnitTests
                 yield return new object[]
                 {
                     Array.Empty<byte>(),
-                    new byte[0],
-                    true,
-                    "comparing empty array (Array.Empty<byte>()) to new byte[0] "
-                };
-
-                yield return new object[]
-                {
-                    new byte[0],
-                    new byte[0],
-                    true,
-                    "comparing empty array new byte[0] to new byte[0] "
-                };
-
-                yield return new object[]
-                {
-                    Array.Empty<byte>(),
                     Array.Empty<byte>(),
                     true,
                     "comparing Array.Empty<byte>() to Array.Empty<byte>()"

@@ -41,7 +41,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="predicate">re</param>
-        /// <returns><c>true</c> if <paramref name="items"/> does not contain exactly any element that fullfills <paramref name="predicate"/> and <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if <paramref name="items"/> does not contain any element that fullfills <paramref name="predicate"/> and <c>false</c> otherwise.</returns>
         public static bool None<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
             if (items is null)
@@ -56,6 +56,14 @@ namespace System.Collections.Generic
 
             return !AtLeastOnce(items, predicate);
         }
+
+        /// <summary>
+        /// Tests if <paramref name="items"/> is empty.
+        /// </summary>
+        /// <typeparam name="T">Type of the </typeparam>
+        /// <param name="items">Collection to test</param>
+        /// <returns><c>true</c> if <paramref name="items"/> does not any element and <c>false</c> otherwise.</returns>
+        public static bool None<T>(this IEnumerable<T> items) => None(items, True<T>());
 
         /// <summary>
         /// Tests if <paramref name="items"/> contains exactly one item that verify the specified <paramref name="predicate"/>
@@ -321,23 +329,8 @@ namespace System.Collections.Generic
         /// </param>
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> body)
         {
-            IList<Exception> exceptions = null;
-            foreach (T item in source)
-            {
-                try
-                {
-                    body(item);
-                }
-                catch (Exception exc)
-                {
-                    (exceptions ?? (exceptions = new List<Exception>())).Add(exc);
-                }
-            }
-
-            if (exceptions?.Any() ?? false)
-            {
-                throw new AggregateException(exceptions);
-            }
+            Action<T, int> bodyWithIndex = (item, _) => body(item);
+            source.ForEach(bodyWithIndex);
         }
 
         /// <summary>
@@ -362,7 +355,7 @@ namespace System.Collections.Generic
                 }
                 catch (Exception exc)
                 {
-                    (exceptions ?? (exceptions = new List<Exception>())).Add(exc);
+                    (exceptions ??= new List<Exception>()).Add(exc);
                 }
                 finally
                 {
@@ -370,7 +363,7 @@ namespace System.Collections.Generic
                 }
             }
 
-            if (exceptions?.Any() ?? false)
+            if (exceptions?.AtLeastOnce() ?? false)
             {
                 throw new AggregateException(exceptions);
             }
@@ -390,7 +383,7 @@ namespace System.Collections.Generic
         {
             Task t = Task.WhenAll(
                 from partition in Partitioner.Create(source)
-                        .GetPartitions(dop.GetValueOrDefault(Environment.ProcessorCount))
+                        .GetPartitions(dop ?? Environment.ProcessorCount)
                 select Task.Run(async delegate
                 {
                     using (partition)

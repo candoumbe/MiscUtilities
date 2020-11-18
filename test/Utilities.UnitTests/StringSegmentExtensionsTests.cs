@@ -85,6 +85,70 @@ namespace Utilities.UnitTests
                        .Match(expectation, reason);
         }
 
+        public static IEnumerable<object[]> OccurrencesWithCharCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new StringSegment("Firstname"),
+                    'z',
+                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && occurrences.None()),
+                     "There's no occurrence of the search element in the string"
+                };
+
+                yield return new object[]
+                {
+                    StringSegment.Empty,
+                    'z',
+                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && occurrences.None()),
+                     "There source is empty"
+                };
+
+                yield return new object[]
+                {
+                    new StringSegment("Firstname"),
+                    'F',
+                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
+                        occurrences != null
+                        && occurrences.Exactly(1)
+                        && occurrences.Once(pos  => pos == 0)
+                    ),
+                    "There is one occurrence of the search element in the string"
+                };
+
+                yield return new object[]
+                {
+                    new StringSegment("zsasz"),
+                    'z',
+                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
+                        occurrences != null
+                        && occurrences.Exactly(2)
+                        && occurrences.Once(pos => pos == 0)
+                        && occurrences.Once(pos  =>pos == 4)
+                    ),
+                    "There is 2 occurrences of the search element in the string"
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(OccurrencesWithCharCases))]
+        public void Occurrences_of_char(StringSegment source, char search, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
+        {
+            _outputHelper.WriteLine($"Source : '{source.Value}'");
+            _outputHelper.WriteLine($"Search : '{search}'");
+
+            // Act
+            IEnumerable<int> occurrences = source.Occurrences(search);
+
+            _outputHelper.WriteLine($"Result : {occurrences.Jsonify()}");
+
+            // Assert
+            occurrences.Should()
+                       .Match(expectation, reason);
+        }
+
         public static IEnumerable<object[]> LastOccurrenceCases
         {
             get
@@ -151,6 +215,56 @@ namespace Utilities.UnitTests
             // Assert
             lastOccurrenceWithSearchEmpty.Should()
                                          .Throw<ArgumentException>();
+        }
+
+        public static IEnumerable<object[]> FirstOccurrenceCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new StringSegment("Firstname"),
+                    new StringSegment("z"),
+                    StringComparison.OrdinalIgnoreCase,
+                    -1
+                };
+
+                yield return new object[]
+                {
+                    StringSegment.Empty,
+                    new StringSegment("z"),
+                    StringComparison.OrdinalIgnoreCase,
+                    -1
+                };
+
+                yield return new object[]
+                {
+                    new StringSegment("Firstname"),
+                    new StringSegment("F"),
+                    StringComparison.OrdinalIgnoreCase,
+                    0
+                };
+
+                yield return new object[]
+                {
+                    new StringSegment("zsasz"),
+                    new StringSegment("z"),
+                    StringComparison.OrdinalIgnoreCase,
+                    0
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(FirstOccurrenceCases))]
+        public void FirstOccurrence(StringSegment source, StringSegment search, StringComparison stringComparison, int expected)
+        {
+            // Act
+            int actual = source.FirstOccurrence(search, stringComparison);
+
+            // Assert
+            actual.Should()
+                  .Be(expected);
         }
     }
 }

@@ -182,7 +182,7 @@ namespace Utilities.UnitTests
 
             // Act
             bool actual = source.AtMost(0);
-            
+
             // Assert
             actual.Should().BeTrue("an empty collection always has at most 0 items.");
         }

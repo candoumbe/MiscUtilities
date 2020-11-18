@@ -8,7 +8,7 @@ namespace System.Collections.Generic
     {
         public static IAsyncEnumerable<T> Empty<T>() => new EmptyAsyncEnumerable<T>();
 
-        class EmptyAsyncEnumerator<T> : IAsyncEnumerator<T>
+        internal sealed class EmptyAsyncEnumerator<T> : IAsyncEnumerator<T>
         {
             public static readonly EmptyAsyncEnumerator<T> Instance = new EmptyAsyncEnumerator<T>();
 
@@ -19,16 +19,13 @@ namespace System.Collections.Generic
             public ValueTask<bool> MoveNextAsync() => new ValueTask<bool>(false);
         }
 
-
-        class EmptyAsyncEnumerable<T> : IAsyncEnumerable<T>
+        internal sealed class EmptyAsyncEnumerable<T> : IAsyncEnumerable<T>
         {
             public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
             {
                 return new EmptyAsyncEnumerator<T>();
             }
         }
-
-
     }
 }
 
