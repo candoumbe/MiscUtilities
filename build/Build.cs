@@ -30,11 +30,8 @@ namespace Utilities.Pipelines
         InvokedTargets = new[] { nameof(Tests) },
         NonEntryTargets = new[] { nameof(Restore) },
         ExcludedTargets = new[] { nameof(Clean) },
-        PullRequestsAutoCancel = true,
-        PullRequestsBranchesInclude = new[] { MainBranch },
         TriggerBranchesInclude = new[]
         {
-            MainBranch,
             FeatureBranch + "/*",
             SupportBranch + "/*",
             HotfixBranch + "/*"
@@ -51,13 +48,9 @@ namespace Utilities.Pipelines
         NonEntryTargets = new[] { nameof(Restore) },
         ExcludedTargets = new[] { nameof(Clean) },
         PullRequestsAutoCancel = true,
-        PullRequestsBranchesInclude = new[] { MainBranch },
         TriggerBranchesInclude = new[]
         {
-            MainBranch,
-            FeatureBranch + "/*",
-            SupportBranch + "/*",
-            HotfixBranch + "/*"
+            MainBranch
         },
         TriggerPathsExclude = new[]
         {
