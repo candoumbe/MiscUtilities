@@ -25,22 +25,44 @@ using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 namespace Utilities.Pipelines
 {
     [AzurePipelines(
+        suffix: "pull-request",
+        AzurePipelinesImage.WindowsLatest,
+        InvokedTargets = new[] { nameof(Tests) },
+        NonEntryTargets = new[] { nameof(Restore) },
+        ExcludedTargets = new[] { nameof(Clean) },
+        PullRequestsAutoCancel = true,
+        PullRequestsBranchesInclude = new[] { MainBranch },
+        TriggerBranchesInclude = new[]
+        {
+            MainBranch,
+            FeatureBranch + "/*",
+            SupportBranch + "/*",
+            HotfixBranch + "/*"
+        },
+        TriggerPathsExclude = new[]
+        {
+            "docs/*",
+            "README.md"
+        }
+    )]
+    [AzurePipelines(
         AzurePipelinesImage.WindowsLatest,
         InvokedTargets = new[] { nameof(Pack) },
         NonEntryTargets = new[] { nameof(Restore) },
         ExcludedTargets = new[] { nameof(Clean) },
         PullRequestsAutoCancel = true,
         PullRequestsBranchesInclude = new[] { MainBranch },
-        TriggerBranchesInclude = new[] {
-        MainBranch,
-        FeatureBranch + "/*",
-        SupportBranch + "/*",
-        HotfixBranch + "/*"
+        TriggerBranchesInclude = new[]
+        {
+            MainBranch,
+            FeatureBranch + "/*",
+            SupportBranch + "/*",
+            HotfixBranch + "/*"
         },
         TriggerPathsExclude = new[]
         {
-        "docs/*",
-        "README.md"
+            "docs/*",
+            "README.md"
         }
     )]
     [CheckBuildProjectConfigurations]
@@ -179,6 +201,7 @@ namespace Utilities.Pipelines
                     .SetFileVersion(GitVersion.AssemblySemFileVer)
                     .SetInformationalVersion(GitVersion.InformationalVersion)
                     .SetVersion(GitVersion.NuGetVersion)
+                    .SetSymbolPackageFormat(DotNetSymbolPackageFormat.snupkg)
                 );
             });
 
