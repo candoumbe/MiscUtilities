@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Utilities\Utilities.csproj" />
+    <ProjectReference Include="..\src\Candoumbe.MiscUtilities\Candoumbe.MiscUtilities.csproj" />
   </ItemGroup>
 
 </Project>

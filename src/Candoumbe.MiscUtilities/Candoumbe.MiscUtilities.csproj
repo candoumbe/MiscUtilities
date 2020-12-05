@@ -8,7 +8,7 @@
     <PackageTags>collections; string; utilities</PackageTags>
     <PackageReleaseNotes>Replaces Newtonsoft.Json with System.Text.Json when possible</PackageReleaseNotes>
     <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl>https://dev.azure.com/candoumbe/Utilities</RepositoryUrl>
+    <RepositoryUrl>https://dev.azure.com/candoumbe/Candoumbe.MiscUtilities</RepositoryUrl>
   </PropertyGroup>
   <Choose>
     <When Condition="'$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'netstandard1.1'">

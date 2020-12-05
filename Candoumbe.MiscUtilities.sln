@@ -19,9 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0CF6B24E-658
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B584E2C0-7BBB-4325-AA7D-428A948E6033}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "src\Utilities\Utilities.csproj", "{DBBB09FB-72CD-4DC6-8C55-DB12767781B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.MiscUtilities", "src\Candoumbe.MiscUtilities\Candoumbe.MiscUtilities.csproj", "{DBBB09FB-72CD-4DC6-8C55-DB12767781B2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities.UnitTests", "test\Utilities.UnitTests\Utilities.UnitTests.csproj", "{07C41AF3-1F60-4940-9336-875A130660F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.MiscUtilities.UnitTests", "test\Candoumbe.MiscUtilities.UnitTests\Candoumbe.MiscUtilities.UnitTests.csproj", "{07C41AF3-1F60-4940-9336-875A130660F9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{F676DA76-FC0E-492C-B01C-194DE15E25E1}"
 EndProject
