@@ -21,6 +21,10 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
+using static Nuke.Common.ChangeLog.ChangelogTasks;
+using static Nuke.Common.Tools.Git.GitTasks;
+using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
+using Nuke.Common.Tools.GitHub;
 
 namespace Utilities.Pipelines
 {
@@ -32,9 +36,9 @@ namespace Utilities.Pipelines
         ExcludedTargets = new[] { nameof(Clean) },
         TriggerBranchesInclude = new[]
         {
-            FeatureBranch + "/*",
-            SupportBranch + "/*",
-            HotfixBranch + "/*"
+            FeatureBranchPrefix + "/*",
+            SupportBranchPrefix + "/*",
+            HotfixBranchPrefix + "/*"
         },
         TriggerPathsExclude = new[]
         {
@@ -50,7 +54,7 @@ namespace Utilities.Pipelines
         PullRequestsAutoCancel = true,
         TriggerBranchesInclude = new[]
         {
-            MainBranch
+            MainBranchName
         },
         TriggerPathsExclude = new[]
         {
@@ -70,6 +74,9 @@ namespace Utilities.Pipelines
         [Parameter("Indicates wheter to restore nuget in interactive mode - Default is false")]
         public readonly bool Interactive = false;
 
+        [Parameter("Indicates to automatically stash before switching branch")]
+        public readonly bool AutoStash = true;
+
         [Solution] public readonly Solution Solution;
         [GitRepository] public readonly GitRepository GitRepository;
         [GitVersion] public readonly GitVersion GitVersion;
@@ -86,15 +93,18 @@ namespace Utilities.Pipelines
 
         public AbsolutePath CoverageReportDirectory => OutputDirectory / "coverage-report";
 
+        public AbsolutePath CoverageHistoryDirectory => OutputDirectory / "coverage-history";
+
         public AbsolutePath TestResultDirectory => OutputDirectory / "tests-results";
 
         public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
 
-        public const string MainBranch = "main";
-        public const string FeatureBranch = "feature";
-        public const string HotfixBranch = "hotfix";
-        public const string ReleaseBranch = "release";
-        public const string SupportBranch = "support";
+        public const string MainBranchName = "main";
+        public const string DevelopBranch = "dev";
+        public const string FeatureBranchPrefix = "feature";
+        public const string HotfixBranchPrefix = "hotfix";
+        public const string ReleaseBranchPrefix = "release";
+        public const string SupportBranchPrefix = "support";
 
         public Target Clean => _ => _
             .Before(Restore)
@@ -102,7 +112,9 @@ namespace Utilities.Pipelines
             {
                 SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
                 TestDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-                EnsureCleanDirectory(OutputDirectory);
+                EnsureCleanDirectory(TestResultDirectory);
+                EnsureCleanDirectory(ArtifactsDirectory);
+                EnsureCleanDirectory(CoverageReportDirectory);
             });
 
         public Target Restore => _ => _
@@ -164,13 +176,14 @@ namespace Utilities.Pipelines
                                                                                                  files: new string[] { testFileResult })
                 );
 
-            // TODO Move this to a separate "coverage" target once https://github.com/nuke-build/nuke/issues/562 is solved !
-            ReportGenerator(_ => _
-                    .SetFramework("net5.0")
-                    .SetReports(TestResultDirectory / "*.xml")
-                    .SetReportTypes(ReportTypes.Badges, ReportTypes.HtmlChart, ReportTypes.HtmlInline_AzurePipelines_Dark)
-                    .SetTargetDirectory(CoverageReportDirectory)
-                );
+                // TODO Move this to a separate "coverage" target once https://github.com/nuke-build/nuke/issues/562 is solved !
+                ReportGenerator(_ => _
+                        .SetFramework("net5.0")
+                        .SetReports(TestResultDirectory / "*.xml")
+                        .SetReportTypes(ReportTypes.Badges, ReportTypes.HtmlChart, ReportTypes.HtmlInline_AzurePipelines_Dark)
+                        .SetTargetDirectory(CoverageReportDirectory)
+                        .SetHistoryDirectory(CoverageHistoryDirectory)
+                    );
 
                 TestResultDirectory.GlobFiles("*.xml")
                                    .ForEach(file => AzurePipelines?.PublishCodeCoverage(coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
@@ -198,14 +211,149 @@ namespace Utilities.Pipelines
                 );
             });
 
-        protected override void OnTargetStart(string target)
+
+        #region Git flow section
+
+        private AbsolutePath ChangeLogFile => RootDirectory / "CHANGELOG.md";
+
+        public Target Changelog => _ => _
+            .OnlyWhenStatic(() => !GitRepository.IsOnReleaseBranch() || GitHasCleanWorkingCopy())
+            .Description("Finalizes the change log so that its up to date for the release. ")
+            .Executes(() =>
+            {
+                FinalizeChangelog(ChangeLogFile, GitVersion.MajorMinorPatch, GitRepository);
+                Info($"Please review CHANGELOG.md ({ChangeLogFile}) and press 'Y' to validate (any other key will cancel changes)...");
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key == ConsoleKey.Y)
+                {
+                    Git($"add {ChangeLogFile}");
+                    Git($"commit -m \"Finalize {Path.GetFileName(ChangeLogFile)} for {GitVersion.MajorMinorPatch}\"");
+                }
+            });
+
+        public Target Feature => _ => _
+            .Description($"Starts a new feature development by creating the associated branch {FeatureBranchPrefix}/{{feature-name}} from {MainBranchName}")
+            .Requires(() => !GitRepository.IsOnFeatureBranch() || GitHasCleanWorkingCopy())
+            .Executes(() =>
+            {
+                string featureName;
+                bool exitCreatingFeature = false;
+                do
+                {
+                    Info("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
+                    featureName = (Console.ReadLine() ?? string.Empty).Trim()
+                                                                      .Trim('/');
+
+                    switch (featureName)
+                    {
+                        case string name when !string.IsNullOrWhiteSpace(name):
+                            {
+                                string branchName = $"{FeatureBranchPrefix}/{featureName.Slugify()}";
+                                Info($"{Environment.NewLine}The branch '{branchName}' will be created.{Environment.NewLine}Do you want to continue ? (Y/N) ");
+                                switch (Console.ReadKey().Key)
+                                {
+                                    case ConsoleKey.Y:
+                                        Info($"{Environment.NewLine}Checking out branch '{branchName}' from '{MainBranchName}'");
+                                        Checkout(branchName, start: MainBranchName);
+                                        Info($"{Environment.NewLine}'{branchName}' created successfully");
+                                        exitCreatingFeature = true;
+                                        break;
+
+                                    default:
+                                        Info($"{Environment.NewLine}Exiting {nameof(Feature)} task.");
+                                        exitCreatingFeature = true;
+                                        break;
+                                }
+                            }
+                            break;
+                        default:
+                            Info($"Exiting {nameof(Feature)} task.");
+                            exitCreatingFeature = true;
+                            break;
+                    }
+
+                } while (string.IsNullOrWhiteSpace(featureName) && !exitCreatingFeature);
+
+                Info($"{EnvironmentInfo.NewLine}Good bye !");
+            });
+
+        string MajorMinorPatchVersion => GitVersion.MajorMinorPatch;
+        public Target Release => _ => _
+            .DependsOn(Changelog)
+            .Description($"Starts a new {ReleaseBranchPrefix}/{{version}} from {MainBranchName}")
+            .Requires(() => !GitRepository.IsOnReleaseBranch() || GitHasCleanWorkingCopy())
+            .Executes(() =>
+            {
+                if (!GitRepository.IsOnReleaseBranch())
+                {
+                    Checkout($"{ReleaseBranchPrefix}/{MajorMinorPatchVersion}", start: MainBranchName);
+                }
+                else
+                {
+                    FinishReleaseOrHotfix();
+                }
+            });
+
+
+        public Target Hotfix => _ => _
+            .DependsOn(Changelog)
+            .Description($"Starts a new hotfix branch '{HotfixBranchPrefix}/*' from {MainBranchName}")
+            .Requires(() => !GitRepository.IsOnHotfixBranch() || GitHasCleanWorkingCopy())
+            .Executes(() =>
+            {
+                (GitVersion mainBranchVersion, IReadOnlyCollection<Output> _) = GitVersion(s => s.SetFramework("net5.0")
+                                                                                                 .SetUrl(RootDirectory)
+                                                                                                 .SetBranch(MainBranchName)
+                                                                                                 .EnableNoFetch()
+                                                                                                 .DisableProcessLogOutput());
+
+                if (!(GitRepository.IsOnHotfixBranch() || GitRepository.Branch.Like("fix/*")))
+                {
+                    Checkout($"{HotfixBranchPrefix}/{mainBranchVersion.Major}.{mainBranchVersion.Minor}.{mainBranchVersion.Patch + 1}", start: MainBranchName);
+                }
+                else
+                {
+                    FinishReleaseOrHotfix();
+                }
+            });
+
+        private void Checkout(string branch, string start)
         {
-            Info($"Starting '{target}' task");
+            bool hasCleanWorkingCopy = GitHasCleanWorkingCopy();
+
+            if (!hasCleanWorkingCopy && AutoStash)
+            {
+                Git("stash");
+            }
+            Git($"checkout -b {branch} {start}");
+
+            if (!hasCleanWorkingCopy && AutoStash)
+            {
+                Git("stash apply");
+            }
         }
 
-        protected override void OnTargetExecuted(string target)
+        private void FinishReleaseOrHotfix()
         {
-            Info($"'{target}' task finished");
+            Warn("The hotfix (or release) could not be created because you have uncommited changes pending. Do you want to finish release/hotfix and continue ? (Y/N)");
+
+            if (Console.ReadKey().Key == ConsoleKey.Y)
+            {
+                Git($"checkout {MainBranchName}");
+                Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+                Git($"tag {MajorMinorPatchVersion}");
+
+                Git($"checkout {DevelopBranch}");
+                Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+
+                Git($"branch -D {GitRepository.Branch}");
+
+                Git($"push origin {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
+
+            }
+
         }
+        #endregion
     }
 }

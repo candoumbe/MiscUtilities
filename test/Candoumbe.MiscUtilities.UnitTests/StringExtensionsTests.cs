@@ -72,6 +72,7 @@ namespace Utilities.UnitTests
         [InlineData("Zsasz", "Zs[A-Z]sz", false, false)]
         [InlineData("Zsasz", "Zs[a-z]sz", false, true)]
         [InlineData("Zsasz", "Zs[A-Za-z]sz", false, true)]
+        [InlineData("first/", "first/*", false, true)]
         public void StringLike(string input, string pattern, bool ignoreCase, bool expectedResult)
         {
             _outputHelper.WriteLine($"input : '{input}'");
@@ -194,6 +195,8 @@ namespace Utilities.UnitTests
         [InlineData("first  name", "first-name")]
         [InlineData(" first name", "first-name")]
         [InlineData("first name ", "first-name")]
+        [InlineData("first/name", "first-name")]
+        [InlineData("o'neal", "o-neal")]
         public void Slugify(string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
@@ -207,6 +210,7 @@ namespace Utilities.UnitTests
         [InlineData("first_name", "first_name")]
         [InlineData("first name", "first_name")]
         [InlineData("first  name", "first_name")]
+        [InlineData("first-name", "first_name")]
         public void ToSnakeCase(string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");

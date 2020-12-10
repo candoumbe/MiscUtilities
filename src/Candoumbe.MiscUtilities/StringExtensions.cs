@@ -193,9 +193,8 @@ namespace System
             }
 
             StringBuilder sb = new StringBuilder(input.Length * 2);
-            input = input
-                .Trim()
-                .Replace("  ", " ");
+            input = input.Trim()
+                         .Replace("  ", " ");
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -203,7 +202,7 @@ namespace System
 
                 switch (character)
                 {
-                    case char c when char.IsWhiteSpace(c):
+                    case char c when char.IsWhiteSpace(c) || char.IsPunctuation(c):
                         if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
                         {
                             sb.Append("-");
@@ -257,7 +256,7 @@ namespace System
 
                 switch (character)
                 {
-                    case char c when char.IsWhiteSpace(c):
+                    case char c when char.IsWhiteSpace(c) || char.IsPunctuation(c):
                         if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
                         {
                             sb.Append("_");
