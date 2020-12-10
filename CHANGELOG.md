@@ -12,3 +12,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Utilities/ReplaceVisitor.cs) public
 
+
