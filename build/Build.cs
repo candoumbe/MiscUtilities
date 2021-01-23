@@ -100,7 +100,7 @@ namespace Utilities.Pipelines
         public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
 
         public const string MainBranchName = "main";
-        public const string DevelopBranch = "dev";
+        public const string DevelopBranch = "develop";
         public const string FeatureBranchPrefix = "feature";
         public const string HotfixBranchPrefix = "hotfix";
         public const string ReleaseBranchPrefix = "release";
