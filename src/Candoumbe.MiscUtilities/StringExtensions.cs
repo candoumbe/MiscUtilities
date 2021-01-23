@@ -145,9 +145,13 @@ namespace System
             }
 
             ParameterExpression pe = Parameter(typeof(TSource), "x");
-            IEnumerable<string> fields = source.Split(new[] { '.' })
-                .Select(item => item.Trim());
+
+            IEnumerable<string> fields = source.Replace(@"[""", ".")
+                                               .Replace(@"""]", string.Empty)
+                                               .Split(new[] { '.' })
+                                               .Select(item => item.Trim());
             MemberExpression property = null;
+
             foreach (string field in fields)
             {
                 property = property == null

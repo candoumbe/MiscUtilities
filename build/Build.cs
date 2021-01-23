@@ -100,7 +100,7 @@ namespace Utilities.Pipelines
         public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
 
         public const string MainBranchName = "main";
-        public const string DevelopBranch = "dev";
+        public const string DevelopBranch = "develop";
         public const string FeatureBranchPrefix = "feature";
         public const string HotfixBranchPrefix = "hotfix";
         public const string ReleaseBranchPrefix = "release";
@@ -217,7 +217,7 @@ namespace Utilities.Pipelines
         private AbsolutePath ChangeLogFile => RootDirectory / "CHANGELOG.md";
 
         public Target Changelog => _ => _
-            .OnlyWhenStatic(() => !GitRepository.IsOnReleaseBranch() || GitHasCleanWorkingCopy())
+            .OnlyWhenStatic(() => GitRepository.IsOnReleaseBranch() || GitRepository.IsOnHotfixBranch())
             .Description("Finalizes the change log so that its up to date for the release. ")
             .Executes(() =>
             {
@@ -233,29 +233,33 @@ namespace Utilities.Pipelines
             });
 
         public Target Feature => _ => _
-            .Description($"Starts a new feature development by creating the associated branch {FeatureBranchPrefix}/{{feature-name}} from {MainBranchName}")
-            .Requires(() => !GitRepository.IsOnFeatureBranch() || GitHasCleanWorkingCopy())
-            .Executes(() =>
+        .Description($"Starts a new feature development by creating the associated branch {FeatureBranchPrefix}/{{feature-name}} from {DevelopBranch}")
+        .Requires(() => IsLocalBuild)
+        .Requires(() => !GitRepository.IsOnFeatureBranch() || GitHasCleanWorkingCopy())
+        .Executes(() =>
+        {
+            if (!GitRepository.IsOnFeatureBranch())
             {
+                Info("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
                 string featureName;
                 bool exitCreatingFeature = false;
                 do
                 {
-                    Info("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
                     featureName = (Console.ReadLine() ?? string.Empty).Trim()
-                                                                      .Trim('/');
+                                                                    .Trim('/');
 
                     switch (featureName)
                     {
                         case string name when !string.IsNullOrWhiteSpace(name):
                             {
                                 string branchName = $"{FeatureBranchPrefix}/{featureName.Slugify()}";
-                                Info($"{Environment.NewLine}The branch '{branchName}' will be created.{Environment.NewLine}Do you want to continue ? (Y/N) ");
+                                Info($"{Environment.NewLine}The branch '{branchName}' will be created.{Environment.NewLine}Confirm ? (Y/N) ");
+
                                 switch (Console.ReadKey().Key)
                                 {
                                     case ConsoleKey.Y:
-                                        Info($"{Environment.NewLine}Checking out branch '{branchName}' from '{MainBranchName}'");
-                                        Checkout(branchName, start: MainBranchName);
+                                        Info($"{Environment.NewLine}Checking out branch '{branchName}' from '{DevelopBranch}'");
+                                        Checkout(branchName, start: DevelopBranch);
                                         Info($"{Environment.NewLine}'{branchName}' created successfully");
                                         exitCreatingFeature = true;
                                         break;
@@ -276,7 +280,12 @@ namespace Utilities.Pipelines
                 } while (string.IsNullOrWhiteSpace(featureName) && !exitCreatingFeature);
 
                 Info($"{EnvironmentInfo.NewLine}Good bye !");
-            });
+            }
+            else
+            {
+                FinishFeature();
+            }
+        });
 
         string MajorMinorPatchVersion => GitVersion.MajorMinorPatch;
         public Target Release => _ => _
@@ -334,26 +343,31 @@ namespace Utilities.Pipelines
             }
         }
 
+
         private void FinishReleaseOrHotfix()
         {
-            Warn("The hotfix (or release) could not be created because you have uncommited changes pending. Do you want to finish release/hotfix and continue ? (Y/N)");
+            Git($"checkout {MainBranchName}");
+            Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+            Git($"tag {MajorMinorPatchVersion}");
 
-            if (Console.ReadKey().Key == ConsoleKey.Y)
-            {
-                Git($"checkout {MainBranchName}");
-                Git($"merge --no-ff --no-edit {GitRepository.Branch}");
-                Git($"tag {MajorMinorPatchVersion}");
+            Git($"checkout {DevelopBranch}");
+            Git($"merge --no-ff --no-edit {GitRepository.Branch}");
 
-                Git($"checkout {DevelopBranch}");
-                Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+            Git($"branch -D {GitRepository.Branch}");
 
-                Git($"branch -D {GitRepository.Branch}");
-
-                Git($"push origin {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
-
-            }
-
+            Git($"push origin {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
         }
+
+        private void FinishFeature()
+        {
+            Git($"rebase {DevelopBranch}");
+            Git($"checkout {DevelopBranch}");
+            Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+
+            Git($"branch -D {GitRepository.Branch}");
+            Git($"push origin {DevelopBranch}");
+        }
+
         #endregion
     }
 }
