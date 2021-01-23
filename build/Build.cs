@@ -334,26 +334,31 @@ namespace Utilities.Pipelines
             }
         }
 
+
         private void FinishReleaseOrHotfix()
         {
-            Warn("The hotfix (or release) could not be created because you have uncommited changes pending. Do you want to finish release/hotfix and continue ? (Y/N)");
+            Git($"checkout {MainBranchName}");
+            Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+            Git($"tag {MajorMinorPatchVersion}");
 
-            if (Console.ReadKey().Key == ConsoleKey.Y)
-            {
-                Git($"checkout {MainBranchName}");
-                Git($"merge --no-ff --no-edit {GitRepository.Branch}");
-                Git($"tag {MajorMinorPatchVersion}");
+            Git($"checkout {DevelopBranch}");
+            Git($"merge --no-ff --no-edit {GitRepository.Branch}");
 
-                Git($"checkout {DevelopBranch}");
-                Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+            Git($"branch -D {GitRepository.Branch}");
 
-                Git($"branch -D {GitRepository.Branch}");
-
-                Git($"push origin {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
-
-            }
-
+            Git($"push origin {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
         }
+
+        private void FinishFeature()
+        {
+            Git($"rebase {DevelopBranch}");
+            Git($"checkout {DevelopBranch}");
+            Git($"merge --no-ff --no-edit {GitRepository.Branch}");
+
+            Git($"branch -D {GitRepository.Branch}");
+            Git($"push origin {DevelopBranch}");
+        }
+
         #endregion
     }
 }
