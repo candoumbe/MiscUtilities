@@ -233,29 +233,33 @@ namespace Utilities.Pipelines
             });
 
         public Target Feature => _ => _
-            .Description($"Starts a new feature development by creating the associated branch {FeatureBranchPrefix}/{{feature-name}} from {MainBranchName}")
-            .Requires(() => !GitRepository.IsOnFeatureBranch() || GitHasCleanWorkingCopy())
-            .Executes(() =>
+        .Description($"Starts a new feature development by creating the associated branch {FeatureBranchPrefix}/{{feature-name}} from {DevelopBranch}")
+        .Requires(() => IsLocalBuild)
+        .Requires(() => !GitRepository.IsOnFeatureBranch() || GitHasCleanWorkingCopy())
+        .Executes(() =>
+        {
+            if (!GitRepository.IsOnFeatureBranch())
             {
+                Info("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
                 string featureName;
                 bool exitCreatingFeature = false;
                 do
                 {
-                    Info("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
                     featureName = (Console.ReadLine() ?? string.Empty).Trim()
-                                                                      .Trim('/');
+                                                                    .Trim('/');
 
                     switch (featureName)
                     {
                         case string name when !string.IsNullOrWhiteSpace(name):
                             {
                                 string branchName = $"{FeatureBranchPrefix}/{featureName.Slugify()}";
-                                Info($"{Environment.NewLine}The branch '{branchName}' will be created.{Environment.NewLine}Do you want to continue ? (Y/N) ");
+                                Info($"{Environment.NewLine}The branch '{branchName}' will be created.{Environment.NewLine}Confirm ? (Y/N) ");
+
                                 switch (Console.ReadKey().Key)
                                 {
                                     case ConsoleKey.Y:
-                                        Info($"{Environment.NewLine}Checking out branch '{branchName}' from '{MainBranchName}'");
-                                        Checkout(branchName, start: MainBranchName);
+                                        Info($"{Environment.NewLine}Checking out branch '{branchName}' from '{DevelopBranch}'");
+                                        Checkout(branchName, start: DevelopBranch);
                                         Info($"{Environment.NewLine}'{branchName}' created successfully");
                                         exitCreatingFeature = true;
                                         break;
@@ -276,7 +280,12 @@ namespace Utilities.Pipelines
                 } while (string.IsNullOrWhiteSpace(featureName) && !exitCreatingFeature);
 
                 Info($"{EnvironmentInfo.NewLine}Good bye !");
-            });
+            }
+            else
+            {
+                FinishFeature();
+            }
+        });
 
         string MajorMinorPatchVersion => GitVersion.MajorMinorPatch;
         public Target Release => _ => _
