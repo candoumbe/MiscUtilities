@@ -217,7 +217,7 @@ namespace Utilities.Pipelines
         private AbsolutePath ChangeLogFile => RootDirectory / "CHANGELOG.md";
 
         public Target Changelog => _ => _
-            .OnlyWhenStatic(() => !GitRepository.IsOnReleaseBranch() || GitHasCleanWorkingCopy())
+            .OnlyWhenStatic(() => GitRepository.IsOnReleaseBranch() || GitRepository.IsOnHotfixBranch())
             .Description("Finalizes the change log so that its up to date for the release. ")
             .Executes(() =>
             {
