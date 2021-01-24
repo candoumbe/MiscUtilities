@@ -369,6 +369,48 @@ namespace System.Collections.Generic
             }
         }
 
+        /// <summary>
+        /// Splits <paramref name="source"/> into buckets so that each one holds <paramref name="bucketSize"/> elements at most
+        /// </summary>
+        /// <typeparam name="T">Type of elements that <paramref name="source"/> contains </typeparam>
+        /// <param name="source"></param>
+        /// <param name="bucketSize">number of elements that each bucket will hold at most.</param>
+        /// <returns>Collection of "buckets" where each bucket are</returns>
+        public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> source, int bucketSize)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (bucketSize < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(bucketSize), bucketSize, "Bucket size must be greater than 0");
+            }
+
+            if (bucketSize == 0)
+            {
+                yield break;
+            }
+            else
+            {
+                IEnumerator<T> enumerator = source.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    IList<T> bucket = new List<T>(bucketSize);
+
+                    int i = 0;
+                    do
+                    {
+                        bucket.Add(enumerator.Current);
+                        i++;
+                    } while (i < bucketSize && enumerator.MoveNext());
+
+                    yield return bucket;
+                }
+            }
+        }
+
 #if !NETSTANDARD1_0
         /// <summary>
         /// Asynchronously run the 
