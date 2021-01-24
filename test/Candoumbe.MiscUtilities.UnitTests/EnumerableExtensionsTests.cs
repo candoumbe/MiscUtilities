@@ -2,18 +2,18 @@
 
 using Bogus;
 using FluentAssertions;
-using FluentAssertions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 using static Newtonsoft.Json.JsonConvert;
 using static System.Linq.Expressions.ExpressionExtensions;
+using FsCheck;
+using FsCheck.Xunit;
 
 namespace Utilities.UnitTests
 {
@@ -820,5 +820,52 @@ namespace Utilities.UnitTests
             dictionary.Should()
                       .Match(dictionaryExpectation);
         }
+
+
+        [Property]
+        public void Given_Source_is_null_Partition_should_throws_ArgumentNullException(NonNegativeInt bucketSize)
+        {
+
+            // Act
+            Action callingPartitionOnNullSource = () => EnumerableExtensions.Partition<int>(null, bucketSize.Item).ToArray();
+
+            // Assert
+            callingPartitionOnNullSource.Should()
+                                        .ThrowExactly<ArgumentNullException>();
+        }
+
+        [Property]
+        public void Given_Source_is_not_null_Partition_should_throw_ArgumentOutOfRangeException_when_bucketSize_is_negative(NonEmptyArray<int> source, NegativeInt bucketSize)
+        {
+            // Act
+            Action callingPartitionWithNegativeBucketSize = () => EnumerableExtensions.Partition<int>(source.Item, bucketSize.Item).ToArray();
+
+            // Assert
+            callingPartitionWithNegativeBucketSize.Should()
+                                                  .ThrowExactly<ArgumentOutOfRangeException>();
+        }
+
+        [Property]
+        public void Given_Source_and_strictly_Positive_bucketSize_Partition_should_create_buckets(NonEmptyArray<int> source, PositiveInt bucketSize)
+        {
+            _outputHelper.WriteLine($"Bucket size : {bucketSize.Item}");
+
+            // Act
+            IEnumerable<IEnumerable<int>> buckets = EnumerableExtensions.Partition(source.Item, bucketSize.Item);
+
+            // Assert
+            int bucketCount = buckets.Count();
+            bucketCount.Should()
+                       .Be((int)Math.Round((decimal)source.Item.Length / bucketSize.Item, 0, MidpointRounding.ToPositiveInfinity));
+
+            for (int i = 0; i < bucketCount; i++)
+            {
+                buckets.ElementAt(i).Should()
+                                    .HaveCountLessOrEqualTo(Math.Min(bucketSize.Item, source.Item.Count()));
+            }
+
+        }
+
+
     }
 }
