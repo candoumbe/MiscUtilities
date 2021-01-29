@@ -1,0 +1,3 @@
+# MiscUtilities
+
+[![Azure DevOps builds](https://img.shields.io/azure-devops/build/candoumbe/7684067c-f6c9-4e35-83ee-944ab5e7505b/29?style=for-the-badge)](https://dev.azure.com/candoumbe/Utilities/_build/latest?definitionId=28&branchName=main) ![Coverage](https://img.shields.io/azure-devops/coverage/candoumbe/Utilities/28?style=for-the-badge) ![Tests](https://img.shields.io/azure-devops/tests/candoumbe/Utilities/28?style=for-the-badge&compact_message) [![Nuget](https://img.shields.io/nuget/v/Candoumbe.MiscUtilities?label=Nuget&style=for-the-badge)](https://www.nuget.org/packages/Candoumbe.MiscUtilities) 

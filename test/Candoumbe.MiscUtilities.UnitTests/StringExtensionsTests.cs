@@ -21,6 +21,8 @@ namespace Utilities.UnitTests
             public string Firstname { get; set; }
 
             public string Lastname { get; set; }
+
+            public SuperHero Acolyte { get; set; }
         }
 
         public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
@@ -251,7 +253,9 @@ namespace Utilities.UnitTests
         [Theory]
         [InlineData("Firstname", "x.Firstname")]
         [InlineData("firstname", "x.Firstname")]
-        [InlineData(" firstname", "x.Firstname")]
+        [InlineData(@"acolyte[""firstname""]", "x.Acolyte.Firstname")]
+        [InlineData(@"acolyte[""acolyte""][""acolyte""]", "x.Acolyte.Acolyte.Acolyte")]
+        [InlineData(@"acolyte.acolyte.acolyte", "x.Acolyte.Acolyte.Acolyte")]
         public void ToLambda(string property, string expectedLambda)
         {
             // Act

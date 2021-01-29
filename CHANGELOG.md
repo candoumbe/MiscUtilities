@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] / 2021-01-29
+- Changed syntax to target subproperties from `prop.subproperty` to `prop["subproperty"]`
+- Added `Partition(int bucketSize)` extension method
+
 ## [0.1.0] / 2020-12-10
 - Fixed `Slugify` to take into account characters like `/`
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Utilities/ReplaceVisitor.cs) public
+
 
 
