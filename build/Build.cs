@@ -79,6 +79,7 @@ namespace Utilities.Pipelines
 
         [Solution] public readonly Solution Solution;
         [GitRepository] public readonly GitRepository GitRepository;
+
         [GitVersion] public readonly GitVersion GitVersion;
 
         [CI] public readonly AzurePipelines AzurePipelines;
@@ -290,13 +291,13 @@ namespace Utilities.Pipelines
         string MajorMinorPatchVersion => GitVersion.MajorMinorPatch;
         public Target Release => _ => _
             .DependsOn(Changelog)
-            .Description($"Starts a new {ReleaseBranchPrefix}/{{version}} from {MainBranchName}")
+            .Description($"Starts a new {ReleaseBranchPrefix}/{{version}} from {DevelopBranch}")
             .Requires(() => !GitRepository.IsOnReleaseBranch() || GitHasCleanWorkingCopy())
             .Executes(() =>
             {
                 if (!GitRepository.IsOnReleaseBranch())
                 {
-                    Checkout($"{ReleaseBranchPrefix}/{MajorMinorPatchVersion}", start: MainBranchName);
+                    Checkout($"{ReleaseBranchPrefix}/{MajorMinorPatchVersion}", start: DevelopBranch);
                 }
                 else
                 {
