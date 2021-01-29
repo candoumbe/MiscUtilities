@@ -255,6 +255,7 @@ namespace Utilities.UnitTests
         [InlineData("firstname", "x.Firstname")]
         [InlineData(@"acolyte[""firstname""]", "x.Acolyte.Firstname")]
         [InlineData(@"acolyte[""acolyte""][""acolyte""]", "x.Acolyte.Acolyte.Acolyte")]
+        [InlineData(@"acolyte.acolyte.acolyte", "x.Acolyte.Acolyte.Acolyte")]
         public void ToLambda(string property, string expectedLambda)
         {
             // Act
