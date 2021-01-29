@@ -355,7 +355,7 @@ namespace Utilities.Pipelines
 
             Git($"branch -D {GitRepository.Branch}");
 
-            Git($"push origin {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
+            Git($"push origin --follow-tags {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
         }
 
         private void FinishFeature()
