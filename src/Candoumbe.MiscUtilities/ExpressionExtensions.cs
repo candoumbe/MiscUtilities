@@ -152,7 +152,6 @@ namespace System.Linq.Expressions
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
         /// <returns>A new expression that represents <code>(T x) => f < g</code></returns>
-
         public static Expression<Func<T, bool>> LessThan<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -173,7 +172,6 @@ namespace System.Linq.Expressions
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
         /// <returns>A new expression that represents <code>(T x) => f > g</code></returns>
-
         public static Expression<Func<T, bool>> GreaterThan<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -194,7 +192,6 @@ namespace System.Linq.Expressions
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
         /// <returns>A new expression that represents <code>(T x) => f >= g</code></returns>
-
         public static Expression<Func<T, bool>> GreaterThanOrEqual<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -215,7 +212,6 @@ namespace System.Linq.Expressions
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
         /// <returns>A new expression that represents <code>(T x) => f <= g</code></returns>
-
         public static Expression<Func<T, bool>> LessThanOrEqual<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -236,7 +232,6 @@ namespace System.Linq.Expressions
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
         /// <returns>A new expression that represents <code>(T x) => f == g</code></returns>
-
         public static Expression<Func<T, bool>> Equal<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));

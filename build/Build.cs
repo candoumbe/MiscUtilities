@@ -1,6 +1,7 @@
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.AzurePipelines;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
@@ -10,24 +11,43 @@ using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.ReportGenerator;
+using Nuke.Common.Utilities;
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using static Nuke.Common.ChangeLog.ChangelogTasks;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
-using static Nuke.Common.ChangeLog.ChangelogTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
 using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
-using Nuke.Common.Tools.GitHub;
+using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
 namespace Utilities.Pipelines
 {
+    [GitHubActions(
+        name:"continuous",
+        GitHubActionsImage.WindowsLatest,
+        OnPushBranchesIgnore = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
+        OnPullRequestBranches = new[] { DevelopBranch },
+        PublishArtifacts = false,
+        InvokedTargets = new[] { nameof(Tests), nameof(Pack) })
+    ]
+    [GitHubActions(
+    "deployment",
+        GitHubActionsImage.WindowsLatest,
+        OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
+        InvokedTargets = new[] { nameof(Publish) },
+        ImportGitHubTokenAs = nameof(GitHubToken),
+    ImportSecrets =
+        new[]
+        {
+            nameof(NugetApiKey),
+        })]
     [AzurePipelines(
         suffix: "pull-request",
         AzurePipelinesImage.WindowsLatest,
@@ -69,7 +89,7 @@ namespace Utilities.Pipelines
         public static int Main() => Execute<Build>(x => x.Pack);
 
         [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-        public readonly string Configuration = IsLocalBuild ? "Debug" : "Release";
+        public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
         [Parameter("Indicates wheter to restore nuget in interactive mode - Default is false")]
         public readonly bool Interactive = false;
@@ -83,6 +103,11 @@ namespace Utilities.Pipelines
         [GitVersion] public readonly GitVersion GitVersion;
 
         [CI] public readonly AzurePipelines AzurePipelines;
+
+        [CI] public readonly GitHubActions GitHubActions;
+
+        [Parameter("Token used to interact with Github")] 
+        public readonly string GitHubToken;
 
         [Partition(10)] public readonly Partition TestPartition;
 
@@ -370,5 +395,54 @@ namespace Utilities.Pipelines
         }
 
         #endregion
+
+        [Parameter("API key used to publish artifacts to Nuget.org")]
+        public readonly string NugetApiKey;
+
+        [Parameter(@"URI where packages should be published (default : ""https://api.nuget.org/v3/index.json""")]
+        public string NugetPackageSource => "https://api.nuget.org/v3/index.json";
+
+        public string GitHubPackageSource => $"https://nuget.pkg.github.com/{GitHubActions.GitHubRepositoryOwner}/index.json";
+
+        public bool IsOnGithub => GitHubActions is not null;
+
+        public Target Publish => _ => _
+            .Description($"Published packages (*.nupkg and *.snupkg) to the destination server set with {nameof(NugetPackageSource)} settings ")
+            .DependsOn(Clean, Tests, Pack)
+            .Consumes(Pack, ArtifactsDirectory / "*.nupkg", ArtifactsDirectory / "*.snupkg")
+            .Requires(() => !NugetApiKey.IsNullOrEmpty())
+            .Requires(() => GitHasCleanWorkingCopy())
+            .Requires(() => GitRepository.Branch == MainBranchName
+                            || GitRepository.IsOnReleaseBranch()
+                            || GitRepository.IsOnDevelopBranch())
+            .Requires(() => Configuration.Equals(Configuration.Release))
+            .Executes(() =>
+            {
+                void PushPackages(IReadOnlyCollection<AbsolutePath> nupkgs)
+                {
+                    Info($"Publishing {nupkgs.Count} package{(nupkgs.Count > 1 ? "s" : string.Empty)}");
+                    Info(string.Join(EnvironmentInfo.NewLine, nupkgs));
+
+                    DotNetNuGetPush(s => s.SetApiKey(NugetApiKey)
+                        .SetSource(NugetPackageSource)
+                        .EnableSkipDuplicate()
+                        .EnableNoSymbols()
+                        .SetProcessLogTimestamp(true)
+                        .CombineWith(nupkgs, (_, nupkg) => _
+                                    .SetTargetPath(nupkg)),
+                        degreeOfParallelism: 4,
+                        completeOnFailure: true);
+                }
+
+                if (!IsOnGithub)
+                {
+                    DotNetNuGetAddSource(_ => _
+                        .SetSource(GitHubPackageSource)
+                        .SetUsername(GitHubActions.GitHubActor)
+                        .SetPassword(GitHubToken));
+                }
+                PushPackages(ArtifactsDirectory.GlobFiles("*.nupkg"));
+                PushPackages(ArtifactsDirectory.GlobFiles("*.snupkg"));
+            });
     }
 }

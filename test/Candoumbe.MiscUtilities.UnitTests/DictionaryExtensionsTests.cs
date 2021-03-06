@@ -9,7 +9,6 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-using static Newtonsoft.Json.JsonConvert;
 using static System.StringSplitOptions;
 
 namespace Utilities.UnitTests

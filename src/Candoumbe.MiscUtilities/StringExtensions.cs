@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 #if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-#if !NET5_0
+#if !NET5_0_OR_GREATER
 using Microsoft.Extensions.Primitives;
 #endif
 #endif
@@ -28,6 +28,7 @@ namespace System
         public static string ToTitleCase(this string input)
         {
             StringBuilder sbResult = null;
+#if !NET5_0_OR_GREATER
             if (input?.ToCharArray()?.AtLeastOnce() ?? false)
             {
                 sbResult = new StringBuilder(input);
@@ -45,6 +46,30 @@ namespace System
                 }
             }
 
+#else
+            Rune[] runes = input?.EnumerateRunes().ToArray() ?? Array.Empty<Rune>();
+            if (runes.AtLeastOnce())
+            {
+                sbResult = new(runes.Length);
+                if (Rune.IsLetter(runes[0]))
+                {
+                    sbResult.Append(Rune.ToUpperInvariant(runes[0]));
+                }
+
+                for (int i = 1; i < runes.Length; i++)
+                {
+                    if (Rune.IsWhiteSpace(runes[i - 1]) || runes[i - 1] == new Rune('-'))
+                    {
+                        sbResult.Append(Rune.ToUpperInvariant(runes[i]));
+                    }
+                    else
+                    {
+                        sbResult.Append(Rune.ToLowerInvariant(runes[i]));
+                    }
+                }
+            }
+
+#endif
             return sbResult?.ToString() ?? string.Empty;
         }
 
@@ -60,9 +85,9 @@ namespace System
             input ??= string.Empty;
             string sanitizedInput
 #if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-             = new string(input
+             = new (input
 #else
-            = new string(input.ToCharArray()
+            = new(input.ToCharArray()
 #endif
                 .Where(character => char.IsLetterOrDigit(character) || character == '-' || char.IsWhiteSpace(character))
                     .ToArray());
@@ -196,7 +221,7 @@ namespace System
                 throw new ArgumentNullException(nameof(input), $"{nameof(input)} cannot be null");
             }
 
-            StringBuilder sb = new StringBuilder(input.Length * 2);
+            StringBuilder sb = new(input.Length * 2);
             input = input.Trim()
                          .Replace("  ", " ");
 
@@ -209,7 +234,7 @@ namespace System
                     case char c when char.IsWhiteSpace(c) || char.IsPunctuation(c):
                         if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
                         {
-                            sb.Append("-");
+                            sb.Append('-');
                         }
                         break;
                     case char c when char.IsUpper(c):
@@ -219,7 +244,7 @@ namespace System
                         }
                         else if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
                         {
-                            sb.Append("-");
+                            sb.Append('-');
                             sb.Append(char.ToLowerInvariant(c));
                         }
                         break;
@@ -250,7 +275,8 @@ namespace System
                 throw new ArgumentNullException(nameof(input), $"{nameof(input)} cannot be null");
             }
 
-            StringBuilder sb = new StringBuilder(input.Length * 2);
+#if !NET5_0_OR_GREATER
+            StringBuilder sb = new(input.Length * 2);
             input = input.Trim()
                          .Replace("  ", " ");
 
@@ -263,7 +289,7 @@ namespace System
                     case char c when char.IsWhiteSpace(c) || char.IsPunctuation(c):
                         if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
                         {
-                            sb.Append("_");
+                            sb.Append('_');
                         }
                         break;
                     case char c when char.IsUpper(c):
@@ -273,7 +299,7 @@ namespace System
                         }
                         else if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
                         {
-                            sb.Append("_");
+                            sb.Append('_');
                             sb.Append(char.ToLowerInvariant(c));
                         }
                         break;
@@ -282,6 +308,41 @@ namespace System
                         break;
                 }
             }
+#else
+            Rune[] runes = input.EnumerateRunes().ToArray();
+            StringBuilder sb = new(runes.Length * 2);
+            input = input.Trim()
+                         .Replace("  ", " ");
+
+            for (int i = 0; i < runes.Length; i++)
+            {
+                Rune rune = runes[i];
+
+                switch (rune)
+                {
+                    case Rune c when Rune.IsWhiteSpace(c) || Rune.IsPunctuation(c):
+                        if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
+                        {
+                            sb.Append('_');
+                        }
+                        break;
+                    case Rune c when Rune.IsUpper(c):
+                        if (i == 0)
+                        {
+                            sb.Append(Rune.ToLowerInvariant(c));
+                        }
+                        else if (i > 0 && !char.IsWhiteSpace(input[i - 1]))
+                        {
+                            sb.Append('_');
+                            sb.Append(Rune.ToLowerInvariant(c));
+                        }
+                        break;
+                    default:
+                        sb.Append(Rune.ToLowerInvariant(rune));
+                        break;
+                }
+            }
+#endif
 
             return sb.ToString();
         }
@@ -295,7 +356,7 @@ namespace System
         public static string RemoveDiacritics(this string input)
         {
             string normalizedString = input.Normalize(NormalizationForm.FormD);
-            StringBuilder stringBuilder = new StringBuilder(input.Length);
+            StringBuilder stringBuilder = new(input.Length);
 
             foreach (char c in normalizedString)
             {

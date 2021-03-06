@@ -32,6 +32,10 @@ namespace Utilities.UnitTests
         [InlineData("bruce", "Bruce")]
         [InlineData("bruce wayne", "Bruce Wayne")]
         [InlineData("cyrille-alexandre", "Cyrille-Alexandre")]
+#if NET5_0_OR_GREATER
+        [InlineData("𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟")]
+        [InlineData("𐐿𐐱𐐻", "𐐗𐐱𐐻")]
+#endif
         public void ToTitleCase(string input, string expectedString)
             => input?.ToTitleCase()?.Should().Be(expectedString);
 
@@ -93,7 +97,7 @@ namespace Utilities.UnitTests
             get
             {
                 {
-                    StringSegment segment = new StringSegment("Bruce");
+                    StringSegment segment = new("Bruce");
 
                     yield return new object[]
                     {
@@ -148,6 +152,7 @@ namespace Utilities.UnitTests
             }
         }
 
+#if NETCOREAPP3_1_OR_GREATER
         [Theory]
         [MemberData(nameof(StringSegmentLikeCases))]
         public void StringSegmentLike((StringSegment input, string pattern, bool ignoreCase, bool expectedResult) data)
@@ -162,6 +167,7 @@ namespace Utilities.UnitTests
             // Assert
             result.Should().Be(data.expectedResult);
         }
+#endif
 
         [Theory]
         [InlineData(null, "test")]
@@ -199,6 +205,10 @@ namespace Utilities.UnitTests
         [InlineData("first name ", "first-name")]
         [InlineData("first/name", "first-name")]
         [InlineData("o'neal", "o-neal")]
+#if NET5_0_OR_GREATER
+        [InlineData("𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
+        [InlineData("𐐿𐐱𐐻", "𐐿𐐱𐐻")]
+#endif
         public void Slugify(string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
@@ -213,6 +223,9 @@ namespace Utilities.UnitTests
         [InlineData("first name", "first_name")]
         [InlineData("first  name", "first_name")]
         [InlineData("first-name", "first_name")]
+#if NET5_0_OR_GREATER
+        [InlineData("𐓘𐓻𐓘𐓏𐓻𐓟", "𐓘𐓻𐓘_𐓷𐓻𐓟")]
+#endif
         public void ToSnakeCase(string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
@@ -255,7 +268,7 @@ namespace Utilities.UnitTests
         [InlineData("firstname", "x.Firstname")]
         [InlineData(@"acolyte[""firstname""]", "x.Acolyte.Firstname")]
         [InlineData(@"acolyte[""acolyte""][""acolyte""]", "x.Acolyte.Acolyte.Acolyte")]
-        [InlineData(@"acolyte.acolyte.acolyte", "x.Acolyte.Acolyte.Acolyte")]
+        [InlineData("acolyte.acolyte.acolyte", "x.Acolyte.Acolyte.Acolyte")]
         public void ToLambda(string property, string expectedLambda)
         {
             // Act
@@ -306,10 +319,9 @@ namespace Utilities.UnitTests
                     "zsasz",
                     "z",
                     StringComparison.CurrentCulture,
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
-                        occurrences != null && occurrences.Count() == 2
-                        && occurrences.Once(pos => pos == 0)
-                        && occurrences.Once(pos  =>pos == 4)
+                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && occurrences.Exactly(2)
+                                                                              && occurrences.Once(pos => pos == 0)
+                                                                              && occurrences.Once(pos => pos == 4)
                     ),
                     "There are 2 occurrences of the search element in the string"
                 };
