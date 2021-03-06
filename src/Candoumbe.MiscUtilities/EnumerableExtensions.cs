@@ -442,7 +442,7 @@ namespace System.Collections.Generic
         }
 #endif
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0
         /// <summary>
         /// Converts a <see cref="IEnumerable{T}"/> to its <see cref="IAsyncEnumerable{T}"/> counterpart.
         /// </summary>

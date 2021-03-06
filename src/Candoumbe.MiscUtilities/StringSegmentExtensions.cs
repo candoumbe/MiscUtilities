@@ -77,7 +77,7 @@ namespace Microsoft.Extensions.Primitives
         {
             if (StringSegment.IsNullOrEmpty(search))
             {
-                throw new ArgumentException(nameof(search));
+                throw new ArgumentException($"{nameof(search)} cannot be null or empty", nameof(search));
             }
 
             int index =-1,
