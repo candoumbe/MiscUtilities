@@ -422,7 +422,7 @@ namespace Utilities.Pipelines
                 {
                     Info($"Publishing {nupkgs.Count} package{(nupkgs.Count > 1 ? "s" : string.Empty)}");
                     Info(string.Join(EnvironmentInfo.NewLine, nupkgs));
-
+                    
                     DotNetNuGetPush(s => s.SetApiKey(NugetApiKey)
                         .SetSource(NugetPackageSource)
                         .EnableSkipDuplicate()
