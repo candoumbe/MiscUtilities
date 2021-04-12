@@ -50,7 +50,7 @@ namespace Utilities.Pipelines
         OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
         OnPullRequestExcludePaths = new[]
         {
-            "docs/*",
+            "'docs/*'",
             "README.md",
             "CHANGELOG.md"
         },
