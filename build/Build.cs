@@ -34,20 +34,33 @@ namespace Utilities.Pipelines
         GitHubActionsImage.WindowsLatest,
         OnPushBranchesIgnore = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
         OnPullRequestBranches = new[] { DevelopBranch },
-        PublishArtifacts = false,
-        InvokedTargets = new[] { nameof(Tests), nameof(Pack) })
-    ]
-    [GitHubActions(
-    "deployment",
-        GitHubActionsImage.WindowsLatest,
-        OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
-        InvokedTargets = new[] { nameof(Publish) },
-        ImportGitHubTokenAs = nameof(GitHubToken),
-    ImportSecrets =
-        new[]
+        PublishArtifacts = true,
+        InvokedTargets = new[] { nameof(Tests) },
+        OnPullRequestExcludePaths = new[]
         {
-            nameof(NugetApiKey),
-        })]
+            "docs/*",
+            "README.md",
+            "CHANGELOG.md"
+        }
+    )]
+    [GitHubActions(
+        "deployment",
+        GitHubActionsImage.WindowsLatest,
+        PublishArtifacts = true,
+        OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
+        OnPullRequestExcludePaths = new[]
+        {
+            "docs/*",
+            "README.md",
+            "CHANGELOG.md"
+        },
+        InvokedTargets = new[] { nameof(Tests), nameof(Publish) },
+        ImportGitHubTokenAs = nameof(GitHubToken),
+        ImportSecrets = new[]
+                        {
+                            nameof(NugetApiKey),
+                        }
+    )]
     [AzurePipelines(
         suffix: "pull-request",
         AzurePipelinesImage.WindowsLatest,
@@ -133,6 +146,7 @@ namespace Utilities.Pipelines
         public const string SupportBranchPrefix = "support";
 
         public Target Clean => _ => _
+            .Description($"Cleans all 'bin' and 'obj' directories under '{SourceDirectory}' and '{TestDirectory}'")
             .Before(Restore)
             .Executes(() =>
             {
@@ -144,6 +158,7 @@ namespace Utilities.Pipelines
             });
 
         public Target Restore => _ => _
+            .Description("Restores nuget packages dependencies")
             .Executes(() =>
             {
                 DotNetRestore(s => s
@@ -165,12 +180,13 @@ namespace Utilities.Pipelines
                     .SetAssemblyVersion(GitVersion.AssemblySemVer)
                     .SetFileVersion(GitVersion.AssemblySemFileVer)
                     .SetInformationalVersion(GitVersion.InformationalVersion)
+                    .SetProperty("GenerateDocumentationFile", true)
                     );
             });
 
         public Target Tests => _ => _
             .DependsOn(Compile)
-            .Description("Run unit tests and collect code")
+            .Description("Run unit tests and collect code coverage results.")
             .Produces(TestResultDirectory / "*.trx")
             .Produces(TestResultDirectory / "*.xml")
             .Executes(() =>
@@ -209,6 +225,7 @@ namespace Utilities.Pipelines
                         .SetReportTypes(ReportTypes.Badges, ReportTypes.HtmlChart, ReportTypes.HtmlInline_AzurePipelines_Dark)
                         .SetTargetDirectory(CoverageReportDirectory)
                         .SetHistoryDirectory(CoverageHistoryDirectory)
+                        .SetTag(MajorMinorPatchVersion)
                     );
 
                 TestResultDirectory.GlobFiles("*.xml")

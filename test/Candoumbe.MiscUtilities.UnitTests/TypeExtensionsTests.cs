@@ -40,9 +40,17 @@ namespace Utilities.UnitTests
             typeof(Bar).IsAssignableToGenericType(typeof(IFoo<>)).Should().BeTrue();
         }
 
+        [Fact]
+        public void Given_Should_be_assignable_from_open_generic_type_to_nongeneric_concrete_type()
+        {
+            typeof(Baz).IsAssignableToGenericType(typeof(IFoo<>)).Should().BeTrue();
+        }
+
         public interface IFoo<T> { }
         public class Foo<T> : IFoo<T> { }
         public class Bar : IFoo<int> { }
+
+        public class Baz : Bar { }
 
         public static IEnumerable<object[]> IsAnonymousCases
         {

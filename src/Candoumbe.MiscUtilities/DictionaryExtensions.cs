@@ -9,7 +9,7 @@ namespace System.Collections.Generic
         /// <summary>
         /// List of all types that can be directly converted to their string representation
         /// </summary>
-        public static IEnumerable<Type> PrimitiveTypes = new[]
+        public static readonly IEnumerable<Type> PrimitiveTypes = new[]
         {
             typeof(string),
 
@@ -25,7 +25,7 @@ namespace System.Collections.Generic
             typeof(bool), typeof(bool?)
         };
 
-        public static IEnumerable<Type> NumericTypes = new[]
+        public static readonly IEnumerable<Type> NumericTypes = new[]
         {
             typeof(int), typeof(int?),
             typeof(long), typeof(long?),
@@ -38,75 +38,76 @@ namespace System.Collections.Generic
         /// Converts a dictionary to a "URL" friendly representation
         /// </summary>
         /// <param name="keyValues">the dictionary to convert</param>
+        /// <param name="transform">A function to customize the value associated with  </param>
         /// <returns></returns>
-        public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues)
+        public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues, Func<string, object, object> transform)
         {
             StringBuilder sb = new ();
+            keyValues ??= Enumerable.Empty<KeyValuePair<string, object>>();
             IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues.Where(kv => kv.Value != null)
                                                                                 .OrderBy(kv => kv.Key)
                                                                                 .ThenBy(kv => kv.Value);
-#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD2_0
             foreach (KeyValuePair<string, object> kv in localKeyValues)
-#else
-            foreach ((string key, object value) in localKeyValues)
-#endif
             {
-#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD2_0
-                object value = kv.Value;
+                object value = transform is not null
+                    ? transform.Invoke(kv.Key, kv.Value)
+                    : kv.Value;
                 string key = kv.Key;
-#endif
-                Type valueType = value.GetType();
-                TypeInfo valueTypeInfo = valueType.GetTypeInfo();
-                //The type of the value is a "simple" object
-                if (valueTypeInfo.IsPrimitive || valueTypeInfo.IsEnum || PrimitiveTypes.Any(x => x == valueType))
+                if (value is not null)
                 {
-                    if (sb.Length > 0)
+                    Type valueType = value.GetType();
+                    TypeInfo valueTypeInfo = valueType.GetTypeInfo();
+                    //The type of the value is a "simple" object
+                    if (valueTypeInfo.IsPrimitive || valueTypeInfo.IsEnum || PrimitiveTypes.Any(x => x == valueType))
                     {
-                        sb.Append("&");
-                    }
+                        if (sb.Length > 0)
+                        {
+                            sb.Append('&');
+                        }
 
-                    sb.Append(Uri.EscapeDataString(key))
-                      .Append("=")
-                      .Append(ConvertValueToString(value));
-                }
-                else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
-                {
-                    subDictionary =  subDictionary
+                        sb.Append(Uri.EscapeDataString(key))
+                          .Append('=')
+                          .Append(ConvertValueToString(value));
+                    }
+                    else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
+                    {
+                        subDictionary = subDictionary
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3
                                     .AsParallel()
 #endif
                                     .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
 
-                    if (sb.Length > 0)
-                    {
-                        sb.Append("&");
-                    }
-                    sb.Append(ToQueryString(subDictionary));
-                }
-                else if (value is IEnumerable enumerable)
-                {
-                    int itemPosition = 0;
-                    Type elementType;
-                    TypeInfo elementTypeInfo;
-
-                    foreach (object item in enumerable)
-                    {
-                        if (item != null)
+                        if (sb.Length > 0)
                         {
-                            elementType = item.GetType();
-                            elementTypeInfo = elementType.GetTypeInfo();
-                            if (elementTypeInfo.IsPrimitive || PrimitiveTypes.Any(x => x == elementType))
+                            sb.Append('&');
+                        }
+                        sb.Append(ToQueryString(subDictionary, transform));
+                    }
+                    else if (value is IEnumerable enumerable)
+                    {
+                        int itemPosition = 0;
+                        Type elementType;
+                        TypeInfo elementTypeInfo;
+
+                        foreach (object item in enumerable)
+                        {
+                            if (item != null)
                             {
-                                if (sb.Length > 0)
+                                elementType = item.GetType();
+                                elementTypeInfo = elementType.GetTypeInfo();
+                                if (elementTypeInfo.IsPrimitive || PrimitiveTypes.Any(x => x == elementType))
                                 {
-                                    sb.Append("&");
+                                    if (sb.Length > 0)
+                                    {
+                                        sb.Append('&');
+                                    }
+
+                                    sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
+                                       .Append('=')
+                                       .Append(ConvertValueToString(item));
+
+                                    itemPosition++;
                                 }
-
-                                sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
-                                   .Append("=")
-                                   .Append(ConvertValueToString(item));
-
-                                itemPosition++;
                             }
                         }
                     }

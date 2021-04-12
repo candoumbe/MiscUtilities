@@ -68,10 +68,6 @@ namespace System
                             {
                                 dictionary.Add($"{count}", current);
                             }
-                            //else 
-                            //{
-                            //    dictionary.Add($"{count}", ParseAnonymousObject(current));
-                            //}
                             count++;
                         }
                     }
@@ -110,7 +106,45 @@ namespace System
         /// </summary>
         /// <param name="obj">The object to convert</param>
         /// <returns>the query string representation preceeded with the "?" or an empty string</returns>
-        public static string ToQueryString(this object obj) => DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject());
+        public static string ToQueryString(this object obj) => ToQueryString(obj, null);
+
+        /// <summary>
+        /// Converts an object to its string representation suitable for appending as query string in a url
+        /// </summary>
+        /// <param name="obj">The object to convert</param>
+        /// <param name="transform">A delegate to apply to each property of <paramref name="obj"/>
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// The <paramref name="transform"/> delegate can be used to "transform" the value associated to a key prior to putting it in a query string.
+        /// </para>
+        /// <para>
+        ///     Without <paramref name="transform"/>
+        ///     <example>
+        ///         <code>
+        ///         class Example
+        ///         {
+        ///             var source = new { id = 1 };
+        ///             string query =  source.ToQueryString() // "id=1"
+        ///         }
+        ///         </code>
+        ///     </example>
+        /// </para>
+        /// <para>
+        ///     With a <paramref name="transform"/>
+        ///     <example>
+        ///         <code ²>
+        ///         class Example
+        ///         {
+        ///             var source = new { id = 1 };
+        ///             string query =  source.ToQueryString((key, value) => key == "id" ? "newValue" : value) // "id=newValue"
+        ///         }
+        ///         </code>
+        ///     </example>
+        /// </para>
+        /// </remarks>
+        /// <returns>the query string representation</returns>
+        public static string ToQueryString(this object obj, Func<string, object, object> transform) => DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject(), transform);
 
         /// <summary>
         /// Performs a "safe cast" of the specified object to the specified type.

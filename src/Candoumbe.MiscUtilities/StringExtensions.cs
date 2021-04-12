@@ -397,11 +397,7 @@ namespace System
                 newPos,
                 currentPos = 0;
 
-            if (input.Length == 0)
-            {
-                yield break;
-            }
-            else
+            if (input.Length > 0)
             {
                 int inputLength = input.Length;
 
