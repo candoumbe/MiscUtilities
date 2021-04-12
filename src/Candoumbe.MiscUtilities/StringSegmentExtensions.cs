@@ -15,18 +15,11 @@ namespace Microsoft.Extensions.Primitives
         /// <returns>
         /// A collection of all indexes in <paramref name="input"/> where <paramref name="search"/> is present.
         /// </returns>
-        /// <remarks>
-        /// 
-        /// </remarks>
         public static IEnumerable<int> Occurrences(this StringSegment input, char search)
         {
             int i = 0;
 
-            if (input.Length == 0)
-            {
-                yield break;
-            }
-            else
+            if (!StringSegment.IsNullOrEmpty(input))
             {
                 while (i < input.Length)
                 {
@@ -77,7 +70,7 @@ namespace Microsoft.Extensions.Primitives
         {
             if (StringSegment.IsNullOrEmpty(search))
             {
-                throw new ArgumentException(nameof(search));
+                throw new ArgumentException($"{nameof(search)} cannot be null or empty", nameof(search));
             }
 
             int index =-1,
@@ -110,20 +103,13 @@ namespace Microsoft.Extensions.Primitives
         /// <returns>
         /// A collection of all indexes in <paramref name="input"/> where <paramref name="search"/> is present.
         /// </returns>
-        /// <remarks>
-        /// 
-        /// </remarks>
         public static IEnumerable<int> Occurrences(this StringSegment input, StringSegment search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
             int index,
                 newPos,
                 currentPos = 0;
 
-            if (input.Length == 0)
-            {
-                yield break;
-            }
-            else
+            if (!StringSegment.IsNullOrEmpty(input))
             {
                 int inputLength = input.Length;
                 do
@@ -148,7 +134,9 @@ namespace Microsoft.Extensions.Primitives
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
         /// <param name="ignoreCase"><c>true</c> to ignore case</param>
-        /// <returns></returns>
+        /// <returns><code>true</code> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <code>false</code>
+        /// otherwise.
+        /// </returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
         public static bool Like(this StringSegment input, string pattern, bool ignoreCase) => input.Value.Like(pattern, ignoreCase);
 

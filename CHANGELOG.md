@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] / 2021-04-12
+- Added `NET5.0` support
+- Improved support for non latin string when using string extension methods
+- Added new overload for `ToQueryString`
+
 ## [0.2.0] / 2021-01-29
 - Changed syntax to target subproperties from `prop.subproperty` to `prop["subproperty"]`
 - Added `Partition(int bucketSize)` extension method
@@ -14,7 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] / 2020-12-10
 - Fixed `Slugify` to take into account characters like `/`
 - Fixed `ToSnakeCase` to take into account characters like `-`
-- Made [ReplaceVisitor](./src/Utilities/ReplaceVisitor.cs) public
+- Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-
+[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.2.0...0.3.0
+[0.2.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/candoumbe/MiscUtilities.git/tree/0.1.0
 

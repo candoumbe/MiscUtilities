@@ -682,7 +682,7 @@ namespace Utilities.UnitTests
         {
             get
             {
-                Faker faker = new Faker();
+                Faker faker = new();
                 int casesCount = faker.Random.Int(min: 1, max: 20);
                 int millisecondsDelay = faker.Random.Int(max: -1);
 
@@ -701,7 +701,7 @@ namespace Utilities.UnitTests
         public void AsAsyncEnumerable_Throws_ArgumentOutOfRangeException_When_MillisecondsDelay_Is_Negative(int millisecondsDelay)
         {
             // Arrange
-            Faker faker = new Faker();
+            Faker faker = new();
             int[] source = faker.Random.Digits(count: 10);
 
             _outputHelper.WriteLine($"Collection : {source.Jsonify()}");
@@ -718,7 +718,7 @@ namespace Utilities.UnitTests
         {
             get
             {
-                Faker faker = new Faker();
+                Faker faker = new();
                 int casesCount = faker.Random.Number(min: 1, max: 20);
 
                 for (int i = 0; i < casesCount; i++)
@@ -821,11 +821,9 @@ namespace Utilities.UnitTests
                       .Match(dictionaryExpectation);
         }
 
-
         [Property]
         public void Given_Source_is_null_Partition_should_throws_ArgumentNullException(NonNegativeInt bucketSize)
         {
-
             // Act
             Action callingPartitionOnNullSource = () => EnumerableExtensions.Partition<int>(null, bucketSize.Item).ToArray();
 
@@ -851,7 +849,7 @@ namespace Utilities.UnitTests
             _outputHelper.WriteLine($"Bucket size : {bucketSize.Item}");
 
             // Act
-            IEnumerable<IEnumerable<int>> buckets = EnumerableExtensions.Partition(source.Item, bucketSize.Item);
+            IEnumerable<IEnumerable<int>> buckets = source.Item.Partition(bucketSize.Item);
 
             // Assert
             int bucketCount = buckets.Count();
@@ -861,11 +859,8 @@ namespace Utilities.UnitTests
             for (int i = 0; i < bucketCount; i++)
             {
                 buckets.ElementAt(i).Should()
-                                    .HaveCountLessOrEqualTo(Math.Min(bucketSize.Item, source.Item.Count()));
+                                    .HaveCountLessOrEqualTo(Math.Min(bucketSize.Item, source.Item.Length));
             }
-
         }
-
-
     }
 }

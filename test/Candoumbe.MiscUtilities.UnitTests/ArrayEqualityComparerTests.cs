@@ -82,7 +82,7 @@ namespace Utilities.UnitTests
             _outputHelper.WriteLine($"First : '{first.Jsonify()}'");
             _outputHelper.WriteLine($"Second : '{second.Jsonify()}'");
 
-            ArrayEqualityComparer<T> comparer = new ArrayEqualityComparer<T>();
+            ArrayEqualityComparer<T> comparer = new();
 
             // Act
             bool actual = comparer.Equals(first, second);

@@ -10,13 +10,13 @@ namespace System.Collections.Generic
 
         internal sealed class EmptyAsyncEnumerator<T> : IAsyncEnumerator<T>
         {
-            public static readonly EmptyAsyncEnumerator<T> Instance = new EmptyAsyncEnumerator<T>();
+            public static readonly EmptyAsyncEnumerator<T> Instance = new();
 
             public T Current => default!;
 
             public ValueTask DisposeAsync() => default;
 
-            public ValueTask<bool> MoveNextAsync() => new ValueTask<bool>(false);
+            public ValueTask<bool> MoveNextAsync() => new(false);
         }
 
         internal sealed class EmptyAsyncEnumerable<T> : IAsyncEnumerable<T>

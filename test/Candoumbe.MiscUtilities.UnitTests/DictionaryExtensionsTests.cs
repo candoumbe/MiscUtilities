@@ -9,7 +9,6 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-using static Newtonsoft.Json.JsonConvert;
 using static System.StringSplitOptions;
 
 namespace Utilities.UnitTests
@@ -187,7 +186,137 @@ namespace Utilities.UnitTests
             _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
 
             // Act
-            string queryString = keyValues?.ToQueryString();
+            string queryString = DictionaryExtensions.ToQueryString(keyValues, null);
+
+            // Arrange
+            _outputHelper.WriteLine($"Result is '{queryString}'");
+            queryString?.Should()
+                        .Match(expectedString);
+        }
+
+        public static IEnumerable<object[]> ToQueryStringWithTransformationCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new []
+                    {
+                        new KeyValuePair<string, object>("color", 3),
+                        new KeyValuePair<string, object>("color", 2),
+                    },
+                    (Func<string, object, object>)((key, value) =>
+                    {
+                        if (key == "color" && Equals(value,3))
+                        {
+                            value = "replacement";
+	                    }
+
+                        return value;
+                    }),
+                    (Expression<Func<string, bool>>) (queryString => queryString != null
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 2
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == "color=replacement")
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == "color=2"))
+                };
+
+                yield return new object[]
+                {
+                    new Dictionary<string, object>{
+                        ["search"] = new Dictionary<string, object>
+                        {
+                            ["page"] = 1,
+                            ["pageSize"] = 3,
+                            ["filter"] = new Dictionary<string, object>
+                            {
+                                ["field"] = "firstname",
+                                ["op"] = "eq",
+                                ["value"] = "Bruce"
+                            }
+                        },
+                    },
+                    (Func<string, object, object>)null,
+                    (Expression<Func<string, bool>>)( queryString => queryString != null
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 5
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[page]")}=1")
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[pageSize]")}=3")
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][field]")}=firstname")
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][op]")}=eq")
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][value]")}=Bruce"))
+                    };
+
+                yield return new object[]
+                {
+                    new[]
+                    {
+                        new KeyValuePair<string, object>("search", new []
+                        {
+                            new KeyValuePair<string, object>("page", 1),
+                            new KeyValuePair<string, object>("pageSize", 3),
+                            new KeyValuePair<string, object>("filter", new []
+                            {
+                                new KeyValuePair<string, object>("field", "firstname"),
+                                new KeyValuePair<string, object>("op", "EqualTo"),
+                                new KeyValuePair<string, object>("value", "Bruce"),
+                            })
+                        })
+                    },
+                    (Func<string, object, object>)((key, value) =>
+                    {
+                        if (key == "search[filter]")
+                        {
+                            value = "replacement";
+                        }
+
+                        return value;
+                    }),
+                    (Expression<Func<string, bool>>)( queryString => queryString != null
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 3
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[page]")}=1")
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[pageSize]")}=3")
+                                                                     && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter]")}=replacement")
+                    )
+                };
+
+                yield return new object[]
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["name"] = new []{ 1, 5, 4 }
+                    },
+                    (Func<string, object, object>)((key, value) =>
+                    {
+                        if (key == "name")
+                        {
+                            value = 10;
+                        }
+
+                        return value;
+                    }),
+                    (Expression<Func<string, bool>>)( queryString =>
+                        queryString != null
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 1
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name")}=10")
+                    )
+                };
+            }
+        }
+
+        /// <summary>
+        /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString(IEnumerable{KeyValuePair{string, object}})"/>
+        /// </summary>
+        /// <param name="keyValues">dictionary to turn into query</param>
+        /// <param name="expectedString"></param>
+        [Theory]
+        [MemberData(nameof(ToQueryStringWithTransformationCases))]
+        public void ToQueryStringWithTransformation(IEnumerable<KeyValuePair<string, object>> keyValues,
+                                                    Func<string, object, object> transformation,
+                                                    Expression<Func<string, bool>> expectedString)
+        {
+            _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
+
+            // Act
+            string queryString = keyValues?.ToQueryString(transformation);
 
             // Arrange
             _outputHelper.WriteLine($"Result is '{queryString}'");
