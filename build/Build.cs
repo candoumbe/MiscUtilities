@@ -41,7 +41,8 @@ namespace Utilities.Pipelines
             "'docs/**'",
             "'README.md'",
             "'CHANGELOG.md'"
-        }
+        },
+        AutoGenerate = false
     )]
     [GitHubActions(
         "deployment",
@@ -59,7 +60,8 @@ namespace Utilities.Pipelines
         ImportSecrets = new[]
                         {
                             nameof(NugetApiKey),
-                        }
+                        },
+        AutoGenerate = false
     )]
     [AzurePipelines(
         suffix: "pull-request",
