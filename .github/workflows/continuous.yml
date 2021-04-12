@@ -25,7 +25,7 @@ on:
     branches:
       - develop
     paths:
-      - !docs/*
+      - !'docs/*'
       - !README.md
       - !CHANGELOG.md
 

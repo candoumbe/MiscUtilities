@@ -38,7 +38,7 @@ namespace Utilities.Pipelines
         InvokedTargets = new[] { nameof(Tests) },
         OnPullRequestExcludePaths = new[]
         {
-            "docs/*",
+            "'docs/*'",
             "README.md",
             "CHANGELOG.md"
         }
