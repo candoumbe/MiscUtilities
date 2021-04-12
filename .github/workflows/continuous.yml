@@ -26,8 +26,8 @@ on:
       - develop
     paths:
       - '!docs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
+      - '!README.md'
+      - '!CHANGELOG.md'
 
 jobs:
   windows-latest:
