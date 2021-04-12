@@ -21,6 +21,11 @@ on:
     branches:
       - main
       - release/*
+  pull_request:
+    paths:
+      - !docs/*
+      - !README.md
+      - !CHANGELOG.md
 
 jobs:
   windows-latest:
@@ -28,11 +33,18 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Run './build.cmd Publish'
-        run: ./build.cmd Publish
+      - name: Cache .tmp, ~/.nuget/packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            .tmp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+      - name: Run './build.cmd Tests Publish'
+        run: ./build.cmd Tests Publish
         env:
-            GitHubToken: ${{ secrets.GITHUB_TOKEN }}
-            NugetApiKey: ${{ secrets.NugetApiKey }}
+          GitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          NugetApiKey: ${{ secrets.NUGET_API_KEY }}
       - uses: actions/upload-artifact@v1
         with:
           name: tests-results

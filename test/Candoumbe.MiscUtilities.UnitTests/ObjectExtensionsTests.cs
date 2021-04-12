@@ -82,7 +82,8 @@ namespace Utilities.UnitTests
 
                 yield return new object[]
                 {
-                    new {
+                    new
+                    {
                         search = new
                         {
                             filter = new { field = "Firstname", op = "eq", value = "Bru&ce" }
@@ -113,7 +114,45 @@ namespace Utilities.UnitTests
         public void ToQueryString(object input, string expectedString)
         {
             _outputHelper.WriteLine($"input : {input}");
-            input.ToQueryString()?.Should().Be(expectedString);
+
+            // Act
+            string actual = input.ToQueryString();
+
+            // Assert
+            actual.Should().Be(expectedString);
+        }
+
+        public static IEnumerable<object[]> ToQueryStringWithTransformCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new { limit = 1 },
+                    null,
+                    "limit=1"
+                };
+
+                yield return new object[]
+                 {
+                    new { limit = 1, offset=3 },
+                    (Func<string, object, object>)((key, value) => key == "limit" ? 2 : value),
+                    "limit=2&offset=3"
+                 };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ToQueryStringWithTransformCases))]
+        public void ToQueryStringWithTransform(object input, Func<string, object, object> transform, string expectedString)
+        {
+            _outputHelper.WriteLine($"input : {input}");
+
+            // Act
+            string actual = input.ToQueryString(transform);
+
+            // Assert
+            actual.Should().Be(expectedString);
         }
 
         public static IEnumerable<object[]> ParseAnonymousObjectCases
