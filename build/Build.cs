@@ -38,9 +38,9 @@ namespace Utilities.Pipelines
         InvokedTargets = new[] { nameof(Tests) },
         OnPullRequestExcludePaths = new[]
         {
-            "docs/**",
-            "README.md",
-            "CHANGELOG.md"
+            "'docs/**'",
+            "'README.md'",
+            "'CHANGELOG.md'"
         }
     )]
     [GitHubActions(
@@ -50,9 +50,9 @@ namespace Utilities.Pipelines
         OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
         OnPullRequestExcludePaths = new[]
         {
-            "docs/**",
-            "README.md",
-            "CHANGELOG.md"
+            "'docs/**'",
+            "'README.md'",
+            "'CHANGELOG.md'"
         },
         InvokedTargets = new[] { nameof(Tests), nameof(Publish) },
         ImportGitHubTokenAs = nameof(GitHubToken),

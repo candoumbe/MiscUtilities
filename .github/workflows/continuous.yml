@@ -25,9 +25,9 @@ on:
     branches:
       - develop
     paths:
-      - !docs/**
-      - !README.md
-      - !CHANGELOG.md
+      - '!docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
 
 jobs:
   windows-latest:
