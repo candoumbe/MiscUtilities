@@ -23,7 +23,7 @@ on:
       - release/*
   pull_request:
     paths:
-      - !'docs/*'
+      - !docs/**
       - !README.md
       - !CHANGELOG.md
 
