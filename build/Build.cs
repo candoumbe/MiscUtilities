@@ -38,10 +38,11 @@ namespace Utilities.Pipelines
         InvokedTargets = new[] { nameof(Tests) },
         OnPullRequestExcludePaths = new[]
         {
-            "docs/*",
-            "README.md",
-            "CHANGELOG.md"
-        }
+            "'docs/**'",
+            "'README.md'",
+            "'CHANGELOG.md'"
+        },
+        AutoGenerate = false
     )]
     [GitHubActions(
         "deployment",
@@ -50,16 +51,17 @@ namespace Utilities.Pipelines
         OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
         OnPullRequestExcludePaths = new[]
         {
-            "docs/*",
-            "README.md",
-            "CHANGELOG.md"
+            "'docs/**'",
+            "'README.md'",
+            "'CHANGELOG.md'"
         },
         InvokedTargets = new[] { nameof(Tests), nameof(Publish) },
         ImportGitHubTokenAs = nameof(GitHubToken),
         ImportSecrets = new[]
                         {
                             nameof(NugetApiKey),
-                        }
+                        },
+        AutoGenerate = false
     )]
     [AzurePipelines(
         suffix: "pull-request",
