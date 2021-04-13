@@ -7,6 +7,9 @@ using Microsoft.Extensions.Primitives;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
+using System.Threading;
+using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Utilities.UnitTests
 {
@@ -27,17 +30,48 @@ namespace Utilities.UnitTests
 
         public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
 
-        [Theory]
-        [InlineData(null, null)]
-        [InlineData("bruce", "Bruce")]
-        [InlineData("bruce wayne", "Bruce Wayne")]
-        [InlineData("cyrille-alexandre", "Cyrille-Alexandre")]
+
+        public static IEnumerable<object[]> ToTitleCases
+        {
+            get
+            {
+                string[] cultures = { "en-US", "fr-FR", "en-GB" };
+
+                foreach (string culture in cultures)
+                {
+                    yield return new object[] { culture, "bruce", "Bruce" };
+                    yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
+                    yield return new object[] { culture, "cyrille-alexandre", "Cyrille-Alexandre" };
 #if NET5_0_OR_GREATER
-        [InlineData("𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟")]
-        [InlineData("𐐿𐐱𐐻", "𐐗𐐱𐐻")]
+                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
+                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
 #endif
-        public void ToTitleCase(string input, string expectedString)
-            => input?.ToTitleCase()?.Should().Be(expectedString);
+                }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ToTitleCases))]
+        public void ToTitleCase(string cultureName, string input, string expectedString)
+        {
+            // Arrange
+            _outputHelper.WriteLine($"Current culture : {CultureInfo.CurrentCulture}");
+            _outputHelper.WriteLine($"Culture to test : {cultureName}");
+            _outputHelper.WriteLine($"Input : {input}");
+            _outputHelper.WriteLine($"expected : {expectedString}");
+
+            using CultureSwitcher cultureSwitcher = new();
+
+            cultureSwitcher.Run(cultureName, () =>
+            {
+                _outputHelper.WriteLine($"Culture while testing : {CultureInfo.CurrentCulture}");
+                // Assert
+                string actual = input?.ToTitleCase();
+
+                // Assert
+                actual.Should().Be(expectedString);
+            });
+        }
 
         [Theory]
         [InlineData(null, null)]
@@ -196,23 +230,32 @@ namespace Utilities.UnitTests
         }
 
         [Theory]
-        [InlineData("firstname", "firstname")]
-        [InlineData("firstName", "first-name")]
-        [InlineData("FirstName", "first-name")]
-        [InlineData("first name", "first-name")]
-        [InlineData("first  name", "first-name")]
-        [InlineData(" first name", "first-name")]
-        [InlineData("first name ", "first-name")]
-        [InlineData("first/name", "first-name")]
-        [InlineData("o'neal", "o-neal")]
+        [InlineData("en-US", "firstname", "firstname")]
+        [InlineData("en-US", "firstName", "first-name")]
+        [InlineData("en-US", "FirstName", "first-name")]
+        [InlineData("en-US", "first name", "first-name")]
+        [InlineData("en-US", "first  name", "first-name")]
+        [InlineData("en-US", " first name", "first-name")]
+        [InlineData("en-US", "first name ", "first-name")]
+        [InlineData("en-US", "first/name", "first-name")]
+        [InlineData("en-US", "o'neal", "o-neal")]
 #if NET5_0_OR_GREATER
-        [InlineData("𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
-        [InlineData("𐐿𐐱𐐻", "𐐿𐐱𐐻")]
+        [InlineData("en-US", "𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
+        [InlineData("en-US", "𐐿𐐱𐐻", "𐐿𐐱𐐻")]
 #endif
-        public void Slugify(string input, string expectedOutput)
+        public void Slugify(string culture, string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
-            input.Slugify().Should().Be(expectedOutput);
+            using CultureSwitcher cultureSwitcher = new();
+            cultureSwitcher.Run(culture, () =>
+            {
+                // Act
+                string actual = input.Slugify();
+
+                // Assert
+                actual.Should().Be(expectedOutput);
+            });
+
         }
 
         [Theory]
