@@ -28,7 +28,7 @@ namespace System
         public static string ToTitleCase(this string input)
         {
             StringBuilder sbResult = null;
-#if !NET5_0_OR_GREATER
+#if !NET5_0
             if (input?.ToCharArray()?.AtLeastOnce() ?? false)
             {
                 sbResult = new StringBuilder(input);

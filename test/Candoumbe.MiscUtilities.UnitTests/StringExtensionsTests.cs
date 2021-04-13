@@ -42,7 +42,7 @@ namespace Utilities.UnitTests
                     yield return new object[] { culture, "bruce", "Bruce" };
                     yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
                     yield return new object[] { culture, "cyrille-alexandre", "Cyrille-Alexandre" };
-#if NET5_0_OR_GREATER
+#if NET5_0
                     yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
                     yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
 #endif
