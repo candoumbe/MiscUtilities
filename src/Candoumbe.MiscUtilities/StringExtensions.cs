@@ -53,18 +53,18 @@ namespace System
                 sbResult = new(runes.Length);
                 if (Rune.IsLetter(runes[0]))
                 {
-                    sbResult.Append(Rune.ToUpperInvariant(runes[0]));
+                    sbResult.Append(Rune.ToUpper(runes[0], CultureInfo.CurrentCulture));
                 }
 
                 for (int i = 1; i < runes.Length; i++)
                 {
                     if (Rune.IsWhiteSpace(runes[i - 1]) || runes[i - 1] == new Rune('-'))
                     {
-                        sbResult.Append(Rune.ToUpperInvariant(runes[i]));
+                        sbResult.Append(Rune.ToUpper(runes[i], CultureInfo.CurrentCulture));
                     }
                     else
                     {
-                        sbResult.Append(Rune.ToLowerInvariant(runes[i]));
+                        sbResult.Append(Rune.ToLower(runes[i], CultureInfo.CurrentCulture));
                     }
                 }
             }
