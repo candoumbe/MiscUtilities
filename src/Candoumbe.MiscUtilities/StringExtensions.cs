@@ -28,7 +28,7 @@ namespace System
         public static string ToTitleCase(this string input)
         {
             StringBuilder sbResult = null;
-#if !NET5_0_OR_GREATER
+#if !NET5_0
             if (input?.ToCharArray()?.AtLeastOnce() ?? false)
             {
                 sbResult = new StringBuilder(input);
@@ -53,18 +53,18 @@ namespace System
                 sbResult = new(runes.Length);
                 if (Rune.IsLetter(runes[0]))
                 {
-                    sbResult.Append(Rune.ToUpperInvariant(runes[0]));
+                    sbResult.Append(Rune.ToUpper(runes[0], CultureInfo.CurrentCulture));
                 }
 
                 for (int i = 1; i < runes.Length; i++)
                 {
                     if (Rune.IsWhiteSpace(runes[i - 1]) || runes[i - 1] == new Rune('-'))
                     {
-                        sbResult.Append(Rune.ToUpperInvariant(runes[i]));
+                        sbResult.Append(Rune.ToUpper(runes[i], CultureInfo.CurrentCulture));
                     }
                     else
                     {
-                        sbResult.Append(Rune.ToLowerInvariant(runes[i]));
+                        sbResult.Append(Rune.ToLower(runes[i], CultureInfo.CurrentCulture));
                     }
                 }
             }
