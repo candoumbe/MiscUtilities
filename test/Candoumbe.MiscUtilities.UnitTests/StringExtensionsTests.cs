@@ -1,15 +1,16 @@
-﻿using System;
+﻿using FluentAssertions;
+
+using Microsoft.Extensions.Primitives;
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+
 using Xunit;
 using Xunit.Abstractions;
-using FluentAssertions;
 using Xunit.Categories;
-using Microsoft.Extensions.Primitives;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Linq;
-using System.Threading;
-using System.Globalization;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Utilities.UnitTests
 {
@@ -42,10 +43,10 @@ namespace Utilities.UnitTests
                     yield return new object[] { culture, "bruce", "Bruce" };
                     yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
                     yield return new object[] { culture, "cyrille-alexandre", "Cyrille-Alexandre" };
-#if NET5_0
-                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
-                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
-#endif
+//#if NET5_0
+//                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
+//                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
+//#endif
                 }
             }
         }
@@ -130,59 +131,58 @@ namespace Utilities.UnitTests
         {
             get
             {
+                
+                StringSegment segment = new("Bruce");
+
+                yield return new object[]
                 {
-                    StringSegment segment = new("Bruce");
+                    (
+                        input : segment,
+                        pattern : "Bruce",
+                        ignoreCase : false,
+                        expected : true
+                    )
+                };
 
-                    yield return new object[]
-                    {
-                        (
-                            input : segment,
-                            pattern : "Bruce",
-                            ignoreCase : false,
-                            expected : true
-                        )
-                    };
+                yield return new object[]
+                {
+                    (
+                        input : segment,
+                        pattern : "bruce",
+                        ignoreCase : true,
+                        expected : true
+                    )
+                };
 
-                    yield return new object[]
-                    {
-                        (
-                            input : segment,
-                            pattern : "bruce",
-                            ignoreCase : true,
-                            expected : true
-                        )
-                    };
+                yield return new object[]
+                {
+                    (
+                        input : segment,
+                        pattern : "bruce",
+                        ignoreCase : false,
+                        expected : false
+                    )
+                };
 
-                    yield return new object[]
-                    {
-                        (
-                            input : segment,
-                            pattern : "bruce",
-                            ignoreCase : false,
-                            expected : false
-                        )
-                    };
+                yield return new object[]
+                {
+                    (
+                        input : segment,
+                        pattern : "*bruce",
+                        ignoreCase : true,
+                        expected : true
+                    )
+                };
 
-                    yield return new object[]
-                    {
-                        (
-                            input : segment,
-                            pattern : "*bruce",
-                            ignoreCase : true,
-                            expected : true
-                        )
-                    };
-
-                    yield return new object[]
-                    {
-                        (
-                            input : segment.Subsegment(0, 3),
-                            pattern : "*bru",
-                            ignoreCase : true,
-                            expected : true
-                        )
-                    };
-                }
+                yield return new object[]
+                {
+                    (
+                        input : segment.Subsegment(0, 3),
+                        pattern : "*bru",
+                        ignoreCase : true,
+                        expected : true
+                    )
+                };
             }
         }
 
@@ -239,10 +239,10 @@ namespace Utilities.UnitTests
         [InlineData("en-US", "first name ", "first-name")]
         [InlineData("en-US", "first/name", "first-name")]
         [InlineData("en-US", "o'neal", "o-neal")]
-#if NET5_0_OR_GREATER
-        [InlineData("en-US", "𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
-        [InlineData("en-US", "𐐿𐐱𐐻", "𐐿𐐱𐐻")]
-#endif
+//#if NET5_0_OR_GREATER
+//        [InlineData("en-US", "𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
+//        [InlineData("en-US", "𐐿𐐱𐐻", "𐐿𐐱𐐻")]
+//#endif
         public void Slugify(string culture, string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
@@ -266,9 +266,9 @@ namespace Utilities.UnitTests
         [InlineData("first name", "first_name")]
         [InlineData("first  name", "first_name")]
         [InlineData("first-name", "first_name")]
-#if NET5_0_OR_GREATER
-        [InlineData("𐓘𐓻𐓘𐓏𐓻𐓟", "𐓘𐓻𐓘_𐓷𐓻𐓟")]
-#endif
+//#if NET5_0_OR_GREATER
+//        [InlineData("𐓘𐓻𐓘𐓏𐓻𐓟", "𐓘𐓻𐓘_𐓷𐓻𐓟")]
+//#endif
         public void ToSnakeCase(string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
