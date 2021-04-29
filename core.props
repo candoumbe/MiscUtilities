@@ -2,6 +2,11 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Authors>Cyrille NDOUMBE</Authors>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/candoumbe/MiscUtilities</RepositoryUrl>
+    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+    <PublishUrl>true</PublishUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
