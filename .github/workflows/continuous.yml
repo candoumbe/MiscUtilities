@@ -20,15 +20,15 @@ on:
   push:
     branches-ignore:
       - main
-      - release/*
+      - 'release/*'
   pull_request:
     branches:
       - develop
     paths:
-      - !docs/*
-      - !README.md
-      - !CHANGELOG.md
-      - !LICENSE
+      - '!docs/*'
+      - '!README.md'
+      - '!CHANGELOG.md'
+      - '!LICENSE'
 
 jobs:
   windows-latest:
@@ -36,11 +36,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Cache .tmp, ~/.nuget/packages
+      - name: Cache .nuke/temp, ~/.nuget/packages
         uses: actions/cache@v2
         with:
           path: |
-            .tmp
+            .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
       - name: Run './build.cmd Tests Pack'
