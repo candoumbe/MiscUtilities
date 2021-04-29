@@ -488,5 +488,43 @@ namespace System
 
             return index;
         }
+
+        /// <summary>
+        /// Converts the <paramref name="input"/> to its PascalCase equivalent
+        /// </summary>
+        /// <param name="input">the string to convert</param>
+        /// <returns>the string converted to PascalCasecase</returns>
+        /// <example>
+        /// <code>
+        /// "cyrille-alexandre".ToPascalCase() // CyrilleAlexandre
+        /// </code>
+        public static string ToPascalCase(this string input)
+        {
+            StringBuilder sbResult = null;
+            input ??= string.Empty;
+            
+            if (input != string.Empty)
+            {
+                sbResult = new StringBuilder(input);
+                if (char.IsLetter(sbResult[0]))
+                {
+                    sbResult[0] = char.ToUpperInvariant(sbResult[0]);
+                }
+
+                for (int i = 1; i < input.Length; i++)
+                {
+                    if (!char.IsLetterOrDigit(sbResult[i - 1]))
+                    {
+                        sbResult[i] = char.ToUpperInvariant(sbResult[i]);
+                    }
+                }
+            }
+
+            return (sbResult?.ToString() ?? string.Empty)
+                        .Replace(" ", string.Empty)
+                        .Replace("-", string.Empty)
+                        .Replace("_", string.Empty);
+        }
+
     }
 }
