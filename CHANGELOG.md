@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] / 2021-04-29
+- Introduces `ToPascalCase` extension method [(feature #2)](https://github.com/candoumbe/MiscUtilities/issues/2)
+- Introduces GPLv3 licence
+
 ## [0.4.0] / 2021-04-17
 - Removes [Rune](https://docs.microsoft.com/en-us/dotnet/api/system.text.rune) tests
 
@@ -27,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.1...0.4.0
 [0.3.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.2.0...0.3.0

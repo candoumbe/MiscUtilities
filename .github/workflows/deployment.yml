@@ -20,12 +20,13 @@ on:
   push:
     branches:
       - main
-      - release/*
+      - 'release/*'
   pull_request:
     paths:
-      - !'docs/**'
-      - !'README.md'
-      - !'CHANGELOG.md'
+      - '!docs/*'
+      - '!README.md'
+      - '!CHANGELOG.md'
+      - '!LICENSE'
 
 jobs:
   windows-latest:
@@ -33,15 +34,15 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Cache .tmp, ~/.nuget/packages
+      - name: Cache .nuke/temp, ~/.nuget/packages
         uses: actions/cache@v2
         with:
           path: |
-            .tmp
+            .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      - name: Run './build.cmd Tests Publish'
-        run: ./build.cmd Tests Publish
+      - name: Run './build.cmd Publish'
+        run: ./build.cmd Publish
         env:
           GitHubToken: ${{ secrets.GITHUB_TOKEN }}
           NugetApiKey: ${{ secrets.NUGET_API_KEY }}

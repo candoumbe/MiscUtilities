@@ -30,38 +30,33 @@ using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 namespace Utilities.Pipelines
 {
     [GitHubActions(
-        name:"continuous",
+        "continuous",
         GitHubActionsImage.WindowsLatest,
         OnPushBranchesIgnore = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
         OnPullRequestBranches = new[] { DevelopBranch },
         PublishArtifacts = true,
-        InvokedTargets = new[] { nameof(Tests) },
-        OnPullRequestExcludePaths = new[]
-        {
-            "'docs/**'",
-            "'README.md'",
-            "'CHANGELOG.md'"
-        },
-        AutoGenerate = false
+        InvokedTargets = new[] { nameof(Tests), nameof(Pack) },
+        OnPullRequestExcludePaths = new[] {
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+        }
     )]
     [GitHubActions(
         "deployment",
         GitHubActionsImage.WindowsLatest,
-        PublishArtifacts = true,
         OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
-        OnPullRequestExcludePaths = new[]
-        {
-            "'docs/**'",
-            "'README.md'",
-            "'CHANGELOG.md'"
-        },
-        InvokedTargets = new[] { nameof(Tests), nameof(Publish) },
+        InvokedTargets = new[] { nameof(Publish) },
         ImportGitHubTokenAs = nameof(GitHubToken),
-        ImportSecrets = new[]
-                        {
-                            nameof(NugetApiKey),
-                        },
-        AutoGenerate = false
+        PublishArtifacts = true,
+        ImportSecrets = new[] { nameof(NugetApiKey) },
+        OnPullRequestExcludePaths = new[] {
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+        }
     )]
     [AzurePipelines(
         suffix: "pull-request",
@@ -101,7 +96,7 @@ namespace Utilities.Pipelines
     [UnsetVisualStudioEnvironmentVariables]
     public class Build : NukeBuild
     {
-        public static int Main() => Execute<Build>(x => x.Pack);
+        public static int Main() => Execute<Build>(x => x.Compile);
 
         [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
         public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -239,7 +234,8 @@ namespace Utilities.Pipelines
         public Target Pack => _ => _
             .DependsOn(Tests, Compile)
             .Consumes(Compile)
-            .Produces(ArtifactsDirectory / "*.nupkg")
+            .Produces(ArtifactsDirectory / "*.nupkg",
+                      ArtifactsDirectory / "*.snupkg")
             .Executes(() =>
             {
                 DotNetPack(s => s
