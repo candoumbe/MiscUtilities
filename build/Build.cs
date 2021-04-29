@@ -234,7 +234,8 @@ namespace Utilities.Pipelines
         public Target Pack => _ => _
             .DependsOn(Tests, Compile)
             .Consumes(Compile)
-            .Produces(ArtifactsDirectory / "*.nupkg")
+            .Produces(ArtifactsDirectory / "*.nupkg",
+                      ArtifactsDirectory / "*.snupkg")
             .Executes(() =>
             {
                 DotNetPack(s => s
