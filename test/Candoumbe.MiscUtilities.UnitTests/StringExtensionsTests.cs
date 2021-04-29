@@ -1,5 +1,8 @@
 ﻿using FluentAssertions;
 
+using FsCheck;
+using FsCheck.Xunit;
+
 using Microsoft.Extensions.Primitives;
 
 using System;
@@ -30,7 +33,6 @@ namespace Utilities.UnitTests
         }
 
         public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
-
 
         public static IEnumerable<object[]> ToTitleCases
         {
@@ -287,15 +289,20 @@ namespace Utilities.UnitTests
                                .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName));
         }
 
-        [Fact]
-        public void Decode()
+        [Property]
+        public Property Decode(Guid input)
         {
-            Guid guid = Guid.NewGuid();
-            guid.Encode().Decode().Should().Be(guid);
+            // Act
+            string encoded = input.Encode();
+
+            Guid decoded = encoded.Decode();
+            
+            // Assert
+            return (decoded == input).ToProperty();
         }
 
         [Fact]
-        public void ToLambdaThrowsArgumentNullExceptionWhenSourceIsNull()
+        public void Given_null_ToLambda_should_throws_ArgumentNullException()
         {
             // Act
             Action action = () => StringExtensions.ToLambda<SuperHero>(null);
@@ -312,7 +319,7 @@ namespace Utilities.UnitTests
         [InlineData(@"acolyte[""firstname""]", "x.Acolyte.Firstname")]
         [InlineData(@"acolyte[""acolyte""][""acolyte""]", "x.Acolyte.Acolyte.Acolyte")]
         [InlineData("acolyte.acolyte.acolyte", "x.Acolyte.Acolyte.Acolyte")]
-        public void ToLambda(string property, string expectedLambda)
+        public void Given_input_ToLambda_should_convert(string property, string expectedLambda)
         {
             // Act
             LambdaExpression lambda = property.ToLambda<SuperHero>();
@@ -423,7 +430,7 @@ namespace Utilities.UnitTests
         [Theory]
         [InlineData(null, "search", "Source is null")]
         [InlineData("source", null, "Search is null")]
-        public void LastOccurrence_should_throws_ArgumentNullRangeException_When_Search_Is_Empty(string source, string search, string reason)
+        public void LastOccurrence_should_throws_ArgumentNullException_When_Search_Is_Empty(string source, string search, string reason)
         {
             // Act
             Action action = () => source.LastOccurrence(search);
@@ -481,6 +488,20 @@ namespace Utilities.UnitTests
         {
             // Act
             string actual = input.RemoveDiacritics();
+
+            // Assert
+            actual.Should()
+                  .Be(expected);
+        }
+
+        [Theory]
+        [InlineData("firstname", "Firstname")]
+        [InlineData("first_name", "FirstName")]
+        [InlineData("firstName", "FirstName")]
+        public void Given_input_TöPascalCase_should_convert(string input, string expected)
+        {
+            // Act
+            string actual = input.ToPascalCase();
 
             // Assert
             actual.Should()
