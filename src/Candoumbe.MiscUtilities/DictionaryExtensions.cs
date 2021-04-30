@@ -43,10 +43,13 @@ namespace System.Collections.Generic
         public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues, Func<string, object, object> transform)
         {
             StringBuilder sb = new ();
-            keyValues ??= Enumerable.Empty<KeyValuePair<string, object>>();
-            IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues.Where(kv => kv.Value != null)
-                                                                                .OrderBy(kv => kv.Key)
-                                                                                .ThenBy(kv => kv.Value);
+
+            IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues is null
+                ? Enumerable.Empty<KeyValuePair<string, object>>()
+                : keyValues.Where(kv => kv.Value != null)
+                           .OrderBy(kv => kv.Key)
+                           .ThenBy(kv => kv.Value);
+
             foreach (KeyValuePair<string, object> kv in localKeyValues)
             {
                 object value = transform is not null

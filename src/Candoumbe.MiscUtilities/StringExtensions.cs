@@ -525,6 +525,5 @@ namespace System
                         .Replace("-", string.Empty)
                         .Replace("_", string.Empty);
         }
-
     }
 }

@@ -207,7 +207,7 @@ namespace Utilities.UnitTests
         public void LastOccurence_throws_ArgumentException_is_search_is_empty()
         {
             // Arrange
-            Faker faker = new Faker();
+            Faker faker = new();
 
             // Act
             Action lastOccurrenceWithSearchEmpty = () => new StringSegment(faker.Lorem.Word()).LastOccurrence(StringSegment.Empty);

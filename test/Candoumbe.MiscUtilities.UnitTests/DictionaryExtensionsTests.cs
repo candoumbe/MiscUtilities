@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Extensions;
 
+using Microsoft.AspNetCore.Routing;
+
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -171,6 +173,21 @@ namespace Utilities.UnitTests
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[2]")}=4")
                     )
                 };
+
+                yield return new object[]
+                {
+                    new RouteValueDictionary
+                    {
+                        ["name"] = new []{ 1, 5, 4 }
+                    },
+                    (Expression<Func<string, bool>>)( queryString =>
+                        queryString != null
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 3
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[0]")}=1")
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[1]")}=5")
+                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[2]")}=4")
+                    )
+                };
             }
         }
 
@@ -186,7 +203,7 @@ namespace Utilities.UnitTests
             _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
 
             // Act
-            string queryString = DictionaryExtensions.ToQueryString(keyValues, null);
+            string queryString = keyValues.ToQueryString();
 
             // Arrange
             _outputHelper.WriteLine($"Result is '{queryString}'");
@@ -210,7 +227,7 @@ namespace Utilities.UnitTests
                         if (key == "color" && Equals(value,3))
                         {
                             value = "replacement";
-	                    }
+                        }
 
                         return value;
                     }),
