@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Fixes calling `ToQueryString` on `RouteValueDictionary` types.
+
+## [0.5.1] / 2021-04-30
+- Fixes calling `ToQueryString` on `RouteValueDictionary` types [#3]([(feature #2)](https://github.com/candoumbe/MiscUtilities/issues/3)).
 
 ## [0.5.0] / 2021-04-29
 - Introduces `ToPascalCase` extension method [(feature #2)](https://github.com/candoumbe/MiscUtilities/issues/2)
@@ -32,7 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.1...HEAD
+[0.5.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.1...0.4.0
 [0.3.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.0...0.3.1
