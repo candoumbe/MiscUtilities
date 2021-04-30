@@ -69,10 +69,10 @@ namespace System.Linq.Expressions
 
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(first.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(first.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(first.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(second.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(second.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(second.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(left, right), parameter);
@@ -92,10 +92,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(expr1.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(expr1.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(expr1.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(expr2.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(expr2.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(expr2.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.OrElse(left, right), parameter);
@@ -115,10 +115,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(expr1.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(expr1.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(expr1.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(expr2.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(expr2.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(expr2.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.Or(left, right), parameter);
@@ -136,10 +136,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(f.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(f.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(f.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(g.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(g.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(g.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.And(left, right), parameter);
@@ -156,10 +156,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(f.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(f.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(f.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(g.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(g.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(g.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.LessThan(left, right), parameter);
@@ -176,10 +176,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(f.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(f.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(f.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(g.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(g.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(g.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.GreaterThan(left, right), parameter);
@@ -196,10 +196,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(f.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(f.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(f.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(g.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(g.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(g.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.GreaterThanOrEqual(left, right), parameter);
@@ -216,10 +216,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(f.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(f.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(f.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(g.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(g.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(g.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.LessThanOrEqual(left, right), parameter);
@@ -236,10 +236,10 @@ namespace System.Linq.Expressions
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 
-            ReplaceVisitor leftVisitor = new ReplaceVisitor(f.Parameters[0], parameter);
+            ReplaceVisitor leftVisitor = new(f.Parameters[0], parameter);
             Expression left = leftVisitor.Visit(f.Body);
 
-            ReplaceVisitor rightVisitor = new ReplaceVisitor(g.Parameters[0], parameter);
+            ReplaceVisitor rightVisitor = new(g.Parameters[0], parameter);
             Expression right = rightVisitor.Visit(g.Body);
 
             return Expression.Lambda<Func<T, bool>>(Expression.Equal(left, right), parameter);

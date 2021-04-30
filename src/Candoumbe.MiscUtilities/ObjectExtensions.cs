@@ -133,23 +133,24 @@ namespace System
         /// <para>
         ///     With a <paramref name="transform"/>
         ///     <example>
-        ///         <code ²>
-        ///         class Example
-        ///         {
+        ///         <code>
         ///             var source = new { id = 1 };
         ///             string query =  source.ToQueryString((key, value) => key == "id" ? "newValue" : value) // "id=newValue"
-        ///         }
         ///         </code>
         ///     </example>
         /// </para>
         /// </remarks>
         /// <returns>the query string representation</returns>
-        public static string ToQueryString(this object obj, Func<string, object, object> transform) => DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject(), transform);
+        public static string ToQueryString(this object obj, Func<string, object, object> transform)
+        {
+            return obj is IEnumerable<KeyValuePair<string, object>> dictionary
+                ? DictionaryExtensions.ToQueryString(dictionary, transform)
+                : DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject() , transform);
+        }
 
         /// <summary>
         /// Performs a "safe cast" of the specified object to the specified type.
         /// </summary>
-        /// <typeparam name="TSource">Type of the object to be converted</typeparam>
         /// <typeparam name="TDest">targeted type</typeparam>
         /// <param name="obj">The object to cast</param>
         /// <returns>The "safe cast" result</returns>

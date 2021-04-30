@@ -132,8 +132,7 @@ namespace Utilities.UnitTests
         public static IEnumerable<object[]> StringSegmentLikeCases
         {
             get
-            {
-                
+            {                
                 StringSegment segment = new("Bruce");
 
                 yield return new object[]
@@ -257,7 +256,6 @@ namespace Utilities.UnitTests
                 // Assert
                 actual.Should().Be(expectedOutput);
             });
-
         }
 
         [Theory]
