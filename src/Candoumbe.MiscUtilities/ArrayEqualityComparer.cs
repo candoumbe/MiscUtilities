@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Utilities
 {
@@ -52,6 +49,7 @@ namespace Utilities
             return equals;
         }
 
+        ///<inheritdoc/>
         public int GetHashCode(T[] obj)
         {
             int hash = 0;
