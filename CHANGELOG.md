@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] / 2021-05-01
+- `ToQueryString` properly handles converting to string values of type that have a `TypeConverter` [#5](https://github.com/candoumbe/MiscUtilities/issues/5)
+
 ## [0.5.1] / 2021-04-30
-- Fixes calling `ToQueryString` on `RouteValueDictionary` types [#3]([(feature #2)](https://github.com/candoumbe/MiscUtilities/issues/3)).
+- Fixes calling `ToQueryString` on `RouteValueDictionary` types [#3](https://github.com/candoumbe/MiscUtilities/issues/3).
 
 ## [0.5.0] / 2021-04-29
 - Introduces `ToPascalCase` extension method [(feature #2)](https://github.com/candoumbe/MiscUtilities/issues/2)
@@ -34,7 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.1...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.2...HEAD
+[0.5.2]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.1...0.5.2
 [0.5.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.1...0.4.0

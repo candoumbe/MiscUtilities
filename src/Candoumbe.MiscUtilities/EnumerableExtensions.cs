@@ -388,25 +388,26 @@ namespace System.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(bucketSize), bucketSize, "Bucket size must be greater than 0");
             }
 
-            if (bucketSize == 0)
+            return PartitionInternal();
+
+            IEnumerable<IEnumerable<T>> PartitionInternal()
             {
-                yield break;
-            }
-            else
-            {
-                IEnumerator<T> enumerator = source.GetEnumerator();
-                while (enumerator.MoveNext())
+                if (bucketSize > 0)
                 {
-                    IList<T> bucket = new List<T>(bucketSize);
-
-                    int i = 0;
-                    do
+                    IEnumerator<T> enumerator = source.GetEnumerator();
+                    while (enumerator.MoveNext())
                     {
-                        bucket.Add(enumerator.Current);
-                        i++;
-                    } while (i < bucketSize && enumerator.MoveNext());
+                        IList<T> bucket = new List<T>(bucketSize);
 
-                    yield return bucket;
+                        int i = 0;
+                        do
+                        {
+                            bucket.Add(enumerator.Current);
+                            i++;
+                        } while (i < bucketSize && enumerator.MoveNext());
+
+                        yield return bucket;
+                    }
                 }
             }
         }

@@ -1,10 +1,7 @@
 ﻿using System;
-using Xunit;
 using Xunit.Categories;
 using FsCheck;
 using FsCheck.Xunit;
-using Xunit.Abstractions;
-using System.Runtime.ExceptionServices;
 
 namespace Utilities.UnitTests
 {
