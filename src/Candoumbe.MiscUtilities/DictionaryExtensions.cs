@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -6,6 +7,8 @@ namespace System.Collections.Generic
 {
     public static class DictionaryExtensions
     {
+        private const char Ampersand = '&';
+
         /// <summary>
         /// List of all types that can be directly converted to their string representation
         /// </summary>
@@ -35,14 +38,14 @@ namespace System.Collections.Generic
         };
 
         /// <summary>
-        /// Converts a dictionary to a "URL" friendly representation
+        /// Converts a collection of key/value pairs to a "URL" friendly representation.
         /// </summary>
         /// <param name="keyValues">the dictionary to convert</param>
-        /// <param name="transform">A function to customize the value associated with  </param>
+        /// <param name="transform">A delegate that can be used to customize the value associated with a field name.</param>
         /// <returns></returns>
         public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues, Func<string, object, object> transform)
         {
-            StringBuilder sb = new ();
+            StringBuilder sb = new();
 
             IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues is null
                 ? Enumerable.Empty<KeyValuePair<string, object>>()
@@ -61,11 +64,13 @@ namespace System.Collections.Generic
                     Type valueType = value.GetType();
                     TypeInfo valueTypeInfo = valueType.GetTypeInfo();
                     //The type of the value is a "simple" object
-                    if (valueTypeInfo.IsPrimitive || valueTypeInfo.IsEnum || PrimitiveTypes.Any(x => x == valueType))
+                    if (valueTypeInfo.IsPrimitive
+                        || valueTypeInfo.IsEnum
+                        || PrimitiveTypes.Any(x => x == valueType))
                     {
                         if (sb.Length > 0)
                         {
-                            sb.Append('&');
+                            sb.Append(Ampersand);
                         }
 
                         sb.Append(Uri.EscapeDataString(key))
@@ -82,7 +87,7 @@ namespace System.Collections.Generic
 
                         if (sb.Length > 0)
                         {
-                            sb.Append('&');
+                            sb.Append(Ampersand);
                         }
                         sb.Append(ToQueryString(subDictionary, transform));
                     }
@@ -102,7 +107,7 @@ namespace System.Collections.Generic
                                 {
                                     if (sb.Length > 0)
                                     {
-                                        sb.Append('&');
+                                        sb.Append(Ampersand);
                                     }
 
                                     sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
@@ -114,12 +119,28 @@ namespace System.Collections.Generic
                             }
                         }
                     }
+                    else
+                    {
+                        TypeConverter tc = TypeDescriptor.GetConverter(valueType);
+                        if (tc.CanConvertTo(typeof(string)))
+                        {
+
+                            if (sb.Length > 0)
+                            {
+                                sb.Append(Ampersand);
+                            }
+
+                            sb.Append(Uri.EscapeDataString(key))
+                              .Append('=')
+                              .Append(tc.ConvertTo(value, typeof(string)));
+                        }
+                    }
                 }
             }
 
             return sb.ToString();
 
-            static string ConvertValueToString(object value) => value switch
+            static string ConvertValueToString(in object value) => value switch
             {
                 DateTime dateTime => dateTime.ToString("s"),
                 DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("s"),

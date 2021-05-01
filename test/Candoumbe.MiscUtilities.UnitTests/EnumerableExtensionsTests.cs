@@ -298,7 +298,6 @@ namespace Utilities.UnitTests
         /// Unit tests for <see cref="EnumerableExtensions.AtLeastOnce{T}(IEnumerable{T})"/>
         /// </summary>
         /// <param name="source">collection to apply <see cref="EnumerableExtensions.AtLeastOnce{T}(IEnumerable{T})"/> onto.</param>
-        /// <param name="predicate">predicate</param>
         /// <param name="expectedResult">expected result</param>
         [Theory]
         [MemberData(nameof(AtLeastOnceCases))]

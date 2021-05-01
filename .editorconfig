@@ -2,6 +2,7 @@ root = true
 [*]
 end_of_line = crlf
 [*.cs]
+file_header_template = "Copyright (c) Cyrille NDOUMBE.\nLicenced under GNU General Public Licence, version 3.0"
 dotnet_sort_system_directives_first = true:warning
 dotnet_style_coalesce_expression = true:warning
 dotnet_style_collection_initializer = true:warning

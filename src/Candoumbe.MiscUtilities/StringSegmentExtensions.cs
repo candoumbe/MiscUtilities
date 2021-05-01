@@ -134,7 +134,7 @@ namespace Microsoft.Extensions.Primitives
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
         /// <param name="ignoreCase"><c>true</c> to ignore case</param>
-        /// <returns><code>true</code> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <code>false</code>
+        /// <returns><c>true</c> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <c>false</c>
         /// otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
