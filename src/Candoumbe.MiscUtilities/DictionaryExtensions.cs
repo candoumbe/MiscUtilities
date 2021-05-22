@@ -142,8 +142,9 @@ namespace System.Collections.Generic
 
             static string ConvertValueToString(in object value) => value switch
             {
-                DateTime dateTime => dateTime.ToString("s"),
-                DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("s"),
+                DateTime dateTime when dateTime.Kind == DateTimeKind.Utc => dateTime.ToString("u").Replace(' ', 'T'),
+                DateTime dateTime => dateTime.ToString("s").Replace(' ', 'T'),
+                DateTimeOffset dateTimeOffset => $"{ dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-":"+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
                 int intValue => Convert.ToString(intValue),
                 long longValue => Convert.ToString(longValue),
                 _ => Uri.EscapeDataString(value.ToString())

@@ -2,11 +2,10 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Authors>Cyrille NDOUMBE</Authors>
-    <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/candoumbe/MiscUtilities</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <PublishUrl>true</PublishUrl>
-    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,6 +20,9 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <!-- Recommended: Embed symbols containing Source Link in the main file (exe/dll) -->
     <DebugType>embedded</DebugType>
+    
+    <!-- Generate the documentation file -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
 
