@@ -106,6 +106,18 @@ namespace Utilities.UnitTests
                     $"&{Uri.EscapeDataString("search[filter][op]")}=eq" +
                     $"&{Uri.EscapeDataString("search[filter][value]")}={Uri.EscapeDataString("Bru&ce")}"
                 };
+
+                yield return new object[]
+                {
+                    new
+                    {
+                        page = 1,
+                        pageSize = 10,
+                        from = 9.July(2019).AsUtc()
+                    },
+                    $"from=2019-07-09T00:00:00Z&page=1&pageSize=10"
+
+                };
             }
         }
 

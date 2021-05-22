@@ -7,14 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] / 2021-05-22
+- Fixed `ToQueryString` extension method to convert `DateTime` instance according to value set for [`Kind`] property.
+- Fixed missing documentation
+- Changed license to Apache 2.0 ([#6](https://github.com/candoumbe/MiscUtilities/issues/6)
+
 ## [0.5.2] / 2021-05-01
-- `ToQueryString` properly handles converting to string values of type that have a `TypeConverter` [#5](https://github.com/candoumbe/MiscUtilities/issues/5)
+- `ToQueryString` properly handles converting to string values of type that have a `TypeConverter` ([#5](https://github.com/candoumbe/MiscUtilities/issues/5))
 
 ## [0.5.1] / 2021-04-30
-- Fixes calling `ToQueryString` on `RouteValueDictionary` types [#3](https://github.com/candoumbe/MiscUtilities/issues/3).
+- Fixes calling `ToQueryString` on `RouteValueDictionary` types ([#3](https://github.com/candoumbe/MiscUtilities/issues/3)).
 
 ## [0.5.0] / 2021-04-29
-- Introduces `ToPascalCase` extension method [(feature #2)](https://github.com/candoumbe/MiscUtilities/issues/2)
+- Introduces `ToPascalCase` extension method ([#2](https://github.com/candoumbe/MiscUtilities/issues/2))
 - Introduces GPLv3 licence
 
 ## [0.4.0] / 2021-04-17
@@ -37,7 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.2...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.3...HEAD
+[0.5.3]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.2...0.5.3
 [0.5.2]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.1...0.5.2
 [0.5.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.4.0...0.5.0

@@ -75,7 +75,7 @@ namespace Utilities.UnitTests
                 {
                     new Dictionary<string, object>
                     {
-                        ["date"] = 1.February(2010).AddMinutes(30)
+                        ["date"] = 1.February(2010).AddMinutes(30).AsLocal()
                     },
                     (Expression<Func<string, bool>>)(x => "date=2010-02-01T00:30:00".Equals(x))
                 };
@@ -84,7 +84,16 @@ namespace Utilities.UnitTests
                 {
                     new Dictionary<string, object>
                     {
-                        ["date"] = 1.February(2010)
+                        ["date"] = 1.February(2010).AddMinutes(30).AsUtc()
+                    },
+                    (Expression<Func<string, bool>>)(x => "date=2010-02-01T00:30:00Z".Equals(x))
+                };
+
+                yield return new object[]
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["date"] = 1.February(2010).AsLocal()
                     },
                     (Expression<Func<string, bool>>)(x => "date=2010-02-01T00:00:00".Equals(x))
                 };
@@ -95,7 +104,7 @@ namespace Utilities.UnitTests
                     {
                         ["date-with-offset"] = new DateTimeOffset(1.February(2010).Add(11.Hours()), 1.Hours())
                     },
-                    (Expression<Func<string, bool>>)(x => "date-with-offset=2010-02-01T11:00:00".Equals(x))
+                    (Expression<Func<string, bool>>)(x => "date-with-offset=2010-02-01T11:00:00+01:00".Equals(x))
                 };
 
                 yield return new object[]

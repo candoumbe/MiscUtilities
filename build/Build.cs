@@ -13,7 +13,6 @@ using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.ReportGenerator;
 using Nuke.Common.Utilities;
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,6 +25,8 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
 using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
+
+using System;
 
 namespace Utilities.Pipelines
 {
@@ -116,7 +117,7 @@ namespace Utilities.Pipelines
 
         [CI] public readonly GitHubActions GitHubActions;
 
-        [Parameter("Token used to interact with Github")] 
+        [Parameter("Token used to interact with Github")]
         public readonly string GitHubToken;
 
         [Partition(10)] public readonly Partition TestPartition;
@@ -176,9 +177,7 @@ namespace Utilities.Pipelines
                     .SetProjectFile(Solution)
                     .SetAssemblyVersion(GitVersion.AssemblySemVer)
                     .SetFileVersion(GitVersion.AssemblySemFileVer)
-                    .SetInformationalVersion(GitVersion.InformationalVersion)
-                    .SetProperty("GenerateDocumentationFile", true)
-                    );
+                    .SetInformationalVersion(GitVersion.InformationalVersion));
             });
 
         public Target Tests => _ => _
@@ -437,7 +436,7 @@ namespace Utilities.Pipelines
                 {
                     Info($"Publishing {nupkgs.Count} package{(nupkgs.Count > 1 ? "s" : string.Empty)}");
                     Info(string.Join(EnvironmentInfo.NewLine, nupkgs));
-                    
+
                     DotNetNuGetPush(s => s.SetApiKey(NugetApiKey)
                         .SetSource(NugetPackageSource)
                         .EnableSkipDuplicate()
