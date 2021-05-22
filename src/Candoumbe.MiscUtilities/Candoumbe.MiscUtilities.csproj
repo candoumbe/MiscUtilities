@@ -4,11 +4,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
     <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
-    <RepositoryType>git</RepositoryType>
     <PackageTags>collections; string; utilities</PackageTags>
-    <PackageReleaseNotes>Replaces Newtonsoft.Json with System.Text.Json when possible</PackageReleaseNotes>
     <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl>https://dev.azure.com/candoumbe/Candoumbe.MiscUtilities</RepositoryUrl>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Candoumbe.MiscUtilities.xml</DocumentationFile>
+    <RepositoryUrl>https://github.com/candoumbe/Candoumbe.MiscUtilities</RepositoryUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <Choose>
     <When Condition="'$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'netstandard1.1'">
@@ -40,7 +42,7 @@
     <PackageReference Include="System.Linq.Parallel" Version="4.*" />
     <PackageReference Include="System.Runtime.InteropServices" Version="4.*" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net5.0'" >
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net5.0'">
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.*" />
   </ItemGroup>
 </Project>
