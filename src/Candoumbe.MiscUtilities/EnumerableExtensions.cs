@@ -199,9 +199,9 @@ namespace System.Collections.Generic
         /// </summary>
         /// <typeparam name="T">Type of the elements of</typeparam>
         /// <param name="items">collection under test</param>
-        /// <param name="count">number of elements in <paramref name="items"/> that must match <paramref name="predicate"/> </param>
+        /// <param name="count">number of elements in <paramref name="items"/> </param>
         /// <returns><c>true</c> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements that match <paramref name="predicate"/> and <c>false</c> otherwise</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="items"/> or <paramref name="predicate"/> are null</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="items"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, int count)
         {
