@@ -23,6 +23,7 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Logger;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
+using static Nuke.Common.Tools.GitReleaseManager.GitReleaseManagerTasks;
 using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
@@ -247,6 +248,7 @@ namespace Utilities.Pipelines
                     .SetFileVersion(GitVersion.AssemblySemFileVer)
                     .SetInformationalVersion(GitVersion.InformationalVersion)
                     .SetVersion(GitVersion.NuGetVersion)
+                    .SetPackageReleaseNotes(GetNuGetReleaseNotes(ChangeLogFile, GitRepository))
                     .SetSymbolPackageFormat(DotNetSymbolPackageFormat.snupkg)
                 );
             });
@@ -357,7 +359,7 @@ namespace Utilities.Pipelines
                                                                                                  .EnableNoFetch()
                                                                                                  .DisableProcessLogOutput());
 
-                if (!(GitRepository.IsOnHotfixBranch() || GitRepository.Branch.Like("fix/*")))
+                if (!GitRepository.IsOnHotfixBranch())
                 {
                     Checkout($"{HotfixBranchPrefix}/{mainBranchVersion.Major}.{mainBranchVersion.Minor}.{mainBranchVersion.Patch + 1}", start: MainBranchName);
                 }
@@ -448,7 +450,7 @@ namespace Utilities.Pipelines
                         completeOnFailure: true);
                 }
 
-                if (!IsOnGithub)
+                if (IsOnGithub)
                 {
                     DotNetNuGetAddSource(_ => _
                         .SetSource(GitHubPackageSource)
@@ -458,5 +460,8 @@ namespace Utilities.Pipelines
                 PushPackages(ArtifactsDirectory.GlobFiles("*.nupkg"));
                 PushPackages(ArtifactsDirectory.GlobFiles("*.snupkg"));
             });
+
+
+
     }
 }
