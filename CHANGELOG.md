@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Fixed `IsAssignaleToGenericType` not working with inheritance class hierarchy ([#8](https://github.com/candoumbe/MiscUtilities/issues/8))
 
 ## [0.5.3] / 2021-05-22
 - Fixed `ToQueryString` extension method to convert `DateTime` instance according to value set for [`Kind`] property.

@@ -46,11 +46,32 @@ namespace Utilities.UnitTests
             typeof(Baz).IsAssignableToGenericType(typeof(IFoo<>)).Should().BeTrue();
         }
 
+        [Theory]
+        [InlineData(typeof(Bat), typeof(IFoo<>), true, "Bat inherits from a type that implements IFoo<>")]
+        [InlineData(typeof(Bat), typeof(Foo<>), true, "Bat inheriance hierarchy as Foo<>")]
+        [InlineData(typeof(Foo<int>), typeof(IFoo<Guid>), false, "Foo<int> does not implements Foo<Guid>")]
+        public void Given_type_IsAssignableToGenericType_should_return_expected_result(Type givenType,
+                                                                                       Type genericType,
+                                                                                       bool expected,
+                                                                                       string reason)
+        {
+            // Act
+            bool actual = givenType.IsAssignableToGenericType(genericType);
+
+            // Assert
+            actual.Should()
+                  .Be(expected, reason);
+        }
+
         public interface IFoo<T> { }
+
         public class Foo<T> : IFoo<T> { }
+
         public class Bar : IFoo<int> { }
 
         public class Baz : Bar { }
+
+        public class Bat : Foo<Guid> {}
 
         public static IEnumerable<object[]> IsAnonymousCases
         {
