@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.5.4] / 2021-05-30
 - Fixed `IsAssignaleToGenericType` not working with inheritance class hierarchy ([#8](https://github.com/candoumbe/MiscUtilities/issues/8))
 
 ## [0.5.3] / 2021-05-22
@@ -43,7 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.3...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.4...HEAD
+[0.5.4]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.3...0.5.4
 [0.5.3]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.2...0.5.3
 [0.5.2]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.1...0.5.2
 [0.5.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.0...0.5.1
