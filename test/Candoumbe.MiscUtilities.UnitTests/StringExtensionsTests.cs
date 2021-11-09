@@ -45,10 +45,10 @@ namespace Utilities.UnitTests
                     yield return new object[] { culture, "bruce", "Bruce" };
                     yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
                     yield return new object[] { culture, "cyrille-alexandre", "Cyrille-Alexandre" };
-//#if NET5_0
-//                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
-//                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
-//#endif
+                    //#if NET5_0
+                    //                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
+                    //                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
+                    //#endif
                 }
             }
         }
@@ -132,7 +132,7 @@ namespace Utilities.UnitTests
         public static IEnumerable<object[]> StringSegmentLikeCases
         {
             get
-            {                
+            {
                 StringSegment segment = new("Bruce");
 
                 yield return new object[]
@@ -240,10 +240,10 @@ namespace Utilities.UnitTests
         [InlineData("en-US", "first name ", "first-name")]
         [InlineData("en-US", "first/name", "first-name")]
         [InlineData("en-US", "o'neal", "o-neal")]
-//#if NET5_0_OR_GREATER
-//        [InlineData("en-US", "𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
-//        [InlineData("en-US", "𐐿𐐱𐐻", "𐐿𐐱𐐻")]
-//#endif
+        //#if NET5_0_OR_GREATER
+        //        [InlineData("en-US", "𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
+        //        [InlineData("en-US", "𐐿𐐱𐐻", "𐐿𐐱𐐻")]
+        //#endif
         public void Slugify(string culture, string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
@@ -266,9 +266,9 @@ namespace Utilities.UnitTests
         [InlineData("first name", "first_name")]
         [InlineData("first  name", "first_name")]
         [InlineData("first-name", "first_name")]
-//#if NET5_0_OR_GREATER
-//        [InlineData("𐓘𐓻𐓘𐓏𐓻𐓟", "𐓘𐓻𐓘_𐓷𐓻𐓟")]
-//#endif
+        //#if NET5_0_OR_GREATER
+        //        [InlineData("𐓘𐓻𐓘𐓏𐓻𐓟", "𐓘𐓻𐓘_𐓷𐓻𐓟")]
+        //#endif
         public void ToSnakeCase(string input, string expectedOutput)
         {
             _outputHelper.WriteLine($"input : '{input}'");
@@ -294,7 +294,7 @@ namespace Utilities.UnitTests
             string encoded = input.Encode();
 
             Guid decoded = encoded.Decode();
-            
+
             // Assert
             return (decoded == input).ToProperty();
         }

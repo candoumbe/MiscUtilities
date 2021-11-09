@@ -5,6 +5,9 @@ using System.Text;
 
 namespace System.Collections.Generic
 {
+    /// <summary>
+    /// Exntesions for <see cref="KeyValuePair{TKey, TValue}"/> and <see cref="IDictionary{TKey, TValue}"/> types.
+    /// </summary>
     public static class DictionaryExtensions
     {
         private const char Ampersand = '&';
@@ -28,6 +31,9 @@ namespace System.Collections.Generic
             typeof(bool), typeof(bool?)
         };
 
+        /// <summary>
+        /// Numeric types.
+        /// </summary>
         public static readonly IEnumerable<Type> NumericTypes = new[]
         {
             typeof(int), typeof(int?),
@@ -124,7 +130,6 @@ namespace System.Collections.Generic
                         TypeConverter tc = TypeDescriptor.GetConverter(valueType);
                         if (tc.CanConvertTo(typeof(string)))
                         {
-
                             if (sb.Length > 0)
                             {
                                 sb.Append(Ampersand);
@@ -144,7 +149,7 @@ namespace System.Collections.Generic
             {
                 DateTime dateTime when dateTime.Kind == DateTimeKind.Utc => dateTime.ToString("u").Replace(' ', 'T'),
                 DateTime dateTime => dateTime.ToString("s").Replace(' ', 'T'),
-                DateTimeOffset dateTimeOffset => $"{ dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-":"+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
+                DateTimeOffset dateTimeOffset => $"{ dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-" : "+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
                 int intValue => Convert.ToString(intValue),
                 long longValue => Convert.ToString(longValue),
                 _ => Uri.EscapeDataString(value.ToString())

@@ -261,7 +261,7 @@ namespace Utilities.ContinuousIntegration
 
         public Target ReportCoverage => _ => _
             .DependsOn(Tests)
-            .Requires(() => IsServerBuild || CodecovToken != null)
+            .OnlyWhenDynamic(() => IsServerBuild || CodecovToken != null)
             .Consumes(Tests, TestResultDirectory / "*.xml")
             .Produces(CoverageReportDirectory / "*.xml")
             .Produces(CoverageReportHistoryDirectory / "*.xml")

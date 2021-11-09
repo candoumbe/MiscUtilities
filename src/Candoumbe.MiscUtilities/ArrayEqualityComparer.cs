@@ -4,9 +4,9 @@ namespace Utilities
 {
     /// <summary>
     /// Generic implementation of <see cref="IEqualityComparer{T}"/> suitable for comparing two arrays of <typeparamref name="T"/>
-    /// 
+    ///
     /// <para>
-    /// This implementation is based on <see cref="https://exceptionshub.com/gethashcode-on-byte-array.html"/> and relies internally
+    /// This implementation is based on <see href="https://exceptionshub.com/gethashcode-on-byte-array.html"/> and relies internally
     /// on <see cref="EqualityComparer{T}.Default"/> to compare items of each array
     /// </para>
     /// </summary>
@@ -16,6 +16,7 @@ namespace Utilities
         // You could make this a per-instance field with a constructor parameter
         private static readonly EqualityComparer<T> _elementComparer = EqualityComparer<T>.Default;
 
+        ///<inheritdoc/>
         public bool Equals(T[] x, T[] y)
         {
             bool equals = false;

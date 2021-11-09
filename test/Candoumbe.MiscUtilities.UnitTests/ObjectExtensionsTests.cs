@@ -115,8 +115,7 @@ namespace Utilities.UnitTests
                         pageSize = 10,
                         from = 9.July(2019).AsUtc()
                     },
-                    $"from=2019-07-09T00:00:00Z&page=1&pageSize=10"
-
+                    "from=2019-07-09T00:00:00Z&page=1&pageSize=10"
                 };
             }
         }
@@ -304,8 +303,5 @@ namespace Utilities.UnitTests
             result.Should()
                   .Match(expectation, reason);
         }
-
-
-
     }
 }

@@ -7,6 +7,9 @@ using System.Collections.Concurrent;
 #endif
 namespace System.Collections.Generic
 {
+    /// <summary>
+    /// Extension methods for <see cref="IEnumerable{T}"/> type.
+    /// </summary>
     public static class EnumerableExtensions
     {
         /// <summary>
@@ -113,17 +116,17 @@ namespace System.Collections.Generic
         /// </summary>
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains one or more one element that fullfills <paramref name="predicate"/></returns>
+        /// <returns><c>true</c> if <paramref name="items"/> contains one or more element.s</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <c>null</c></exception>
         public static bool AtLeastOnce<T>(this IEnumerable<T> items) => AtLeast(items, True<T>(), 1);
 
         /// <summary>
-        /// Tests if <paramref name="items"/> contains one or more items that verify the specified <paramref name="predicate"/>
+        /// Tests if <paramref name="items"/> contains <paramref name="count"/> or more items.
         /// </summary>
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="count"></param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains one or more one element that fullfills <paramref name="predicate"/></returns>
+        /// <returns><c>true</c> if <paramref name="items"/> contains <paramref name="count"/> or more one elements.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <c>null</c></exception>
         public static bool AtLeast<T>(this IEnumerable<T> items, int count) => AtLeast(items, True<T>(), count);
 
@@ -131,7 +134,7 @@ namespace System.Collections.Generic
         /// Tests if <paramref name="source"/> contains at least <paramref name="count"/> elements that match <paramref name="predicate"/>
         /// </summary>
         /// <remarks>
-        /// 
+        ///
         /// </remarks>
         /// <typeparam name="T">Type of elements</typeparam>
         /// <param name="source">the collection to test</param>
@@ -200,7 +203,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the elements of</typeparam>
         /// <param name="items">collection under test</param>
         /// <param name="count">number of elements in <paramref name="items"/> </param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements that match <paramref name="predicate"/> and <c>false</c> otherwise</returns>
+        /// <returns><c>true</c> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements and <c>false</c> otherwise</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, int count)
@@ -255,9 +258,9 @@ namespace System.Collections.Generic
         /// </summary>
         /// <typeparam name="T">Type of the elements of the collection to test</typeparam>
         /// <param name="items"></param>
-        /// <param name="count">Number of elements that match <paramref name="predicate"/></param>
+        /// <param name="count">Number of elements that the current contains at most</param>
         /// <returns><c>true</c> if there are 0 to <paramref name="count"/> elements and <c>false</c> otherwise.</returns>
-        /// <exception cref="ArgumentNullException">if either <paramref name="items"/> or <paramref name="predicate"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if either <paramref name="items"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtMost<T>(this IEnumerable<T> items, int count) => AtMost(items, True<T>(), count);
 
@@ -293,7 +296,6 @@ namespace System.Collections.Generic
         /// <typeparam name="TFirst">Type of element in <paramref name="first"/> collection.</typeparam>
         /// <typeparam name="TSecond">Type of element in <paramref name="second"/> collection.</typeparam>
         /// <typeparam name="TThird">Type of element in <paramref name="third"/> collection.</typeparam>
-        /// <typeparam name="TResult">Type of element of the result collection.</typeparam>
         /// <param name="first">the first collection of the cross join</param>
         /// <param name="second">the second collection</param>
         /// <param name="third">the third collection</param>
@@ -414,7 +416,7 @@ namespace System.Collections.Generic
 
 #if !NETSTANDARD1_0
         /// <summary>
-        /// Asynchronously run the 
+        /// Asynchronously run the
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>

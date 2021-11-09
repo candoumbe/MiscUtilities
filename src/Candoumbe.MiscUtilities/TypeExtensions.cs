@@ -10,12 +10,6 @@ namespace System
     /// </summary>
     public static class TypeExtensions
     {
-        /// <summary>
-          /// Determines whether the <paramref name="genericType"/> is assignable from
-          /// <paramref name="givenType"/> taking into account generic definitions
-          /// </summary>
-        /// <param name="givenType"></param>
-        /// <param name="genericType"></param>
         public static bool IsAssignableToGenericType(this Type givenType, Type genericType)
             => givenType is not null && genericType is not null
                && (givenType == genericType || givenType.MapsToGenericTypeDefinition(genericType)
@@ -23,7 +17,7 @@ namespace System
                    || givenType.GetTypeInfo().BaseType.IsAssignableToGenericType(genericType));
 
         private static bool HasInterfaceThatMapsToGenericTypeDefinition(this Type givenType, Type genericType)
-        => givenType is not null &&  genericType is not null && givenType
+        => givenType is not null && genericType is not null && givenType
                 .GetTypeInfo()
 #if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD1_3
 
@@ -36,8 +30,7 @@ namespace System
 
         private static bool MapsToGenericTypeDefinition(this Type givenType, Type genericType)
             => givenType is not null
-               && genericType is not null
-               && genericType.GetTypeInfo().IsGenericTypeDefinition
+               && genericType?.GetTypeInfo().IsGenericTypeDefinition == true
                && givenType.GetTypeInfo().IsGenericType
                && givenType.GetGenericTypeDefinition() == genericType;
 
