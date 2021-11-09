@@ -18,10 +18,13 @@ using static System.Text.Json.JsonSerializerOptions;
 #endif
 namespace System
 {
+    /// <summary>
+    /// Extension methods for object
+    /// </summary>
     public static class ObjectExtensions
     {
         /// <summary>
-        /// Deeply clone the <paramref name="source"/> 
+        /// Deeply clone the <paramref name="source"/>
         /// </summary>
         /// <typeparam name="T">Type of the <paramref name="source"/></typeparam>
         /// <param name="source">The object to clone</param>
@@ -45,7 +48,6 @@ namespace System
         /// </summary>
         /// <param name="obj"></param>
         /// <returns><see cref="IDictionary{TKey, TValue}"/></returns>
-
         public static IDictionary<string, object> ParseAnonymousObject(this object obj)
         {
             IDictionary<string, object> dictionary = new Dictionary<string, object>();
@@ -145,7 +147,7 @@ namespace System
         {
             return obj is IEnumerable<KeyValuePair<string, object>> dictionary
                 ? DictionaryExtensions.ToQueryString(dictionary, transform)
-                : DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject() , transform);
+                : DictionaryExtensions.ToQueryString(obj.ParseAnonymousObject(), transform);
         }
 
         /// <summary>
@@ -160,7 +162,6 @@ namespace System
         /// <summary>
         /// Performs a "safe cast" of <paramref name="obj"/> to the type <paramref name="targetType"/>.
         /// </summary>
-        /// <typeparam name="TSource">type of the object to cast </param>
         /// <param name="obj">The object to cast</param>
         /// <param name="targetType">type to cast </param>
         /// <returns>The "safe cast" result</returns>
@@ -205,13 +206,5 @@ namespace System
                 ? null
                 : Serialize(obj, obj.GetType(), settings);
 #endif
-
-        /// <summary>
-        /// Converts <see cref="o"/> to its JSON representation
-        /// </summary>
-        /// <param name="obj">The object to jsonify</param>
-        /// <returns></returns>
-        [Obsolete("Use Jsonify(object obj) instead")]
-        public static string Stringify(this object obj) => Jsonify(obj);
     }
 }

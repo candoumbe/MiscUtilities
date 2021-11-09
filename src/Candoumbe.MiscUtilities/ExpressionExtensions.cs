@@ -52,12 +52,12 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>&&</c>
+        /// Combines two expressions using the logical <c>&amp;&amp;</c>
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="first">the first expression</param>
         /// <param name="second">the second expression</param>
-        /// <returns>A new expression that represents <c>(T x) => f && g</c></returns>
+        /// <returns>A new expression that represents <c>(T x) => f &amp;&amp; g</c></returns>
         /// <exception cref="ArgumentNullException">either<paramref name="first"/> or <paramref name="second"/> is <c>null</c>.</exception>
         public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
         {
@@ -83,7 +83,7 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>||</c> operator 
+        /// Combines two expressions using the logical <c>||</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="expr1"></param>
@@ -103,13 +103,12 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>|</c> operator 
+        /// Combines two expressions using the logical <c>|</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="expr1"></param>
         /// <param name="expr2"></param>
         /// <returns>A new expression that represents <c>(T x) => f | g</c></returns>
-
         public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -124,13 +123,12 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>&</c> operator 
+        /// Combines two expressions using the logical <c>&amp;</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
-        /// <returns>A new expression that represents <c>(T x) => f & g</c></returns>
-
+        /// <returns>A new expression that represents <c>(T x) => f &amp; g</c></returns>
         public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -145,12 +143,12 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>&lt;</c> operator 
+        /// Combines two expressions using the logical <c>&lt;</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
-        /// <returns>A new expression that represents <c>(T x) => f < g</c></returns>
+        /// <returns>A new expression that represents <c>(T x) => f &lt; g</c></returns>
         public static Expression<Func<T, bool>> LessThan<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -165,7 +163,7 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>&</c> operator 
+        /// Combines two expressions using the logical <c>&gt;</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="f">the first expression</param>
@@ -185,7 +183,7 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>&</c> operator 
+        /// Combines two expressions using the logical <c>&gt;=</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="f">the first expression</param>
@@ -205,12 +203,12 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>&</c> operator 
+        /// Combines two expressions using the logical <c>&lt;=</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
-        /// <returns>A new expression that represents <c>(T x) => f <= g</c></returns>
+        /// <returns>A new expression that represents <c>(T x) => f &lt;= g</c></returns>
         public static Expression<Func<T, bool>> LessThanOrEqual<T>(this Expression<Func<T, bool>> f, Expression<Func<T, bool>> g)
         {
             ParameterExpression parameter = Expression.Parameter(typeof(T));
@@ -225,7 +223,7 @@ namespace System.Linq.Expressions
         }
 
         /// <summary>
-        /// Combines two expressions using the logical <c>&</c> operator 
+        /// Combines two expressions using the logical <c>==</c> operator
         /// </summary>
         /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
         /// <param name="f">the first expression</param>

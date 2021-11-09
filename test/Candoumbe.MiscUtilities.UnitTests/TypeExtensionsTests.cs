@@ -1,6 +1,8 @@
 using FluentAssertions;
+
 using System;
 using System.Collections.Generic;
+
 using Xunit;
 using Xunit.Categories;
 
@@ -71,7 +73,7 @@ namespace Utilities.UnitTests
 
         public class Baz : Bar { }
 
-        public class Bat : Foo<Guid> {}
+        public class Bat : Foo<Guid> { }
 
         public static IEnumerable<object[]> IsAnonymousCases
         {
