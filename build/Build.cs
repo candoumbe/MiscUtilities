@@ -34,7 +34,7 @@ namespace Utilities.ContinuousIntegration
 
     [GitHubActions(
         "pull-request",
-        GitHubActionsImage.WindowsLatest, GitHubActionsImage.MacOsLatest,
+        GitHubActionsImage.UbuntuLatest, GitHubActionsImage.MacOsLatest,
         OnPullRequestBranches = new[] { DevelopBranch },
         PublishArtifacts = true,
         InvokedTargets = new[] { nameof(Tests), nameof(ReportCoverage) },
@@ -53,7 +53,7 @@ namespace Utilities.ContinuousIntegration
     )]
     [GitHubActions(
         "integration",
-        GitHubActionsImage.WindowsLatest, GitHubActionsImage.MacOsLatest,
+        GitHubActionsImage.UbuntuLatest, GitHubActionsImage.MacOsLatest,
         OnPushBranchesIgnore = new[] { MainBranchName },
         PublishArtifacts = true,
         InvokedTargets = new[] { nameof(Tests), nameof(ReportCoverage), nameof(Pack) },
@@ -73,7 +73,7 @@ namespace Utilities.ContinuousIntegration
     )]
     [GitHubActions(
         "delivery",
-        GitHubActionsImage.WindowsLatest, GitHubActionsImage.MacOsLatest,
+        GitHubActionsImage.UbuntuLatest, GitHubActionsImage.MacOsLatest,
         OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
         InvokedTargets = new[] { nameof(ReportCoverage), nameof(Publish), nameof(AddGithubRelease) },
         ImportGitHubTokenAs = nameof(GitHubToken),
@@ -96,16 +96,9 @@ namespace Utilities.ContinuousIntegration
     [UnsetVisualStudioEnvironmentVariables]
     [DotNetVerbosityMapping]
     [HandleVisualStudioDebugging]
-    public class Build : NukeBuild
+    public partial class Build : NukeBuild
     {
-        public static int Main()
-        {
-            if (IsServerBuild)
-            {
-                EnvironmentInfo.SetVariable("DOTNET_ROLL_FORWARD", "major");
-            }
-            return Execute<Build>(x => x.Compile);
-        }
+        public static int Main() => Execute<Build>(x => x.Compile);
 
         [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
         public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -123,6 +116,8 @@ namespace Utilities.ContinuousIntegration
         [Parameter]
         [Secret]
         public readonly string CodecovToken;
+
+        public readonly string DotnetRollForward;
 
         [Required] [Solution] public readonly Solution Solution;
         [Required] [GitRepository] public readonly GitRepository GitRepository;
@@ -511,8 +506,6 @@ namespace Utilities.ContinuousIntegration
             Git($"branch -D {GitRepository.Branch}");
             Git($"push origin {DevelopBranch}");
         }
-
-
         #endregion
 
         [Parameter("API key used to publish artifacts to Nuget.org")]
@@ -605,5 +598,13 @@ namespace Utilities.ContinuousIntegration
                     Info($"Release '{MajorMinorPatchVersion}' already exists - skipping ");
                 }
             });
+
+        protected override void OnBuildCreated()
+        {
+            if (IsServerBuild)
+            {
+                EnvironmentInfo.SetVariable("DOTNET_ROLL_FORWARD", "Major");
+            }
+        }
     }
 }
