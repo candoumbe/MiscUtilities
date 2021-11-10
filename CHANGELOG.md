@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] / 2021-11-10
+- Fixes minor build pipeline issues
+
 ## [0.6.0] / 2021-11-10
 - Added `TimeOnly` support when calling `ToQueryString` extension methods
 - Added `DateOnly` support when calling `ToQueryString` extension methods
@@ -49,7 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.6.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.6.1...HEAD
+[0.6.1]: https://github.com/candoumbe/MiscUtilities/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/candoumbe/MiscUtilities/compare/0.5.4...0.6.0
 [0.5.4]: https://github.com/candoumbe/MiscUtilities/compare/0.5.3...0.5.4
 [0.5.3]: https://github.com/candoumbe/MiscUtilities/compare/0.5.2...0.5.3
