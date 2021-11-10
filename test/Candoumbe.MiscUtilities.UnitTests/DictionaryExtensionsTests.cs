@@ -388,5 +388,31 @@ public class DictionaryExtensionsTests
         queryString.Should()
                    .Be($"date-only={date:yyyy-MM-dd}");
     }
+
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    public void Given_dictionary_that_contains_a_TimeOnly_instance_ToQueryString_should_returns_expected_result(TimeOnly time)
+    {
+        // Arrange
+        IDictionary<string, object> dictionary = new Dictionary<string, object>
+        {
+            ["time-only"] = time
+        };
+
+        //  Act
+        string queryString = dictionary.ToQueryString();
+
+        // Assert
+        switch (time)
+        {
+            case TimeOnly t when t.Millisecond == 0:
+                queryString.Should()
+                           .Be($"time-only={time:hh:mm:ss}");
+                break;
+            default:
+                queryString.Should()
+                           .Be($"time-only={time:hh:mm:ss.fffffff}");
+                break;
+        }
+    }
 #endif
 }
