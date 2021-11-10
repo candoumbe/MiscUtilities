@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.6.0] / 2021-11-10
 - Added `TimeOnly` support when calling `ToQueryString` extension methods
 - Added `DateOnly` support when calling `ToQueryString` extension methods
 
@@ -47,15 +49,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.4...HEAD
-[0.5.4]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.3...0.5.4
-[0.5.3]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.2...0.5.3
-[0.5.2]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.1...0.5.2
-[0.5.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.5.0...0.5.1
-[0.5.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.4.0...0.5.0
-[0.4.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.1...0.4.0
-[0.3.1]: https://github.com/candoumbe/MiscUtilities.git/compare/0.3.0...0.3.1
-[0.3.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.2.0...0.3.0
-[0.2.0]: https://github.com/candoumbe/MiscUtilities.git/compare/0.1.0...0.2.0
-[0.1.0]: https://github.com/candoumbe/MiscUtilities.git/tree/0.1.0
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.6.0...HEAD
+[0.6.0]: https://github.com/candoumbe/MiscUtilities/compare/0.5.4...0.6.0
+[0.5.4]: https://github.com/candoumbe/MiscUtilities/compare/0.5.3...0.5.4
+[0.5.3]: https://github.com/candoumbe/MiscUtilities/compare/0.5.2...0.5.3
+[0.5.2]: https://github.com/candoumbe/MiscUtilities/compare/0.5.1...0.5.2
+[0.5.1]: https://github.com/candoumbe/MiscUtilities/compare/0.5.0...0.5.1
+[0.5.0]: https://github.com/candoumbe/MiscUtilities/compare/0.4.0...0.5.0
+[0.4.0]: https://github.com/candoumbe/MiscUtilities/compare/0.3.1...0.4.0
+[0.3.1]: https://github.com/candoumbe/MiscUtilities/compare/0.3.0...0.3.1
+[0.3.0]: https://github.com/candoumbe/MiscUtilities/compare/0.2.0...0.3.0
+[0.2.0]: https://github.com/candoumbe/MiscUtilities/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/candoumbe/MiscUtilities/tree/0.1.0
 
