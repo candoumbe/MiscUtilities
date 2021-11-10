@@ -98,7 +98,14 @@ namespace Utilities.ContinuousIntegration
     [HandleVisualStudioDebugging]
     public class Build : NukeBuild
     {
-        public static int Main() => Execute<Build>(x => x.Compile);
+        public static int Main()
+        {
+            if (IsServerBuild)
+            {
+                EnvironmentInfo.SetVariable("DOTNET_ROLL_FORWARD", "major");
+            }
+            return Execute<Build>(x => x.Compile);
+        }
 
         [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
         public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
