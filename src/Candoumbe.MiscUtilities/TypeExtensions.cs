@@ -10,6 +10,12 @@ namespace System
     /// </summary>
     public static class TypeExtensions
     {
+        /// <summary>
+        /// Checks if an instance of <paramref name="givenType"/> can be assigned to a type <paramref name="genericType"/>.
+        /// </summary>
+        /// <param name="givenType">The type under test</param>
+        /// <param name="genericType">The targeted type</param>
+        /// <returns><c>true</c> if <paramref name="genericType"/> is an ancestor of <paramref name="givenType"/> and <c>false</c> otherwise.</returns>
         public static bool IsAssignableToGenericType(this Type givenType, Type genericType)
             => givenType is not null && genericType is not null
                && (givenType == genericType || givenType.MapsToGenericTypeDefinition(genericType)
