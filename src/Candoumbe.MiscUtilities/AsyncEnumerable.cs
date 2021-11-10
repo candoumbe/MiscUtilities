@@ -4,8 +4,16 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Generic
 {
+    /// <summary>
+    /// A static
+    /// </summary>
     public static class AsyncEnumerable
     {
+        /// <summary>
+        /// An empty <see cref="IAsyncEnumerable{T}"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static IAsyncEnumerable<T> Empty<T>() => new EmptyAsyncEnumerable<T>();
 
         internal sealed class EmptyAsyncEnumerator<T> : IAsyncEnumerator<T>

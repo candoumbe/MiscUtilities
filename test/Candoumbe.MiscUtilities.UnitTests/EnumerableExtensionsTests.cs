@@ -835,7 +835,7 @@ namespace Utilities.UnitTests
         public void Given_Source_is_not_null_Partition_should_throw_ArgumentOutOfRangeException_when_bucketSize_is_negative(NonEmptyArray<int> source, NegativeInt bucketSize)
         {
             // Act
-            Action callingPartitionWithNegativeBucketSize = () => EnumerableExtensions.Partition<int>(source.Item, bucketSize.Item).ToArray();
+            Action callingPartitionWithNegativeBucketSize = () => source.Item.Partition(bucketSize.Item).ToArray();
 
             // Assert
             callingPartitionWithNegativeBucketSize.Should()

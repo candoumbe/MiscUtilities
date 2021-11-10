@@ -24,7 +24,9 @@ namespace System
         /// </summary>
         /// <param name="input">the string to convert</param>
         /// <returns>the string converted to Title case</returns>
-        /// <example><c>"cyrille-alexandre".<see cref="ToTitleCase()"/></c> returns <c>"Cyrille-Alexandre"</c></example>
+        /// <example>
+        /// <c>"cyrille-alexandre".ToTitleCase(); // "Cyrille-Alexandre" </c>
+        /// </example>
         public static string ToTitleCase(this string input)
         {
             StringBuilder sbResult = null;
@@ -78,14 +80,14 @@ namespace System
         /// </summary>
         /// <param name="input">the string to convert</param>
         /// <returns>the string converted to Title case</returns>
-        /// <example><c>"cyrille-alexandre".<see cref="ToTitleCase()"/></c> returns <c>"cyrilleAlexandre"</c></example>
+        /// <example><c>"cyrille-alexandre".ToTitleCase()" // "cyrilleAlexandre"</c></example>
         public static string ToCamelCase(this string input)
         {
             StringBuilder sbResult = null;
             input ??= string.Empty;
             string sanitizedInput
 #if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-             = new (input
+             = new(input
 #else
             = new(input.ToCharArray()
 #endif
@@ -188,7 +190,7 @@ namespace System
         }
 
         /// <summary>
-        /// Decodes a <see cref="string"/> converted using <see cref="GuidExtensions.Encode{string}"/> back to <see cref="Guid"/>. 
+        /// Decodes a <see cref="string"/> converted using <see cref="GuidExtensions.Encode(Guid)"/> back to <see cref="Guid"/>.
         /// </summary>
         /// <remarks>
         /// See http://madskristensen.net/post/A-shorter-and-URL-friendly-GUID for more details.
@@ -200,19 +202,20 @@ namespace System
             encoded = encoded.Replace("_", "/");
             encoded = encoded.Replace("-", "+");
             byte[] buffer = Convert.FromBase64String(encoded + "==");
+
             return new Guid(buffer);
         }
 
         /// <summary>
-        /// Converts <see cref="input"/> to its lower kebab representation
-        /// 
+        /// Converts <paramref name="input"/> to its lower kebab representation
+        ///
         /// </summary>
         /// <param name="input">The string to transform</param>
         /// <returns>The lower-kebab-cased string</returns>
         /// <example>
-        /// 
+        ///
         /// "JusticeLeague".ToLowerKebabCase() // "justice-league"
-        /// 
+        ///
         /// </example>
         public static string Slugify(this string input)
         {
@@ -258,15 +261,15 @@ namespace System
         }
 
         /// <summary>
-        /// Converts <see cref="input"/> to its snake_case equivalent
-        /// 
+        /// Converts <param ref="input"/> to its snake_case equivalent
+        ///
         /// </summary>
         /// <param name="input">The string to transform</param>
         /// <returns>The snake-cased string</returns>
         /// <example>
-        /// 
+        ///
         /// "JusticeLeague".ToSnakeCase() // "Justice_League"
-        /// 
+        ///
         /// </example>
         public static string ToSnakeCase(this string input)
         {
@@ -382,14 +385,14 @@ namespace System
         /// <summary>
         /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
         /// </summary>
-        /// <param name="input">The <see cref="StringSegment"/> where searching occurrences will be performed</param>
+        /// <param name="input">The <see cref="string"/> onto which searching occurrences will be performed</param>
         /// <param name="search">The searched element</param>
         /// <param name="stringComparison"></param>
         /// <returns>
         /// A collection of all indexes in <paramref name="input"/> where <paramref name="search"/> is present.
         /// </returns>
         /// <remarks>
-        /// 
+        ///
         /// </remarks>
         public static IEnumerable<int> Occurrences(this string input, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
@@ -423,10 +426,10 @@ namespace System
         /// <param name="search"></param>
         /// <param name="stringComparison"></param>
         /// <returns>
-        /// the index where <paramref name="search"/> 
+        /// the index where <paramref name="search"/>
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref="source"> or <paramref name="search"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int FirstOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
@@ -498,11 +501,12 @@ namespace System
         /// <code>
         /// "cyrille-alexandre".ToPascalCase() // CyrilleAlexandre
         /// </code>
+        /// </example>
         public static string ToPascalCase(this string input)
         {
             StringBuilder sbResult = null;
             input ??= string.Empty;
-            
+
             if (input != string.Empty)
             {
                 sbResult = new StringBuilder(input);

@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 
 namespace Microsoft.Extensions.Primitives
 {
+    /// <summary>
+    /// Extension methods for <see cref="StringSegment"/> types
+    /// </summary>
     public static class StringSegmentExtensions
     {
         /// <summary>
@@ -40,10 +43,10 @@ namespace Microsoft.Extensions.Primitives
         /// <param name="search"></param>
         /// <param name="stringComparison"></param>
         /// <returns>
-        /// the index where <paramref name="search"/> 
+        /// the index where <paramref name="search"/>
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref="source"> or <paramref name="search"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = default)
         {
@@ -62,7 +65,7 @@ namespace Microsoft.Extensions.Primitives
         /// <param name="search">The pattern to lookup for</param>
         /// <param name="stringComparison"></param>
         /// <returns>
-        /// the index where <paramref name="search"/> 
+        /// the index where <paramref name="search"/>
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
         /// <exception cref="ArgumentException">if <paramref name="search"/> is <c>empty</c></exception>
@@ -73,13 +76,13 @@ namespace Microsoft.Extensions.Primitives
                 throw new ArgumentException($"{nameof(search)} cannot be null or empty", nameof(search));
             }
 
-            int index =-1,
+            int index = -1,
                 offset = 0,
                 currentPos = source.LastIndexOf(search[0]);
 
             bool found = false;
 
-            while(!found && currentPos >= 0)
+            while (!found && currentPos >= 0)
             {
                 StringSegment subSegment = source.Subsegment(currentPos, search.Length);
                 found = subSegment.Equals(search, stringComparison);
@@ -145,7 +148,7 @@ namespace Microsoft.Extensions.Primitives
         /// </summary>
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <returns></returns>
+        /// <returns><c>true</c> if input is like <paramref name="pattern"/> and <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
         public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
 
@@ -154,7 +157,7 @@ namespace Microsoft.Extensions.Primitives
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
-        /// <returns></returns>
+        /// <returns><see cref="LambdaExpression"/></returns>
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
         public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
     }

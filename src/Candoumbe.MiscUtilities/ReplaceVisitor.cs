@@ -20,6 +20,7 @@ namespace Utilities
             _to = to;
         }
 
+        ///<inheritdoc/>
         public override Expression Visit(Expression node) => node == _from ? _to : base.Visit(node);
     }
 }
