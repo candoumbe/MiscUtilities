@@ -75,7 +75,7 @@ namespace Utilities.ContinuousIntegration
         "delivery",
         GitHubActionsImage.UbuntuLatest, GitHubActionsImage.MacOsLatest,
         OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
-        InvokedTargets = new[] { nameof(ReportCoverage), nameof(Publish), nameof(AddGithubRelease) },
+        InvokedTargets = new[] { nameof(Tests), nameof(ReportCoverage), nameof(Publish), nameof(AddGithubRelease) },
         ImportGitHubTokenAs = nameof(GitHubToken),
         CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
         PublishArtifacts = true,

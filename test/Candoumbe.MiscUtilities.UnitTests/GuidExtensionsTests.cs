@@ -2,6 +2,7 @@
 using Xunit.Categories;
 using FsCheck;
 using FsCheck.Xunit;
+using FsCheck.Fluent;
 
 namespace Utilities.UnitTests
 {
