@@ -29,6 +29,7 @@ namespace System.Collections.Generic
             typeof(DateTimeOffset), typeof(DateTimeOffset?),
 #if NET6_0_OR_GREATER
             typeof(DateOnly), typeof(DateOnly?),
+            typeof(TimeOnly), typeof(TimeOnly?),
 	#endif
             typeof(Guid), typeof(Guid?),
             typeof(bool), typeof(bool?)
@@ -154,6 +155,11 @@ namespace System.Collections.Generic
                 DateTime dateTime => dateTime.ToString("s").Replace(' ', 'T'),
                 DateTimeOffset dateTimeOffset => $"{ dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-" : "+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
 #if NET6_0_OR_GREATER
+                TimeOnly time => (time.Hour, time.Minute, time.Second, time.Millisecond) switch 
+                {
+                    (_, _, _, > 0) => time.ToString("hh:mm:ss.fffffff"),
+                    _ => time.ToString("hh:mm:ss"),
+                },
                 DateOnly date => date.ToString("yyyy-MM-dd"),
 #endif
                 int intValue => Convert.ToString(intValue),
