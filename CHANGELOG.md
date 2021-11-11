@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.2] / 2021-11-11
+## [0.6.3] / 2021-11-11
 - Fixed `NotSupportedException` thrown when calling `Jsonify` extension method with an object that has a `DateOnly` / `TimeOnly` property ([#30](https://github.com/candoumbe/MiscUtilities/30))
+
+## [0.6.2] / 2021-11-11
+- Fixed `NotSupportedException` thrown when calling `DeepClone` extension method with an object that has a `DateOnly` / `TimeOnly` property ([#30](https://github.com/candoumbe/MiscUtilities/30))
 
 ## [0.6.1] / 2021-11-10
 - Fixed minor build pipeline issues
@@ -55,7 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.6.2...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.6.3...HEAD
+[0.6.3]: https://github.com/candoumbe/MiscUtilities/compare/0.6.2...0.6.3
 [0.6.2]: https://github.com/candoumbe/MiscUtilities/compare/0.6.1...0.6.2
 [0.6.1]: https://github.com/candoumbe/MiscUtilities/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/candoumbe/MiscUtilities/compare/0.5.4...0.6.0
