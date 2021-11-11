@@ -14,7 +14,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using static System.Text.Json.JsonSerializer;
-using static System.Text.Json.JsonSerializerOptions;
 #endif
 namespace System
 {
@@ -208,14 +207,41 @@ namespace System
         /// <param name="obj">The object to "jsonify"</param>
         /// <param name="settings">settings to use when serializing <paramref name="obj"/> to Json.</param>
         /// <returns>Json representation</returns>
-#if NEWTONSOFT_JSON && !NET6_0_OR_GREATER // TODO remove the right hand of the expression once https://github.com/JamesNK/Newtonsoft.Json/issues/2521 is fixed.
+#if NEWTONSOFT_JSON // TODO remove the right hand of the expression once https://github.com/JamesNK/Newtonsoft.Json/issues/2521 is fixed.
         public static string Jsonify(this object obj, JsonSerializerSettings settings = null) => settings is null
                 ? SerializeObject(obj)
                 : SerializeObject(obj, settings);
 #else
-        public static string Jsonify(this object obj, JsonSerializerOptions settings = null) => obj is null
-                ? null
-                : Serialize(obj, obj.GetType(), settings);
+        public static string Jsonify(this object obj, JsonSerializerOptions settings = null)
+        {
+            string json = null;
+            if (obj is not null)
+            {
+#if REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND
+                if (settings is null)
+                {
+                    settings = new();
+                    settings.Converters.Add(new Candoumbe.MiscUtilities.DateOnlyJsonConverter());
+                    settings.Converters.Add(new Candoumbe.MiscUtilities.TimeOnlyJsonConverter());
+                }
+                else
+                {
+                    if (settings.Converters.None(conv => conv.GetType().IsAssignableToGenericType(typeof(JsonConverter<DateOnly>))))
+                    {
+                        settings.Converters.Add(new Candoumbe.MiscUtilities.DateOnlyJsonConverter());
+                    }
+
+                    if (settings.Converters.None(conv => conv.GetType().IsAssignableToGenericType(typeof(JsonConverter<TimeOnly>))))
+                    {
+                        settings.Converters.Add(new Candoumbe.MiscUtilities.TimeOnlyJsonConverter());
+                    }
+                }
+#endif
+                json = Serialize(obj, obj.GetType(), settings);
+            }
+
+            return json;
+        }
 #endif
     }
 }
