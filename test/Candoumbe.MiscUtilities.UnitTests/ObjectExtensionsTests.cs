@@ -1,13 +1,24 @@
-﻿using System.Collections.Generic;
-using Xunit;
-using System;
-using FluentAssertions;
-using System.Linq.Expressions;
-using Xunit.Abstractions;
-using static Newtonsoft.Json.JsonConvert;
-using FluentAssertions.Extensions;
-using Xunit.Categories;
+﻿using Candoumbe.MiscUtilities.UnitTests.Generators;
 using Candoumbe.MiscUtilities.UnitTests.Models;
+
+using FluentAssertions;
+using FluentAssertions.Extensions;
+using FluentAssertions.Json;
+
+using FsCheck.Xunit;
+
+using Newtonsoft.Json.Linq;
+
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Text.Json;
+
+using Xunit;
+using Xunit.Abstractions;
+using Xunit.Categories;
+
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Utilities.UnitTests
 {
@@ -331,6 +342,35 @@ namespace Utilities.UnitTests
             // Assert
             clone.Should()
                  .BeEquivalentTo(source);
+        }
+
+        [Property(Arbitrary = new[] {typeof(ValueGenerators)})]
+        public void Given_non_null_input_and_no_serializerOptions_Jsonify_should_behave_as_expected(Appointment source)
+        {
+            // Act
+            string json = source.Jsonify();
+            JToken jtoken = JToken.Parse(json);
+
+            // Assert
+            jtoken[nameof(Appointment.Name)].Should().HaveValue(source.Name);
+            jtoken[nameof(Appointment.Date)].Should().HaveValue(source.Date.ToString("yyyy-MM-dd"));
+            jtoken[nameof(Appointment.Time)].Should().HaveValue(source.Time.ToString(source.Time.Millisecond  > 0 ? "HH:mm:ss.FFFFFFF" : "HH:mm:ss"));
+        }
+
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+        public void Given_non_null_input_and_serializerOptions_with_no_custom_converters_for_TimeOnly_or_DateOnly_types_Jsonify_should_behave_as_expected(Appointment source)
+        {
+            // Arrange
+            JsonSerializerOptions settings = new ();
+
+            // Act
+            string json = source.Jsonify(settings);
+
+            // Assert
+            JToken jtoken = JToken.Parse(json);
+            jtoken[nameof(Appointment.Name)].Should().HaveValue(source.Name);
+            jtoken[nameof(Appointment.Date)].Should().HaveValue(source.Date.ToString("yyyy-MM-dd"));
+            jtoken[nameof(Appointment.Time)].Should().HaveValue(source.Time.ToString(source.Time.Millisecond > 0 ? "HH:mm:ss.FFFFFFF" : "HH:mm:ss"));
         }
 #endif
     }

@@ -428,7 +428,7 @@ namespace Utilities.ContinuousIntegration
                     .SetFramework("net5.0")
                     .SetUrl(RootDirectory)
                     .SetBranch(MainBranchName)
-                    .EnableNoFetch()
+                    //.EnableNoFetch()
                     .DisableProcessLogOutput());
 
                 if (!GitRepository.IsOnHotfixBranch())
