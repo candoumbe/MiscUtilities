@@ -520,7 +520,7 @@ namespace Utilities.ContinuousIntegration
         public bool IsOnGithub => GitHubActions is not null;
 
         public Target Publish => _ => _
-            .Description($"Published packages (*.nupkg and *.snupkg) to the destination server set with {nameof(NugetPackageSource)} settings ")
+            .Description($"Publish packages (*.nupkg and *.snupkg) to the destination server set with {nameof(NugetPackageSource)} settings ")
             .DependsOn(Tests, Pack)
             .Triggers(AddGithubRelease)
             .Consumes(Pack, ArtifactsDirectory / "*.nupkg", ArtifactsDirectory / "*.snupkg")
@@ -584,7 +584,7 @@ namespace Utilities.ContinuousIntegration
                     Octokit.NewRelease newRelease = new(MajorMinorPatchVersion)
                     {
                         TargetCommitish = GitRepository.Commit,
-                        Body = string.Concat("- ", ExtractChangelogSectionNotes(ChangeLogFile, MajorMinorPatchVersion).Select(line => $"{line}\n")),
+                        Body = string.Concat("* ", ExtractChangelogSectionNotes(ChangeLogFile, MajorMinorPatchVersion).Select(line => $"{line}\n")),
                         Name = MajorMinorPatchVersion,
                     };
 

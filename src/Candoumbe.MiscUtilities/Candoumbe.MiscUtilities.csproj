@@ -24,6 +24,7 @@
     <Otherwise>
       <PropertyGroup>
         <DefineConstants>SYSTEM_TEXT</DefineConstants>
+        <DefineConstants Condition="'$(TargetFramework)' == 'net6.0'">REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND</DefineConstants>
       </PropertyGroup>
       <ItemGroup>
         <PackageReference Include="System.Text.Json" Version="6.0.0" />

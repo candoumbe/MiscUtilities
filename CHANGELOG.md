@@ -6,9 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Fixed `NotSupportedException` thrown when calling `Jsonify` extension method with an object that has a `DateOnly` / `TimeOnly` property ([#30](https://github.com/candoumbe/MiscUtilities/30))
 
 ## [0.6.1] / 2021-11-10
-- Fixes minor build pipeline issues
+- Fixed minor build pipeline issues
 
 ## [0.6.0] / 2021-11-10
 - Added `TimeOnly` support when calling `ToQueryString` extension methods
