@@ -31,13 +31,24 @@ namespace System
         /// <returns>A deep copy of the object</returns>
         public static T DeepClone<T>(this T source)
         {
+#if REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND
+            Candoumbe.MiscUtilities.DateOnlyJsonConverter dateOnlyJsonConverter = new();
+            Candoumbe.MiscUtilities.TimeOnlyJsonConverter timeOnlyJsonConverter = new();
+
+            JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.General);
+            serializerOptions.Converters.Add(dateOnlyJsonConverter);
+            serializerOptions.Converters.Add(timeOnlyJsonConverter);
+#endif
+
             // Don't serialize a null object, simply return the default for that object
             T clone = ReferenceEquals(source, default)
                 ? default
 #if NEWTONSOFT_JSON
         : DeserializeObject<T>(SerializeObject(source));
+#elif REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND
+        : Deserialize<T>(Serialize(source, serializerOptions), serializerOptions);
 #else
-        : Deserialize<T>(Serialize<T>(source));
+        : Deserialize<T>(Serialize(source));
 #endif
 
             return clone;
@@ -197,7 +208,7 @@ namespace System
         /// <param name="obj">The object to "jsonify"</param>
         /// <param name="settings">settings to use when serializing <paramref name="obj"/> to Json.</param>
         /// <returns>Json representation</returns>
-#if NEWTONSOFT_JSON
+#if NEWTONSOFT_JSON && !NET6_0_OR_GREATER // TODO remove the right hand of the expression once https://github.com/JamesNK/Newtonsoft.Json/issues/2521 is fixed.
         public static string Jsonify(this object obj, JsonSerializerSettings settings = null) => settings is null
                 ? SerializeObject(obj)
                 : SerializeObject(obj, settings);

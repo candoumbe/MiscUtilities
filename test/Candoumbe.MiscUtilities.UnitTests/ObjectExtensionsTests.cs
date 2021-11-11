@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 using static Newtonsoft.Json.JsonConvert;
 using FluentAssertions.Extensions;
 using Xunit.Categories;
+using Candoumbe.MiscUtilities.UnitTests.Models;
 
 namespace Utilities.UnitTests
 {
@@ -303,5 +304,34 @@ namespace Utilities.UnitTests
             result.Should()
                   .Match(expectation, reason);
         }
+
+#if NET6_0_OR_GREATER
+        public static IEnumerable<object[]> DeepCloneCases
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new Appointment
+                    {
+                        Date = DateOnly.FromDateTime(DateTime.Now),
+                        Time = TimeOnly.FromDateTime(DateTime.Now)
+                    }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(DeepCloneCases))]
+        public void Given_non_null_input_DeepClone_should_returns_a_clone_of_the_input(Appointment source)
+        {
+            // Act
+            object clone = source.DeepClone();
+
+            // Assert
+            clone.Should()
+                 .BeEquivalentTo(source);
+        }
+#endif
     }
 }
