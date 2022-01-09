@@ -581,10 +581,12 @@ namespace Utilities.ContinuousIntegration
 
                 if (!releases.AtLeastOnce(release => release.Name == MajorMinorPatchVersion))
                 {
+                    string[] lines = ExtractChangelogSectionNotes(ChangeLogFile, MajorMinorPatchVersion).Select(line => $"{line}\n").ToArray();
+
                     Octokit.NewRelease newRelease = new(MajorMinorPatchVersion)
                     {
                         TargetCommitish = GitRepository.Commit,
-                        Body = string.Join("- ", ExtractChangelogSectionNotes(ChangeLogFile, MajorMinorPatchVersion).Select(line => $"{line}\n")),
+                        Body = string.Join("- ", lines),
                         Name = MajorMinorPatchVersion,
                     };
 
