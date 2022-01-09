@@ -497,6 +497,7 @@ namespace Utilities.UnitTests
         [InlineData("firstname", "Firstname")]
         [InlineData("first_name", "FirstName")]
         [InlineData("firstName", "FirstName")]
+        [InlineData("convert to pascal case", "ConvertToPascalCase")]
         public void Given_input_TöPascalCase_should_convert(string input, string expected)
         {
             // Act
