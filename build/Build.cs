@@ -34,7 +34,7 @@ namespace Utilities.ContinuousIntegration
 
     [GitHubActions(
         "pull-request",
-        GitHubActionsImage.UbuntuLatest, GitHubActionsImage.MacOsLatest,
+        GitHubActionsImage.UbuntuLatest,
         OnPullRequestBranches = new[] { DevelopBranch },
         PublishArtifacts = true,
         InvokedTargets = new[] { nameof(Tests), nameof(ReportCoverage) },
@@ -53,7 +53,7 @@ namespace Utilities.ContinuousIntegration
     )]
     [GitHubActions(
         "integration",
-        GitHubActionsImage.UbuntuLatest, GitHubActionsImage.MacOsLatest,
+        GitHubActionsImage.UbuntuLatest,
         OnPushBranchesIgnore = new[] { MainBranchName },
         PublishArtifacts = true,
         InvokedTargets = new[] { nameof(Tests), nameof(ReportCoverage), nameof(Pack) },
@@ -73,7 +73,7 @@ namespace Utilities.ContinuousIntegration
     )]
     [GitHubActions(
         "delivery",
-        GitHubActionsImage.UbuntuLatest, GitHubActionsImage.MacOsLatest,
+        GitHubActionsImage.UbuntuLatest,
         OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
         InvokedTargets = new[] { nameof(Tests), nameof(ReportCoverage), nameof(Publish), nameof(AddGithubRelease) },
         ImportGitHubTokenAs = nameof(GitHubToken),
@@ -581,10 +581,12 @@ namespace Utilities.ContinuousIntegration
 
                 if (!releases.AtLeastOnce(release => release.Name == MajorMinorPatchVersion))
                 {
+                    string[] lines = ExtractChangelogSectionNotes(ChangeLogFile, MajorMinorPatchVersion).Select(line => $"{line}\n").ToArray();
+
                     Octokit.NewRelease newRelease = new(MajorMinorPatchVersion)
                     {
                         TargetCommitish = GitRepository.Commit,
-                        Body = string.Concat("* ", ExtractChangelogSectionNotes(ChangeLogFile, MajorMinorPatchVersion).Select(line => $"{line}\n")),
+                        Body = string.Join("- ", lines),
                         Name = MajorMinorPatchVersion,
                     };
 
