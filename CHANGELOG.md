@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Added `SortBy` extension method for `IEnumerable<T>` type
+- Added `IShuffler` interface and `FisherYatesShuffler` implementation
 
 ## [0.7.0] / 2022-01-11
 - Added `EnumExtensions.GetValues<TEnum>()` utility method
