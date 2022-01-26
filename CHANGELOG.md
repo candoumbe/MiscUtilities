@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.8.0] / 2022-01-26
 - Added `SortBy` extension method for `IEnumerable<T>` type
 - Added `IShuffler` interface and `FisherYatesShuffler` implementation
 
@@ -64,7 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/candoumbe/MiscUtilities/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/candoumbe/MiscUtilities/compare/0.6.3...0.7.0
 [0.6.3]: https://github.com/candoumbe/MiscUtilities/compare/0.6.2...0.6.3
 [0.6.2]: https://github.com/candoumbe/MiscUtilities/compare/0.6.1...0.6.2
