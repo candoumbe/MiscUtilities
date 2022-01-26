@@ -5,9 +5,9 @@
     <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard2.0;netstandard2.1;net5.0;net6.0</TargetFrameworks>
     <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
     <PackageTags>collections; string; utilities</PackageTags>
-    <PackageProjectUrl></PackageProjectUrl>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Candoumbe.MiscUtilities.xml</DocumentationFile>
     <RepositoryUrl>https://github.com/candoumbe/Candoumbe.MiscUtilities</RepositoryUrl>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
     <WarningLevel>4</WarningLevel>

@@ -1,10 +1,12 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using static System.Linq.Expressions.ExpressionExtensions;
-using System.Threading.Tasks;
+
 #if !NETSTANDARD1_0
+using System.Threading.Tasks;
 using System.Collections.Concurrent;
 #endif
+
 namespace System.Collections.Generic
 {
     /// <summary>
@@ -413,6 +415,19 @@ namespace System.Collections.Generic
                 }
             }
         }
+
+        /// <summary>
+        /// Sorts <see cref="source"/> into 2 groups
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="predicate"></param>
+        /// <returns>
+        /// A tuple that contains two <see cref="IEnumerable{T}"/> parts : <c>Truthy</c> that contains all items from <paramref name="source"/>
+        /// that satifies <paramref name="predicate"/>.
+        /// </returns>
+        public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+            => (source.Where(predicate), source.Where(val => !predicate(val)));
 
 #if !NETSTANDARD1_0
         /// <summary>

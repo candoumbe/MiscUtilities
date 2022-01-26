@@ -501,6 +501,7 @@ namespace Utilities.ContinuousIntegration
         {
             Git($"rebase {DevelopBranch}");
             Git($"checkout {DevelopBranch}");
+            Git("pull");
             Git($"merge --no-ff --no-edit {GitRepository.Branch}");
 
             Git($"branch -D {GitRepository.Branch}");
