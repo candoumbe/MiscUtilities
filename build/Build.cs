@@ -490,6 +490,7 @@ namespace Utilities.ContinuousIntegration
             Git($"tag {MajorMinorPatchVersion}");
 
             Git($"checkout {DevelopBranch}");
+            Git("pull");
             Git($"merge --no-ff --no-edit {GitRepository.Branch}");
 
             Git($"branch -D {GitRepository.Branch}");
