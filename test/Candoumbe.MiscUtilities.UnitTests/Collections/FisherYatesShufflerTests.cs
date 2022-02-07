@@ -63,29 +63,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Collections
             };
         }
 
-        [Theory]
-        [InlineData(new[] { -12, -1, 0 })]
-        public void Given_a_collection_of_inputs_Shuffle_should_give_expected_result(IEnumerable<int> original)
-        {
-            List<int> input = new(original.Count());
-            original.ForEach(val => input.Add(val));
-            _outputHelper.WriteLine($"Input : {input.Jsonify()} before shuffling");
-
-            // Act
-            IEnumerable<int> output = _sut.Shuffle(input);
-
-            // Assert
-            _outputHelper.WriteLine($"output : {output.Jsonify()}");
-
-            _outputHelper.WriteLine($"Input : {input.Jsonify()} after shuffling");
-            _outputHelper.WriteLine($"Input : {original.Jsonify()} after shuffling");
-
-            output.Should()
-                  .HaveSameCount(original).And
-                  .Contain(original).And
-                  .NotContainInOrder(original);
-        }
-
         [Fact]
         public void Given_an_empty_collection_Shuffle_should_returns_an_empty_output()
         {
