@@ -38,6 +38,9 @@ public class DateOnlyRangeTests
         DateOnly lower = faker.Date.PastDateOnly(refDate: reference);
         DateOnly upper = reference;
 
+        _outputHelper.WriteLine($"start : {upper}");
+        _outputHelper.WriteLine($"end : {lower}");
+
         // Act
         Action ctor = () => new DateOnlyRange(start: upper, end: lower);
 

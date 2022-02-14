@@ -46,14 +46,16 @@ internal static class ValueGenerators
         .ToArbitrary();
 
     public static Arbitrary<TimeOnlyRange> TimeOnlyRanges()
-        => TimeOnlys().Generator.Two()
+        => Gen.OneOf(TimeOnlys().Generator.Two()
                          .Select(times => (start: times.Item1, end: times.Item2))
                              .Where(times => times.start != times.end)
                              .Select(times => (times.start < times.end) switch
                              {
                                  true => new TimeOnlyRange(times.start, times.end),
                                  _ => new TimeOnlyRange(times.end, times.start)
-                             })
+                             }),
+                      Gen.Constant(TimeOnlyRange.Zero),
+                      Gen.Constant(TimeOnlyRange.AllDay))
             .ToArbitrary();
 #endif
 

@@ -247,7 +247,8 @@ namespace Utilities.ContinuousIntegration
                                                                    .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting.SetFramework(framework)
                                                                                                                                               .AddLoggers($"trx;LogFileName={project.Name}.trx")
                                                                                                                                               .SetCoverletOutput(TestResultDirectory / $"{project.Name}.{framework}.xml")))
-                    );
+                    ,
+                    completeOnFailure : true);
 
                 TestResultDirectory.GlobFiles("*.trx")
                                         .ForEach(testFileResult => AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,

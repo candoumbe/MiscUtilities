@@ -17,8 +17,7 @@ public record DateOnlyRange : Range<DateOnly>
     /// <param name="start">lower bound</param>
     /// <param name="end">Upper bound</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> is after <paramref name="end"/>.</exception>
-    public DateOnlyRange(DateOnly start, DateOnly end) : base(start,
-                                                              end)
+    public DateOnlyRange(DateOnly start, DateOnly end) : base(start, end)
     {
         if (start > end)
         {

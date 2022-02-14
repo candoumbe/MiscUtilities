@@ -16,7 +16,7 @@ namespace Candoumbe.MiscUtilities.Types;
 public abstract class Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>
     where T : IComparable<T>
 #else
-public record Range<T>(T Start, T End) where T : IComparable<T>, IComparable
+public record Range<T>(T Start, T End): IComparable<Range<T>> where T : IComparable<T>
 #endif
 {
 #if !NET5_0_OR_GREATER
@@ -59,9 +59,6 @@ public record Range<T>(T Start, T End) where T : IComparable<T>, IComparable
     }
 
     ///<inheritdoc/>
-    public int CompareTo(Range<T> other) => Start.CompareTo(other.Start);
-
-    ///<inheritdoc/>
     public static bool operator ==(Range<T> left, Range<T> right) => EqualityComparer<Range<T>>.Default.Equals(left, right);
 
     ///<inheritdoc/>
@@ -73,4 +70,7 @@ public record Range<T>(T Start, T End) where T : IComparable<T>, IComparable
     /// </summary>
     /// <returns></returns>
     public virtual bool IsEmpty() => Start.Equals(End);
+
+    ///<inheritdoc/>
+    public int CompareTo(Range<T> other) => Start.CompareTo(other.Start);
 }
