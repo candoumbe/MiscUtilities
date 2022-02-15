@@ -8,8 +8,17 @@ using System.Diagnostics;
 namespace Candoumbe.MiscUtilities.Types;
 
 /// <summary>
-/// A <see cref="TimeOnly"/> range
+/// <para>
+/// A type suitable to represent a "time range"
+/// </para>
 /// </summary>
+/// <remarks>
+/// <see cref="TimeOnlyRange"/> allows to express ranges like :
+/// <list type="bullet">
+///     <item>"from 22PM to 6AM" : <c>new TimeOnlyRange(new TimeOnly(22, 0), new TimeOnly(6))</c></item>
+///     <item>"all day" : <c>TimeOnlyRange.AllDay</c></item>
+/// </list>
+/// </remarks>
 public record TimeOnlyRange : Range<TimeOnly>
 {
     private TimeSpan Span => End - Start;
@@ -82,7 +91,7 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// <exception cref="InvalidOperationException">if either : current instance does not overlap or is not continuous with <paramref name="other"/>.</exception>
     public TimeOnlyRange Union(TimeOnlyRange other)
     {
-        TimeOnlyRange result = Zero;
+        TimeOnlyRange result = Empty;
         if (this == AllDay || other == AllDay)
         {
             result = AllDay;
@@ -162,9 +171,9 @@ public record TimeOnlyRange : Range<TimeOnly>
     public static TimeOnlyRange AllDay => new(TimeOnly.MinValue, TimeOnly.MaxValue);
 
     /// <summary>
-    /// Empty <see cref="TimeOnlyRange"/>.
+    /// An empty <see cref="TimeOnlyRange"/>.
     /// </summary>
-    public static TimeOnlyRange Zero => new(TimeOnly.MinValue, TimeOnly.MinValue);
+    public static TimeOnlyRange Empty => new(TimeOnly.MinValue, TimeOnly.MinValue);
 
     /// <summary>
     /// Computes  <see cref="TimeOnlyRange"/> value that is common between the current instance and <paramref name="other"/>.
@@ -173,10 +182,10 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// This methods relies on <see cref="Overlaps(TimeOnlyRange)"/> to see if there can be a intersection with <paramref name="other"/>.
     /// </remarks>
     /// <param name="other">The other instance to test</param>
-    /// <returns>a <see cref="TimeOnlyRange"/> that represent the overlap between the current instance and <paramref name="other"/> or <see cref="Zero"/> when no intersection found.</returns>
+    /// <returns>a <see cref="TimeOnlyRange"/> that represent the overlap between the current instance and <paramref name="other"/> or <see cref="Empty"/> when no intersection found.</returns>
     public TimeOnlyRange Intersect(TimeOnlyRange other)
     {
-        TimeOnlyRange intersection = Zero;
+        TimeOnlyRange intersection = Empty;
         if (this == AllDay)
         {
             intersection = other;
@@ -220,7 +229,7 @@ public record TimeOnlyRange : Range<TimeOnly>
                     (true, true) => new(right.Start, right.End),
                     (true, false) => new(right.Start, left.End),
                     (false, true) => new(left.Start, right.End),
-                    _ => Zero
+                    _ => Empty
                 }
             };
         }
@@ -233,10 +242,10 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// </summary>
     /// <param name="input">The <see cref="TimeOnlyRange"/> to "invert" </param>
     /// <returns></returns>
-    private static TimeOnlyRange Complement(TimeOnlyRange input) => (input == Zero, input == AllDay) switch
+    private static TimeOnlyRange Complement(TimeOnlyRange input) => (input == Empty, input == AllDay) switch
     {
         (true, _) => AllDay,
-        (false, true) => Zero,
+        (false, true) => Empty,
         _ => input with { Start = input.End, End = input.Start }
     };
 
@@ -250,7 +259,7 @@ public record TimeOnlyRange : Range<TimeOnly>
         }
         else if (range.End - range.Start <= TimeSpan.Zero)
         {
-            normalizedOutput = Zero;
+            normalizedOutput = Empty;
         }
         else
         {

@@ -54,13 +54,13 @@ internal static class ValueGenerators
                                  true => new TimeOnlyRange(times.start, times.end),
                                  _ => new TimeOnlyRange(times.end, times.start)
                              }),
-                      Gen.Constant(TimeOnlyRange.Zero),
+                      Gen.Constant(TimeOnlyRange.Empty),
                       Gen.Constant(TimeOnlyRange.AllDay))
             .ToArbitrary();
 #endif
 
     public static Arbitrary<DateTimeRange> DateTimeRanges()
-        => ArbMap.Default.ArbFor<DateTime>()
+        => Gen.OneOf(ArbMap.Default.ArbFor<DateTime>()
                          .Generator
                          .Two()
                          .Where(dates => dates.Item1 != dates.Item2)
@@ -68,6 +68,8 @@ internal static class ValueGenerators
                          {
                              true => new DateTimeRange(dates.Item1, dates.Item2),
                              _ => new DateTimeRange(dates.Item2, dates.Item1)
-                         })
+                         }),
+                    Gen.Constant(DateTimeRange.Infinite),
+                    Gen.Constant(DateTimeRange.Empty))
         .ToArbitrary();
 }

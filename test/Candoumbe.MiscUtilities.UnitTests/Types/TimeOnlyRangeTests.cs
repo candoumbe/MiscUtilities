@@ -35,10 +35,10 @@ public class TimeOnlyRangeTests
     }
 
     [Property(Arbitrary = new[] {typeof(ValueGenerators)})]
-    public void Given_start_and_end_Cosntructor_should_feed_Properties_accordingly(TimeOnly start, TimeOnly end)
+    public void Given_start_and_end_Constructor_should_feed_Properties_accordingly(TimeOnly start, TimeOnly end)
     {
         // Act
-        TimeOnlyRange range = new TimeOnlyRange(start, end);
+        TimeOnlyRange range = new (start, end);
 
         // Assert
         range.Start.Should().Be(start);
@@ -249,14 +249,10 @@ public class TimeOnlyRangeTests
     public FsCheck.Property Overlaps_should_be_symetric(TimeOnlyRange left, TimeOnlyRange right)
         => (left.Overlaps(right) == right.Overlaps(left)).ToProperty();
 
-
     [Property(Arbitrary = new [] { typeof(ValueGenerators) })]
-    public void Given_infinity_when_testing_overlap_with_any_other_TimeOnlyRange_Overlaps_should_be_true(TimeOnly reference)
+    public void Given_infinity_when_testing_overlap_with_any_other_TimeOnlyRange_Overlaps_should_be_true(TimeOnlyRange other)
     {
-        // Arrange
-        TimeOnlyRange other = new (faker.Date.RecentTimeOnly(refTime:reference), reference);
-
-        // Arrange
+        // Act
         bool actual = TimeOnlyRange.AllDay.Overlaps(other);
 
         // Assert
@@ -264,7 +260,7 @@ public class TimeOnlyRangeTests
               .BeTrue($"infinity range overlaps every other {nameof(TimeOnlyRange)}s");
     }
 
-    public static IEnumerable<object[]> PlusCases
+    public static IEnumerable<object[]> UnionCases
     {
         get
         {
@@ -403,8 +399,8 @@ public class TimeOnlyRangeTests
     }
 
     [Theory]
-    [MemberData(nameof(PlusCases))]
-    public void Given_two_instances_Plus_should_behave_as_expected(TimeOnlyRange current, TimeOnlyRange other, TimeOnlyRange expected)
+    [MemberData(nameof(UnionCases))]
+    public void Given_two_instances_Union_should_behave_as_expected(TimeOnlyRange current, TimeOnlyRange other, TimeOnlyRange expected)
     {
         // Act
         TimeOnlyRange actual = current.Union(other);
@@ -425,9 +421,9 @@ public class TimeOnlyRangeTests
              */
             yield return new object[]
             {
-                TimeOnlyRange.Zero,
-                TimeOnlyRange.Zero,
-                TimeOnlyRange.Zero
+                TimeOnlyRange.Empty,
+                TimeOnlyRange.Empty,
+                TimeOnlyRange.Empty
             };
 
             /*
@@ -475,7 +471,7 @@ public class TimeOnlyRangeTests
             {
                 new TimeOnlyRange(TimeOnly.FromTimeSpan(07.Hours()), TimeOnly.FromTimeSpan(13.Hours())),
                 new TimeOnlyRange(TimeOnly.FromTimeSpan(21.Hours()), TimeOnly.FromTimeSpan(06.Hours())),
-                TimeOnlyRange.Zero
+                TimeOnlyRange.Empty
             };
 
             /*
@@ -508,5 +504,16 @@ public class TimeOnlyRangeTests
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
     public FsCheck.Property Intersect_should_be_symetric(TimeOnlyRange left, TimeOnlyRange right)
         => (left.Intersect(right) == right.Intersect(left)).ToProperty();
+
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    public void Zero_should_be_the_neutral_element_of_TimeOnlyRange(TimeOnlyRange range)
+    {
+        // Act
+        TimeOnlyRange result = range.Union(TimeOnlyRange.Empty);
+
+        // Assert
+        result.Should()
+              .Be(range);
+    }
 }
 #endif
