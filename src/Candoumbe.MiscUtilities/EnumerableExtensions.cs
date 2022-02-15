@@ -417,7 +417,7 @@ namespace System.Collections.Generic
         }
 
         /// <summary>
-        /// Sorts <see cref="source"/> into 2 groups
+        /// Sorts <paramref name="source"/> into 2 groups.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
