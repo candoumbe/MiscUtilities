@@ -68,7 +68,7 @@ public record Range<T>(T Start, T End): IComparable<Range<T>> where T : ICompara
     /// <summary>
     /// Checks if the current instance reprensents an empty range
     /// </summary>
-    /// <returns></returns>
+    /// <returns><c>true</c> when current instance is empty and <c>false</c> otherwise.</returns>
     public virtual bool IsEmpty() => Start.Equals(End);
 
     ///<inheritdoc/>
