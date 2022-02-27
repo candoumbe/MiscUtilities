@@ -20,6 +20,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0CF6B24E-658F-43DE-BFE8-6020D9CC19A1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B584E2C0-7BBB-4325-AA7D-428A948E6033}"
+	ProjectSection(SolutionItems) = preProject
+		test\stryker-config.json = test\stryker-config.json
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.MiscUtilities", "src\Candoumbe.MiscUtilities\Candoumbe.MiscUtilities.csproj", "{DBBB09FB-72CD-4DC6-8C55-DB12767781B2}"
 EndProject
@@ -32,6 +35,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{BE129832-7169-431D-AD36-723C53CCCF3D}"
 	ProjectSection(SolutionItems) = preProject
 		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{FA04CE34-36A6-4C5B-BD26-15CE08C5B51D}"
+	ProjectSection(SolutionItems) = preProject
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
 Global

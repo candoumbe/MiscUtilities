@@ -44,7 +44,9 @@ public class DateOnlyRangeTests
         Action action = () => new DateOnlyRange(start: end, end: start);
 
         // Assert
-        action.Should().Throw<ArgumentOutOfRangeException>("start cannot be greater than end");
+        action.Should().Throw<ArgumentOutOfRangeException>("start cannot be greater than end")
+                       .Where(ex => !string.IsNullOrWhiteSpace(ex.Message))
+                       .Where(ex => !string.IsNullOrWhiteSpace(ex.ParamName));
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
@@ -89,22 +91,18 @@ public class DateOnlyRangeTests
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-
-    public void Given_two_non_empty_DateOnlyRange_instances_when_first_ends_where_other_starts_Abuts_should_return_true(DateOnly reference)
+    public void Given_two_non_empty_DateOnlyRange_instances_when_first_ends_where_other_starts_Abuts_should_return_true(NonNull<DateOnlyRange> nonNullLeft, NonNull<DateOnlyRange> nonNullRight)
     {
         // Arrange
-        DateOnly start = faker.Date.RecentDateOnly(refDate: reference);
-        DateOnly end = reference;
-
-        DateOnlyRange current = new(start, reference);
-        DateOnlyRange other = new(reference, end);
+        DateOnlyRange left = nonNullLeft.Item;
+        DateOnlyRange right = nonNullRight.Item;
 
         // Act
-        bool isContiguous = current.IsContiguousWith(other);
+        bool isContiguous = left.IsContiguousWith(right);
 
         // Assert
         isContiguous.Should()
-            .BeTrue();
+                    .Be(left.Start == right.End || right.Start == left.End);
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
@@ -295,6 +293,18 @@ public class DateOnlyRangeTests
                 new DateOnlyRange(DateOnly.FromDateTime(3.January(1990)), DateOnly.FromDateTime(5.January(1990))),
                 new DateOnlyRange(DateOnly.FromDateTime(1.January(1990)), DateOnly.FromDateTime(6.January(1990))),
             };
+
+            /* 
+             * current     : ---------------------
+             * other       :         |---------| 
+             * expected    : ---------------------
+             */
+            yield return new object[]
+            {
+                DateOnlyRange.Infinite,
+                new DateOnlyRange(DateOnly.FromDateTime(3.January(1990)), DateOnly.FromDateTime(5.January(1990))),
+                DateOnlyRange.Infinite,
+            };
         }
     }
 
@@ -308,6 +318,39 @@ public class DateOnlyRangeTests
 
         // Assert
         actual.Should().Be(expected);
+    }
+
+    [Property(Arbitrary = new[] {typeof(ValueGenerators)})]
+    public void Given_non_empty_TimeOnlyRange_When_merging_with_empty_range_Union_should_returns_the_non_empty_range(DateOnlyRange range, DateOnly date)
+    {
+        // Arrange
+        DateOnlyRange empty = new (date, date);
+
+        // Act
+        DateOnlyRange union = range.Union(empty);
+
+        // Assert
+        union.Should().Be(range);
+    }
+
+    [Property(Arbitrary =new[] {typeof(ValueGenerators)})]
+    public void Given_non_empty_TimeOnlyRange_When_merging_with_an_other_TimeOnlyRange_that_does_not_overlaps_nor_is_contiguous_Union_should_throw_InvalidOperationException(DateOnly date)
+    {
+        // Arrange
+        DateOnlyRange left = new (date.AddDays(1), faker.Date.FutureDateOnly(refDate: date.AddDays(2)));
+        DateOnlyRange right = new(faker.Date.RecentDateOnly(refDate: date.AddDays(-2)), date.AddDays(-1));
+
+        _outputHelper.WriteLine($"{nameof(left)} : {left}");
+        _outputHelper.WriteLine($"{nameof(right)} : {right}");
+
+        // Act
+        Action callingUnionWhenLeftAndRightDontOverlapsAndAreNotContiguous = () => left.Union(right);
+
+        // Assert
+        callingUnionWhenLeftAndRightDontOverlapsAndAreNotContiguous.Should()
+                                                                   .Throw<InvalidOperationException>()
+                                                                   .Which.Message.Should()
+                                                                   .NotBeNullOrWhiteSpace();
     }
 
     public static IEnumerable<object[]> IntersectCases

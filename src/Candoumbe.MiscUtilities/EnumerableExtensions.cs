@@ -423,8 +423,11 @@ namespace System.Collections.Generic
         /// <param name="source"></param>
         /// <param name="predicate"></param>
         /// <returns>
-        /// A tuple that contains two <see cref="IEnumerable{T}"/> parts : <c>Truthy</c> that contains all items from <paramref name="source"/>
-        /// that satifies <paramref name="predicate"/>.
+        /// A tuple that contains two <see cref="IEnumerable{T}"/> parts :
+        /// <list type="bullet">
+        /// <item><c>Truthy</c> : that contains all items from <paramref name="source"/> that satifies <paramref name="predicate"/>.</item>
+        /// <item><c>Falsy</c> : that contains all items from <paramref name="source"/> that do not satifies <paramref name="predicate"/>.</item>
+        /// </list>
         /// </returns>
         public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
             => (source.Where(predicate), source.Where(val => !predicate(val)));

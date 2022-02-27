@@ -77,5 +77,20 @@ namespace Candoumbe.MiscUtilities.UnitTests.Collections
             output.Should()
                   .BeEmpty("there is no item to shuffle");
         }
+
+        [Property]
+        public void Given_an_collection_with_two_element_Shuffle_should_returns_same_result_as_reverse()
+        {
+            // Arrange
+            IEnumerable<int> input = new[] { 1, 2 };
+            FisherYatesShuffler<int> shuffler = new();
+
+            // Act
+            IEnumerable<int> output = shuffler.Shuffle(input);
+
+            // Assert
+            output.Should()
+                  .BeEquivalentTo(input.Reverse());
+        }
     }
 }
