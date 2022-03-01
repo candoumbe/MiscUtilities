@@ -39,10 +39,11 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('global.json', 'src/**/*.csproj') }}
-      - name: Run './build.cmd Tests ReportCoverage'
-        run: ./build.cmd Tests ReportCoverage
+      - name: Run './build.cmd UnitTests ReportCoverage'
+        run: ./build.cmd UnitTests ReportCoverage
         env:
           CodecovToken: ${{ secrets.CODECOV_TOKEN }}
+          StrykerDashboardApiKey: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
       - uses: actions/upload-artifact@v1
         with:
           name: tests-results

@@ -73,22 +73,18 @@ public class TimeOnlyRangeTests
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-
-    public void Given_two_non_empty_TimeOnlyRange_instances_when_first_ends_where_other_starts_Abuts_should_return_true(TimeOnly reference)
+    public void Given_two_non_empty_TimeOnlyRange_instances_when_first_ends_where_other_starts_Abuts_should_return_true(NonNull<TimeOnlyRange> nonNullLeft, NonNull<TimeOnlyRange> nonNullRight)
     {
         // Arrange
-        TimeOnly start = faker.Date.RecentTimeOnly(mins: (int)(reference - TimeOnly.MinValue).TotalMinutes, refTime: reference);
-        TimeOnly end = reference;
-        
-        TimeOnlyRange current = new(start, reference);
-        TimeOnlyRange other = new(reference, end);
+        TimeOnlyRange left = nonNullLeft.Item;
+        TimeOnlyRange right = nonNullRight.Item;
 
         // Act
-        bool isContiguous = current.IsContiguousWith(other);
+        bool isContiguous = left.IsContiguousWith(right);
 
         // Assert
         isContiguous.Should()
-            .BeTrue();
+                    .Be(left.Start == right.End || right.Start == left.End);
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]

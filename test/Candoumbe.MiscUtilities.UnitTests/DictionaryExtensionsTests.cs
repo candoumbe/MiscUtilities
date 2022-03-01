@@ -4,6 +4,7 @@ using Candoumbe.MiscUtilities.UnitTests.Models;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 
+using FsCheck;
 using FsCheck.Fluent;
 using FsCheck.Xunit;
 
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Routing;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 using Xunit;
@@ -282,7 +284,7 @@ public class DictionaryExtensionsTests
                             }
                         },
                     },
-                    (Func<string, object, object>)null,
+                    null,
                     (Expression<Func<string, bool>>)( queryString => queryString != null
                                                                      && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 5
                                                                      && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[page]")}=1")

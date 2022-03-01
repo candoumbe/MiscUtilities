@@ -57,6 +57,12 @@ internal static class ValueGenerators
                       Gen.Constant(TimeOnlyRange.Empty),
                       Gen.Constant(TimeOnlyRange.AllDay))
             .ToArbitrary();
+
+    public static Arbitrary<MultiTimeOnlyRange> MultiTimeOnlyRanges()
+        => Gen.OneOf(TimeOnlyRanges().Generator.ArrayOf()
+                                     .Select(ranges => new MultiTimeOnlyRange(ranges)),
+                     Gen.Constant(MultiTimeOnlyRange.Empty))
+            .ToArbitrary();
 #endif
 
     public static Arbitrary<DateTimeRange> DateTimeRanges()

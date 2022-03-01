@@ -163,6 +163,26 @@ public record TimeOnlyRange : Range<TimeOnly>
             > 0 => left,
             _ => right
         };
+
+        static TimeOnlyRange Normalize(TimeOnlyRange range)
+        {
+            TimeOnlyRange normalizedOutput;
+
+            if (range.End - range.Start >= AllDay.Span)
+            {
+                normalizedOutput = AllDay.ShiftTo(range.Start);
+            }
+            else if (range.End - range.Start <= TimeSpan.Zero)
+            {
+                normalizedOutput = Empty;
+            }
+            else
+            {
+                normalizedOutput = range;
+            }
+
+            return normalizedOutput;
+        }
     }
 
     /// <summary>
@@ -248,26 +268,6 @@ public record TimeOnlyRange : Range<TimeOnly>
         (false, true) => Empty,
         _ => input with { Start = input.End, End = input.Start }
     };
-
-    private static TimeOnlyRange Normalize(TimeOnlyRange range)
-    {
-        TimeOnlyRange normalizedOutput;
-
-        if (range.End - range.Start >= AllDay.Span)
-        {
-            normalizedOutput = AllDay.ShiftTo(range.Start);
-        }
-        else if (range.End - range.Start <= TimeSpan.Zero)
-        {
-            normalizedOutput = Empty;
-        }
-        else
-        {
-            normalizedOutput = range;
-        }
-
-        return normalizedOutput;
-    }
 
     private TimeOnlyRange ShiftTo(TimeOnly offset)
         => this with { Start = offset, End = offset.Add(Span) };
