@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 using Xunit;
 using Xunit.Abstractions;
@@ -139,7 +138,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                 * inputs :  |--|
                 *             |----|
                 *                |------|
-                *          
                 * ranges :  |-----------|
                 */
                 yield return new object[]
@@ -200,7 +198,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
             };
         }
 
-        [Property(Arbitrary =new[] { typeof(ValueGenerators) })]
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
         public void Given_an_instance_that_one_range_eq_AllDay_When_adding_any_other_range_Should_result_in_a_noop_call(NonEmptyArray<TimeOnlyRange> ranges)
         {
             // Arrange
@@ -224,6 +222,9 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
             MultiTimeOnlyRange left = leftSource.Item;
             MultiTimeOnlyRange right = rightSource.Item;
 
+            _outputHelper.WriteLine($"{nameof(left)} : {left}");
+            _outputHelper.WriteLine($"{nameof(right)} : {right}");
+
             // Act
             MultiTimeOnlyRange union = left.Union(right);
 
@@ -232,6 +233,41 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
             {
                 union.Covers(range).Should().BeTrue();
             }
+
+            TimeOnlyRange[] ranges = union.Ranges.ToArray();
+
+            ranges.ForEach((range, index) =>
+            {
+                for (int i = 0; i < ranges.Length; i++)
+                {
+                    if (i != index)
+                    {
+                        bool overlaps = range.Overlaps(ranges[i]);
+                        bool abuts = range.IsContiguousWith(ranges[i]);
+
+                        overlaps.Should().BeFalse($"{nameof(MultiTimeOnlyRange)} internal storage is optimized to not hold two {nameof(TimeOnlyRange)}s that overlap each other");
+                        abuts.Should().BeFalse($"{nameof(MultiTimeOnlyRange)} internal storage is optimized to not hold two {nameof(TimeOnlyRange)}s that abuts each other");
+                    }
+                }
+            });
+        }
+
+        [Property(Arbitrary = new [] { typeof(ValueGenerators) })]
+        public void Given_two_non_null_instances_when_calling_plus_operator_should_have_same_result_as_calling_Union_method(NonNull<MultiTimeOnlyRange> leftSource, NonNull<MultiTimeOnlyRange> rightSource)
+        {
+            // Arrange
+            MultiTimeOnlyRange left = leftSource.Item;
+            MultiTimeOnlyRange right = rightSource.Item;
+
+            _outputHelper.WriteLine($"{nameof(left)} : {left}");
+            _outputHelper.WriteLine($"{nameof(right)} : {right}");
+            MultiTimeOnlyRange expected = left.Union(right);
+
+            // Act
+            MultiTimeOnlyRange actual = left + right;
+
+            // Assert
+            actual.Should().BeEquivalentTo(expected);
         }
 
         public static IEnumerable<object[]> CoversCases
@@ -241,6 +277,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                 /*
                  * multirange : ----------------------
                  * current    : ---------------------- 
+                 * expected   : true
                  */
                 yield return new object[]
                 {
@@ -253,6 +290,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                  * multirange :       |--------|
                  *              |--|
                  * current    :   |-----|
+                 * expected   : false
                  */
                 yield return new object[]
                 {
@@ -267,6 +305,23 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                  *             --|      |----     
                  *                 |--| 
                  * current    :     |-----|
+                 * expected   : false
+                 */
+                yield return new object[]
+                {
+                    new MultiTimeOnlyRange(new TimeOnlyRange(TimeOnly.FromTimeSpan(22.Hours()), TimeOnly.FromTimeSpan(08.Hours())),
+                                           new TimeOnlyRange(TimeOnly.FromTimeSpan(10.Hours()), TimeOnly.FromTimeSpan(12.Hours()))),
+                    new TimeOnlyRange(TimeOnly.FromTimeSpan(11.Hours()), TimeOnly.FromTimeSpan(23.Hours())),
+                    false
+                };
+
+                /*
+                 * multirange :        
+                 *                
+                 *                |--|      |----     
+                 *                 |--| 
+                 * current    :     |-----|
+                 * expected   : false
                  */
                 yield return new object[]
                 {
