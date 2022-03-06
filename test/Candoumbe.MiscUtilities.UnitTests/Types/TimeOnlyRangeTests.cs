@@ -227,6 +227,17 @@ public class TimeOnlyRangeTests
                 new TimeOnlyRange(TimeOnly.FromTimeSpan(22.Hours()), TimeOnly.FromTimeSpan(23.Hours())),
                 true
             };
+
+            /* 
+            * first:     ------------------ 
+            * other:                      |
+            */
+            yield return new object[]
+            {
+                TimeOnlyRange.AllDay,
+                TimeOnlyRange.Empty,
+                true
+            };
         }
     }
 

@@ -37,22 +37,24 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// </summary>
     /// <param name="other"></param>
     /// <returns><c>true</c> when current instance and <paramref name="other"/> overlaps each other and <c>false</c> otherwise.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
     public bool Overlaps(TimeOnlyRange other)
-        => (Start < End) switch
+        => (other.IsEmpty(), Start < End) switch
         {
-            true => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
+            (false, true) => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
                                || (End.IsBetween(other.Start, other.End) && End != other.Start && End != other.End)
                                || (Start <= other.Start && other.End <= End)
                                || (other.Start.IsBetween(Start, End) && Start != other.Start && Start != other.End)
                                || (other.End.IsBetween(Start, End) && End != other.Start && End != other.End)
                                || (other.Start <= Start && End <= other.End)
             ,
-            false => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
+            (false, false) => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
                                || (End.IsBetween(other.Start, other.End) && End != other.Start && End != other.End)
                                || (Start <= other.Start && other.End <= End)
                                || (other.Start.IsBetween(Start, End) && Start != other.Start && Start != other.End)
                                || (other.End.IsBetween(Start, End) && End != other.Start && End != other.End)
-                               || (other.Start <= End && Start <= other.End)
+                               || (other.Start <= End && Start <= other.End),
+            (true, _) => this == AllDay || (Start < other.Start && other.Start < End)
         };
 
     /// <summary>
@@ -271,5 +273,12 @@ public record TimeOnlyRange : Range<TimeOnly>
 
     private TimeOnlyRange ShiftTo(TimeOnly offset)
         => this with { Start = offset, End = offset.Add(Span) };
+
+    /// <summary>
+    /// Gets the <see cref="TimeOnlyRange"/> that complements <paramref name="source"/>
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns>A <see cref="TimeOnlyRange"/> does not overlaps the source and </returns>
+    public static TimeOnlyRange operator -(TimeOnlyRange source) => Complement(source);
 }
 #endif

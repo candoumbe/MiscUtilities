@@ -18,9 +18,9 @@ public class MultiTimeOnlyRange
     /// <summary>
     /// Ranges holded by the current instance.
     /// </summary>
-    public IEnumerable<TimeOnlyRange> Ranges => _ranges;
+    public IEnumerable<TimeOnlyRange> Ranges => _ranges.ToArray();
 
-    private readonly IList<TimeOnlyRange> _ranges;
+    private readonly ISet<TimeOnlyRange> _ranges;
 
     /// <summary>
     /// A <see cref="MultiTimeOnlyRange"/> that contains no <see cref="TimeOnlyRange"/>.
@@ -32,7 +32,7 @@ public class MultiTimeOnlyRange
     /// </summary>
     public MultiTimeOnlyRange(params TimeOnlyRange[] ranges)
     {
-        _ranges = new List<TimeOnlyRange>(ranges.Length);
+        _ranges = new HashSet<TimeOnlyRange>(ranges.Length);
         foreach (TimeOnlyRange range in ranges.OrderBy(x => x.Start))
         {
             Add(range);
@@ -47,6 +47,7 @@ public class MultiTimeOnlyRange
     /// will swap that element with the result of <c>range.Union(element)</c>
     /// </remarks>
     /// <param name="range"></param>
+    /// <exception cref="ArgumentNullException">if <paramref name="range"/> is <c>null</c>.</exception>
     public void Add(TimeOnlyRange range)
     {
         ArgumentNullException.ThrowIfNull(range);
@@ -71,7 +72,10 @@ public class MultiTimeOnlyRange
             {
                 _ranges.Add(range);
             }
-
+        }
+        else if(!_ranges.Contains(TimeOnlyRange.AllDay))
+        {
+            _ranges.Add(range);
         }
     }
 
@@ -92,15 +96,19 @@ public class MultiTimeOnlyRange
     public static MultiTimeOnlyRange operator +(MultiTimeOnlyRange left, MultiTimeOnlyRange right) => left.Union(right);
 
     /// <summary>
+    /// Computes the complement of <paramref name="source"/>
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static MultiTimeOnlyRange operator -(MultiTimeOnlyRange source) => source.Complement();
+
+    /// <summary>
     /// Creates a <see cref="MultiTimeOnlyRange"/> that is the exact complement of the current instance
     /// </summary>
     /// <returns></returns>
-    public MultiTimeOnlyRange Complement()
-    {
-        MultiTimeOnlyRange complement = new MultiTimeOnlyRange();
-
-        return complement;
-    }
+    public MultiTimeOnlyRange Complement() => _ranges.AtLeastOnce()
+        ? new(_ranges.AsParallel().Select(range => -range).ToArray())
+        : new( new []{ TimeOnlyRange.Empty } );
 
     /// <summary>
     /// Tests if the current instance contains one or more ranges which, combined together, covers the specified <paramref name="range"/>. 
@@ -117,8 +125,9 @@ public class MultiTimeOnlyRange
         }
         else
         {
-            covers = _ranges.Any(item => item.Overlaps(range)
-                                         && item.Start <= range.Start && range.End <= item.End
+            covers = _ranges.Any(item => (item.Overlaps(range)
+                                         && item.Start <= range.Start && range.End <= item.End) 
+                                         || item == range
             );
         }
 
