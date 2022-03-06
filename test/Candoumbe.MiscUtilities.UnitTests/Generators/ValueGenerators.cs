@@ -22,7 +22,7 @@ internal static class ValueGenerators
     public static Arbitrary<DateOnly> DateOnlys()
         => ArbMap.Default.ArbFor<DateTime>()
                          .Generator
-                         .Select(dateTime => new DateOnly(dateTime.Year, dateTime.Month, dateTime.Day))
+                         .Select(dateTime => DateOnly.FromDateTime(dateTime))
                          .ToArbitrary();
 
     /// <summary>
@@ -31,7 +31,7 @@ internal static class ValueGenerators
     public static Arbitrary<TimeOnly> TimeOnlys()
         => ArbMap.Default.ArbFor<DateTime>()
                          .Generator
-                         .Select(dateTime => new TimeOnly(dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond))
+                         .Select(dateTime => TimeOnly.FromDateTime(dateTime))
                          .ToArbitrary();
 
     public static Arbitrary<DateOnlyRange> DateOnlyRanges()
@@ -59,10 +59,34 @@ internal static class ValueGenerators
             .ToArbitrary();
 
     public static Arbitrary<MultiTimeOnlyRange> MultiTimeOnlyRanges()
-        => Gen.OneOf(TimeOnlyRanges().Generator.ArrayOf()
+        => Gen.Sized(MultiTimeOnlyRangesGenerator).ToArbitrary();
+
+    private static Gen<MultiTimeOnlyRange> MultiTimeOnlyRangesGenerator(int size)
+    {
+        Gen<MultiTimeOnlyRange> gen;
+
+        switch (size)
+        {
+            case 0:
+                {
+                    gen = TimeOnlyRanges().Generator.ArrayOf(2)
+                                     .Select(ranges => new MultiTimeOnlyRange(ranges));
+                    break;
+                }
+
+            default:
+                {
+                    Gen<MultiTimeOnlyRange> subtree = MultiTimeOnlyRangesGenerator(size / 2);
+
+                    gen = Gen.OneOf(TimeOnlyRanges().Generator.ArrayOf(size)
                                      .Select(ranges => new MultiTimeOnlyRange(ranges)),
-                     Gen.Constant(MultiTimeOnlyRange.Empty))
-            .ToArbitrary();
+                                    subtree);
+                    break;
+                }
+        }
+
+        return gen;
+    }
 #endif
 
     public static Arbitrary<DateTimeRange> DateTimeRanges()

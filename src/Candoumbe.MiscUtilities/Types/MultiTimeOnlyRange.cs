@@ -18,9 +18,9 @@ public class MultiTimeOnlyRange
     /// <summary>
     /// Ranges holded by the current instance.
     /// </summary>
-    public IEnumerable<TimeOnlyRange> Ranges => _ranges;
+    public IEnumerable<TimeOnlyRange> Ranges => _ranges.ToArray();
 
-    private readonly IList<TimeOnlyRange> _ranges;
+    private readonly ISet<TimeOnlyRange> _ranges;
 
     /// <summary>
     /// A <see cref="MultiTimeOnlyRange"/> that contains no <see cref="TimeOnlyRange"/>.
@@ -32,13 +32,10 @@ public class MultiTimeOnlyRange
     /// </summary>
     public MultiTimeOnlyRange(params TimeOnlyRange[] ranges)
     {
-        _ranges = new List<TimeOnlyRange>(ranges.Length);
-        TimeOnlyRange[] copies = ranges.OrderBy(x => x.Start)
-                                       .ToArray();
-
-        for (int i = 0; i < copies.Length; i++)
+        _ranges = new HashSet<TimeOnlyRange>(ranges.Length);
+        foreach (TimeOnlyRange range in ranges.OrderBy(x => x.Start))
         {
-            Add(copies[i]);
+            Add(range);
         }
     }
 
@@ -46,10 +43,11 @@ public class MultiTimeOnlyRange
     /// Adds <paramref name="range"/>.
     /// </summary>
     /// <remarks>
-    /// The algorithm will first tries to find if any other <see cref="TimeOnlyRange"/> overlaps <paramref name="range"/> and if so,
+    /// The algorithm will first tries to find if any other <see cref="TimeOnlyRange"/> overlaps or abuts with <paramref name="range"/> and if so,
     /// will swap that element with the result of <c>range.Union(element)</c>
     /// </remarks>
     /// <param name="range"></param>
+    /// <exception cref="ArgumentNullException">if <paramref name="range"/> is <c>null</c>.</exception>
     public void Add(TimeOnlyRange range)
     {
         ArgumentNullException.ThrowIfNull(range);
@@ -61,31 +59,56 @@ public class MultiTimeOnlyRange
         }
         else if (!range.IsEmpty())
         {
-            TimeOnlyRange previous = _ranges.SingleOrDefault(item => item.IsContiguousWith(range) || item.Overlaps(range), range);
-
-            _ranges.Remove(previous);
-            _ranges.Add(previous.Union(range));
+            TimeOnlyRange[] previous = _ranges.Where(item => item.IsContiguousWith(range) || item.Overlaps(range))
+                                              .OrderBy(x => x.Start)
+                                              .ToArray();
+            if (previous.Length != 0)
+            {
+                previous.ForEach(item => _ranges.Remove(item));
+                TimeOnlyRange union = previous.Aggregate(range, (a, b) => a.Union(b));
+                _ranges.Add(union);
+            }
+            else
+            {
+                _ranges.Add(range);
+            }
+        }
+        else if(!_ranges.Contains(TimeOnlyRange.AllDay))
+        {
+            _ranges.Add(range);
         }
     }
 
     /// <summary>
-    /// Adds all <see cref="TimeOnlyRange"/>s 
+    /// Builds a <see cref="MultiTimeOnlyRange"/> instance that represents the union of the current instance with <paramref name="other"/>.
     /// </summary>
-    /// <param name="other"></param>
+    /// <param name="other">The other instance to add</param>
     /// <exception cref="ArgumentNullException">if <paramref name="other"/> is <c>null</c></exception>
+    /// <returns>a <see cref="MultiTimeOnlyRange"/> that represents the union of the current instance with <paramref name="other"/>.</returns>
     public MultiTimeOnlyRange Union(MultiTimeOnlyRange other) => new(_ranges.Concat(other.Ranges).ToArray());
+
+    /// <summary>
+    /// Performs a "union" operation between <paramref name="left"/> and <paramref name="right"/> elements.
+    /// </summary>
+    /// <param name="left">The left element of the operator</param>
+    /// <param name="right">The right element of the operator</param>
+    /// <returns>a <see cref="MultiTimeOnlyRange"/> that represents <paramref name="left"/> and <paramref name="right"/> values.</returns>
+    public static MultiTimeOnlyRange operator +(MultiTimeOnlyRange left, MultiTimeOnlyRange right) => left.Union(right);
+
+    /// <summary>
+    /// Computes the complement of <paramref name="source"/>
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static MultiTimeOnlyRange operator -(MultiTimeOnlyRange source) => source.Complement();
 
     /// <summary>
     /// Creates a <see cref="MultiTimeOnlyRange"/> that is the exact complement of the current instance
     /// </summary>
     /// <returns></returns>
-    public MultiTimeOnlyRange Complement()
-    {
-        MultiTimeOnlyRange complement = new MultiTimeOnlyRange();
-
-        return complement;
-
-    }
+    public MultiTimeOnlyRange Complement() => _ranges.AtLeastOnce()
+        ? new(_ranges.AsParallel().Select(range => -range).ToArray())
+        : new( new []{ TimeOnlyRange.Empty } );
 
     /// <summary>
     /// Tests if the current instance contains one or more ranges which, combined together, covers the specified <paramref name="range"/>. 
@@ -102,8 +125,9 @@ public class MultiTimeOnlyRange
         }
         else
         {
-            covers = _ranges.Any(item => item.Overlaps(range)
-                                         && item.Start <= range.Start && range.End <= item.End
+            covers = _ranges.Any(item => (item.Overlaps(range)
+                                         && item.Start <= range.Start && range.End <= item.End) 
+                                         || item == range
             );
         }
 

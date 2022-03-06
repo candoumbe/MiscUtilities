@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 using Xunit;
 using Xunit.Abstractions;
@@ -139,7 +138,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                 * inputs :  |--|
                 *             |----|
                 *                |------|
-                *          
                 * ranges :  |-----------|
                 */
                 yield return new object[]
@@ -170,37 +168,50 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
         }
 
         [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-        public void Given_two_date_only_ranges_that_overlaps_each_other_When_adding_them_to_the_instance_Add_should_pack_into_one_Range_only(NonNull<TimeOnlyRange> left, NonNull<TimeOnlyRange> right)
+        public void Given_two_date_only_ranges_that_overlaps_each_other_When_adding_them_to_the_instance_Add_should_pack_into_one_Range_only(NonNull<TimeOnlyRange> leftSource, NonNull<TimeOnlyRange> rightSource)
         {
             // Arrange
+            TimeOnlyRange left = leftSource.Item;
+            TimeOnlyRange right = rightSource.Item;
             MultiTimeOnlyRange range = new();
-            range.Add(left.Item);
+            range.Add(left);
 
             // Act
-            range.Add(right.Item);
+            range.Add(right);
 
             // Assert
-            _ = (left.Item.IsEmpty(), right.Item.IsEmpty(), left.Item.IsContiguousWith(right.Item) || left.Item.Overlaps(right.Item)) switch
+            _ = (left.IsEmpty(), right.IsEmpty(), left.IsContiguousWith(right) || left.Overlaps(right)) switch
             {
-                (true, false, _) => range.Ranges.Should()
+                (true, false, true) => range.Ranges.Should()
                                                 .HaveCount(1).And
-                                                .Contain(data => data == right.Item),
-                (false, true, _) => range.Ranges.Should()
+                                                .Contain(right),
+                (false, true, true) => range.Ranges.Should()
                                                 .HaveCount(1).And
-                                                .Contain(data => data == left.Item),
-
+                                                .Contain(left),
+                (false, true, false) => range.Ranges.Should()
+                                                    .HaveCount(2).And
+                                                    .Contain(left).And
+                                                    .Contain(right),
                 (false, false, true) => range.Ranges.Should()
                                                     .HaveCount(1).And
-                                                    .Contain(data => data == left.Item.Union(right.Item)),
-                (true, true, _) => range.Ranges.Should().BeEmpty(),
+                                                    .Contain(left.Union(right)),
+                (true, true, _) => (left == right) switch
+                {
+                    true => range.Ranges.Should()
+                                        .HaveCount(1).And
+                                        .Contain(left),
+                    _ => range.Ranges.Should().HaveCount(2).And
+                                              .Contain(right).And
+                                              .Contain(left)
+                },
                 _ => range.Ranges.Should()
                                  .HaveCount(2).And
-                                 .ContainSingle(range => range == right.Item).And
-                                 .ContainSingle(range => range == left.Item)
+                                 .ContainSingle(range => range == right).And
+                                 .ContainSingle(range => range == left)
             };
         }
 
-        [Property(Arbitrary =new[] { typeof(ValueGenerators) })]
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
         public void Given_an_instance_that_one_range_eq_AllDay_When_adding_any_other_range_Should_result_in_a_noop_call(NonEmptyArray<TimeOnlyRange> ranges)
         {
             // Arrange
@@ -218,20 +229,77 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
         }
 
         [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+        public void Given_an_instance_of_MultiTimeOnlyRange_calling_Minus_operator_Should_return_the_complement_of_the_instance(NonNull<MultiTimeOnlyRange> input)
+        {
+            // Arrange
+            MultiTimeOnlyRange range = input.Item;
+
+            // Act
+            MultiTimeOnlyRange complement = -range;
+
+            // Assert
+            complement.Should().NotBeNull();
+            complement.Ranges.Should().NotBeEmpty();
+            foreach (TimeOnlyRange item in range.Ranges)
+            {
+                complement.Ranges.Should().NotContain(timeRange => timeRange == item && timeRange.Overlaps(item));
+            }
+        }
+
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
         public void Given_one_MultiTimeOnlyRange_when_calling_union_with_an_other_MultiTimeOnlyRange_Should_return_a_MultiTimeOnlyRange_instance_that_covers_all_TimeOnlyRange_from_initial_MultiTimeOnlyRange(NonNull<MultiTimeOnlyRange> leftSource, NonNull<MultiTimeOnlyRange> rightSource)
         {
             // Arrange
             MultiTimeOnlyRange left = leftSource.Item;
             MultiTimeOnlyRange right = rightSource.Item;
 
+            _outputHelper.WriteLine($"{nameof(left)} : {left}");
+            _outputHelper.WriteLine($"{nameof(right)} : {right}");
+
             // Act
             MultiTimeOnlyRange union = left.Union(right);
 
             // Assert
+            _outputHelper.WriteLine($"Union : {union}");
             foreach (TimeOnlyRange range in left.Ranges.Concat(right.Ranges))
             {
                 union.Covers(range).Should().BeTrue();
             }
+
+            TimeOnlyRange[] ranges = union.Ranges.ToArray();
+
+            ranges.ForEach((range, index) =>
+            {
+                for (int i = 0; i < ranges.Length; i++)
+                {
+                    if (i != index)
+                    {
+                        bool overlaps = range.Overlaps(ranges[i]);
+                        bool abuts = range.IsContiguousWith(ranges[i]);
+
+                        overlaps.Should().BeFalse($"{nameof(MultiTimeOnlyRange)} internal storage is optimized to not hold two {nameof(TimeOnlyRange)}s that overlap each other");
+                        abuts.Should().BeFalse($"{nameof(MultiTimeOnlyRange)} internal storage is optimized to not hold two {nameof(TimeOnlyRange)}s that abuts each other");
+                    }
+                }
+            });
+        }
+
+        [Property(Arbitrary = new [] { typeof(ValueGenerators) })]
+        public void Given_two_non_null_instances_when_calling_plus_operator_should_have_same_result_as_calling_Union_method(NonNull<MultiTimeOnlyRange> leftSource, NonNull<MultiTimeOnlyRange> rightSource)
+        {
+            // Arrange
+            MultiTimeOnlyRange left = leftSource.Item;
+            MultiTimeOnlyRange right = rightSource.Item;
+
+            _outputHelper.WriteLine($"{nameof(left)} : {left}");
+            _outputHelper.WriteLine($"{nameof(right)} : {right}");
+            MultiTimeOnlyRange expected = left.Union(right);
+
+            // Act
+            MultiTimeOnlyRange actual = left + right;
+
+            // Assert
+            actual.Should().BeEquivalentTo(expected);
         }
 
         public static IEnumerable<object[]> CoversCases
@@ -241,6 +309,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                 /*
                  * multirange : ----------------------
                  * current    : ---------------------- 
+                 * expected   : true
                  */
                 yield return new object[]
                 {
@@ -253,6 +322,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                  * multirange :       |--------|
                  *              |--|
                  * current    :   |-----|
+                 * expected   : false
                  */
                 yield return new object[]
                 {
@@ -267,6 +337,23 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
                  *             --|      |----     
                  *                 |--| 
                  * current    :     |-----|
+                 * expected   : false
+                 */
+                yield return new object[]
+                {
+                    new MultiTimeOnlyRange(new TimeOnlyRange(TimeOnly.FromTimeSpan(22.Hours()), TimeOnly.FromTimeSpan(08.Hours())),
+                                           new TimeOnlyRange(TimeOnly.FromTimeSpan(10.Hours()), TimeOnly.FromTimeSpan(12.Hours()))),
+                    new TimeOnlyRange(TimeOnly.FromTimeSpan(11.Hours()), TimeOnly.FromTimeSpan(23.Hours())),
+                    false
+                };
+
+                /*
+                 * multirange :        
+                 *                
+                 *                |--|      |----     
+                 *                 |--| 
+                 * current    :     |-----|
+                 * expected   : false
                  */
                 yield return new object[]
                 {
