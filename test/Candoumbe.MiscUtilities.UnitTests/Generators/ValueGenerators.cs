@@ -87,6 +87,36 @@ internal static class ValueGenerators
 
         return gen;
     }
+
+    public static Arbitrary<MultiDateOnlyRange> MultiDateOnlyRanges()
+        => Gen.Sized(MultiDateOnlyRangesGenerator).ToArbitrary();
+
+    private static Gen<MultiDateOnlyRange> MultiDateOnlyRangesGenerator(int size)
+    {
+        Gen<MultiDateOnlyRange> gen;
+
+        switch (size)
+        {
+            case 0:
+                {
+                    gen = DateOnlyRanges().Generator.ArrayOf(2)
+                                     .Select(ranges => new MultiDateOnlyRange(ranges));
+                    break;
+                }
+
+            default:
+                {
+                    Gen<MultiDateOnlyRange> subtree = MultiDateOnlyRangesGenerator(size / 2);
+
+                    gen = Gen.OneOf(DateOnlyRanges().Generator.ArrayOf(size)
+                                     .Select(ranges => new MultiDateOnlyRange(ranges)),
+                                    subtree);
+                    break;
+                }
+        }
+
+        return gen;
+    }
 #endif
 
     public static Arbitrary<DateTimeRange> DateTimeRanges()
