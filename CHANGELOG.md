@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added [`DateTimeRange`](/src/Candoumbe.MiscUtilities/Types/DateTimeRange.cs) type
 - Added generic [`Range<T>`](/src/Candoumbe.MiscUtilities/Types/DateTimeRange.cs) type
 - Added [`MultiTimeOnlyRange<T>`](/src/Candoumbe.MiscUtilities/Types/MultiTimeOnlyTimeRange.cs) type
+- Added [`MultiDateOnlyRange<T>`](/src/Candoumbe.MiscUtilities/Types/MultiDateOnlyTimeRange.cs) type
 
 ## [0.8.0] / 2022-01-26
 - Added `SortBy` extension method for `IEnumerable<T>` type

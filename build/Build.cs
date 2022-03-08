@@ -97,7 +97,7 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
             "LICENSE"
     }
 )]
-[CheckBuildProjectConfigurations]
+
 [UnsetVisualStudioEnvironmentVariables]
 [DotNetVerbosityMapping]
 [HandleVisualStudioDebugging]

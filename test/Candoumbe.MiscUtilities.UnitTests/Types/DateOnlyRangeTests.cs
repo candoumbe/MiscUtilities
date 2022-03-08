@@ -448,7 +448,7 @@ public class DateOnlyRangeTests
     public FsCheck.Property Intersect_should_be_symetric(DateOnlyRange left, DateOnlyRange right)
         => (left.Intersect(right) == right.Intersect(left)).ToProperty();
 
-    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    [Property(Arbitrary = new[] { typeof(ValueGenerators)})]
     public void Empty_should_be_the_neutral_element_of_DateOnlyRange(DateOnlyRange range)
     {
         // Act
