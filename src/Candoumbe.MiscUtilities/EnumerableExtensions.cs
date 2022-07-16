@@ -417,15 +417,17 @@ namespace System.Collections.Generic
         }
 
         /// <summary>
-        /// Sorts <see cref="source"/> into 2 groups
+        /// Sorts <paramref name="source"/> into 2 groups
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="predicate"></param>
         /// <returns>
         /// A tuple that contains two <see cref="IEnumerable{T}"/> parts : <c>Truthy</c> that contains all items from <paramref name="source"/>
-        /// that satifies <paramref name="predicate"/>.
+        /// that satifies <paramref name="predicate"/> and <c>Falsy</c> which contains all items that don't satify <paramref name="predicate"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is 
+        /// <see langword="null"/>.</exception>
         public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
             => (source.Where(predicate), source.Where(val => !predicate(val)));
 
