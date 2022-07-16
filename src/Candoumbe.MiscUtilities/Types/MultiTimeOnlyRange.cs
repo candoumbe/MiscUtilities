@@ -114,7 +114,7 @@ public class MultiTimeOnlyRange
     /// Tests if the current instance contains one or more ranges which, combined together, covers the specified <paramref name="range"/>. 
     /// </summary>
     /// <param name="range">The range to test</param>
-    /// <returns><c>true</c> if the current instance contains <see cref="TimeOnlyRange"/>s which combined together covers <paramref name="range"/> and <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/> if the current instance contains <see cref="TimeOnlyRange"/>s which combined together covers <paramref name="range"/> and <see langword="false"/> otherwise.</returns>
     public bool Covers(TimeOnlyRange range)
     {
         bool covers = false;

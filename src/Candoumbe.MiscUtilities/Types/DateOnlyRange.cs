@@ -40,7 +40,7 @@ public record DateOnlyRange : Range<DateOnly>
     /// Tests wheters the current instance overlaps with <paramref name="other"/>.
     /// </summary>
     /// <param name="other"></param>
-    /// <returns><c>true</c> when current instance and <paramref name="other"/> overlaps each other <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> overlaps each other <see langword="false"/> otherwise.</returns>
     public bool Overlaps(DateOnlyRange other)
         => (Start <= other.Start && other.End <= End)
            || (Start <= other.Start && other.Start < End && End <= other.End)
@@ -52,7 +52,7 @@ public record DateOnlyRange : Range<DateOnly>
     /// Checks if <paramref name="other"/> and current instances are contiguoous.
     /// </summary>
     /// <param name="other"></param>
-    /// <returns><c>true</c> when current instance and <paramref name="other"/> are contiguous and <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> are contiguous and <see langword="false"/> otherwise.</returns>
     public bool IsContiguousWith(DateOnlyRange other)
         => End == other.Start || Start == other.End;
 
