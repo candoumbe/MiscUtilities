@@ -138,8 +138,8 @@ namespace Microsoft.Extensions.Primitives
         /// </summary>
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <param name="ignoreCase"><c>true</c> to ignore case</param>
-        /// <returns><c>true</c> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <c>false</c>
+        /// <param name="ignoreCase"><see langword="true"/> to ignore case</param>
+        /// <returns><see langword="true"/> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <see langword="false"/>
         /// otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
@@ -150,7 +150,7 @@ namespace Microsoft.Extensions.Primitives
         /// </summary>
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <returns><c>true</c> if input is like <paramref name="pattern"/> and <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if input is like <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
         public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
 

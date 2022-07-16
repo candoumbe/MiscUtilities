@@ -108,8 +108,8 @@ namespace System
         /// </summary>
         /// <param name="input">the string to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <param name="ignoreCase"><c>true</c> to ignore case</param>
-        /// <returns><c>true</c> when <paramref name="input"/> matches <paramref name="pattern"/> and <c>false</c> otherwise.</returns>
+        /// <param name="ignoreCase"><see langword="true"/> to ignore case</param>
+        /// <returns><see langword="true"/> when <paramref name="input"/> matches <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
         public static bool Like(this string input, string pattern, bool ignoreCase)
         {

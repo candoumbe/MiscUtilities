@@ -104,7 +104,7 @@ public class MultiDateOnlyRange
     /// Tests if the current instance contains one or more ranges which, combined together, covers the specified <paramref name="range"/>. 
     /// </summary>
     /// <param name="range">The range to test</param>
-    /// <returns><c>true</c> if the current instance contains <see cref="DateOnlyRange"/>s which combined together covers <paramref name="range"/> and <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/> if the current instance contains <see cref="DateOnlyRange"/>s which combined together covers <paramref name="range"/> and <see langword="false"/> otherwise.</returns>
     public bool Covers(DateOnlyRange range)
     {
         bool covers = false;

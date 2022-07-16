@@ -36,7 +36,7 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// Tests wheters the current instance overlaps with <paramref name="other"/>.
     /// </summary>
     /// <param name="other"></param>
-    /// <returns><c>true</c> when current instance and <paramref name="other"/> overlaps each other and <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> overlaps each other and <see langword="false"/> otherwise.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
     public bool Overlaps(TimeOnlyRange other)
         => (other.IsEmpty(), Start < End) switch
@@ -61,7 +61,7 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// Checks if <paramref name="other"/> and current instances are contiguoous.
     /// </summary>
     /// <param name="other"></param>
-    /// <returns><c>true</c> when current instance and <paramref name="other"/> are contiguous and <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> are contiguous and <see langword="false"/> otherwise.</returns>
     public bool IsContiguousWith(TimeOnlyRange other) => IsContiguousWithStart(other) || IsContiguousWithEnd(other);
 
     private bool IsContiguousWithStart(TimeOnlyRange other) => End == other.Start;

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Candoumbe.MiscUtilities.Types;
 
 /// <summary>
-/// It's quite common to see comparisons where a value is checked against a range of values. Ranges are usually handled by a pair of values 
+/// It's quite common to see comparisons where a value is checked against a range of values. Ranges are most of the time handled by a pair of values
 /// and you check against them both. <see cref="Range{T}"/> instead uses a single object to represent the range as a whole, and then provides the relevant operations
 /// to test to see if values fall in the <see cref="Range{T}"/> and to compare <see cref="Range{T}"/>s.
 /// </summary>
@@ -68,7 +68,7 @@ public record Range<T>(T Start, T End): IComparable<Range<T>> where T : ICompara
     /// <summary>
     /// Checks if the current instance reprensents an empty range
     /// </summary>
-    /// <returns><c>true</c> when current instance is empty and <c>false</c> otherwise.</returns>
+    /// <returns><see langword="true"/> when current instance is empty and <see langword="false"/> otherwise.</returns>
     public virtual bool IsEmpty() => Start.Equals(End);
 
     ///<inheritdoc/>
