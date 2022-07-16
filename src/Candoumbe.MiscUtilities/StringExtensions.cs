@@ -1,19 +1,19 @@
-﻿using System.Globalization;
-#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-#if !NET5_0_OR_GREATER
-using Microsoft.Extensions.Primitives;
-#endif
-#endif
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Text.RegularExpressions;
-using static System.Collections.Generic.EnumerableExtensions;
-using static System.Linq.Expressions.Expression;
-
+﻿
 namespace System
 {
+    using Globalization;
+
+    #if STRING_SEGMENT
+    using Microsoft.Extensions.Primitives;
+    #endif
+    using Collections.Generic;
+    using Linq;
+    using Linq.Expressions;
+    using Text;
+    using Text.RegularExpressions;
+
+    using static Linq.Expressions.Expression;
+
     /// <summary>
     /// Extension methods for <see cref="string"/> type
     /// </summary>
@@ -30,8 +30,7 @@ namespace System
         public static string ToTitleCase(this string input)
         {
             StringBuilder sbResult = null;
-#if !NET5_0
-            if (input?.ToCharArray()?.AtLeastOnce() ?? false)
+            if ((input?.Length ?? 0 ) > 0)
             {
                 sbResult = new StringBuilder(input);
                 if (char.IsLetter(sbResult[0]))
@@ -48,30 +47,6 @@ namespace System
                 }
             }
 
-#else
-            Rune[] runes = input?.EnumerateRunes().ToArray() ?? Array.Empty<Rune>();
-            if (runes.AtLeastOnce())
-            {
-                sbResult = new(runes.Length);
-                if (Rune.IsLetter(runes[0]))
-                {
-                    sbResult.Append(Rune.ToUpper(runes[0], CultureInfo.CurrentCulture));
-                }
-
-                for (int i = 1; i < runes.Length; i++)
-                {
-                    if (Rune.IsWhiteSpace(runes[i - 1]) || runes[i - 1] == new Rune('-'))
-                    {
-                        sbResult.Append(Rune.ToUpper(runes[i], CultureInfo.CurrentCulture));
-                    }
-                    else
-                    {
-                        sbResult.Append(Rune.ToLower(runes[i], CultureInfo.CurrentCulture));
-                    }
-                }
-            }
-
-#endif
             return sbResult?.ToString() ?? string.Empty;
         }
 
@@ -148,7 +123,7 @@ namespace System
                 throw new ArgumentNullException(nameof(pattern));
             }
 
-            StringBuilder sbPattern = new (pattern.Length * 2);
+            StringBuilder sbPattern = new(pattern.Length * 2);
             RegexOptions regexOptions = RegexOptions.Singleline;
 
             if (ignoreCase)
@@ -361,7 +336,6 @@ namespace System
                 }
             }
 #endif
-
             return sb.ToString();
         }
 
