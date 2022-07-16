@@ -22,12 +22,11 @@ namespace Utilities.UnitTests
     public class EnumerableExtensionsTests
     {
         private readonly ITestOutputHelper _outputHelper;
-        private readonly Faker _faker;
+        private readonly static Faker _faker = new ();
 
         public EnumerableExtensionsTests(ITestOutputHelper outputHelper)
         {
             _outputHelper = outputHelper;
-            _faker = new Faker();
         }
 
         /// <summary>
@@ -798,8 +797,28 @@ namespace Utilities.UnitTests
                     (Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>>)(dictionary => dictionary.Exactly(2)
                                                                                                 && dictionary.Once(kv => kv.Key)
                                                                                                 && dictionary.Once(kv => !kv.Key)
-                                                                                                && dictionary[true].All(x => x % 2 == 0)
-                                                                                                && dictionary[false].All(x => x % 2 != 0)
+                                                                                                && dictionary[true].SequenceEqual(new []{2, 4, 6, 8, 10 })
+                                                                                                && dictionary[false].SequenceEqual(new []{1, 3, 5, 7, 9 })
+                    )
+                };
+
+                yield return new object[]
+                {
+                    Enumerable.Range(1, 10),
+                    (Func<int, bool>)(_ => true),
+                    (Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>>)(dictionary => dictionary.Exactly(1)
+                                                                                                && dictionary.Once(kv => kv.Key)
+                                                                                                && dictionary[true].SequenceEqual(Enumerable.Range(1, 10))
+                    )
+                };
+
+                yield return new object[]
+                {
+                    Enumerable.Range(1, 10),
+                    (Func<int, bool>)(_ => false),
+                    (Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>>)(dictionary => dictionary.Exactly(1)
+                                                                                                && dictionary.Once(kv => !kv.Key)
+                                                                                                && dictionary[false].SequenceEqual(Enumerable.Range(1, 10))
                     )
                 };
             }
@@ -824,7 +843,7 @@ namespace Utilities.UnitTests
         public void Given_Source_is_null_Partition_should_throws_ArgumentNullException(NonNegativeInt bucketSize)
         {
             // Act
-            Action callingPartitionOnNullSource = () => EnumerableExtensions.Partition<int>(null, bucketSize.Item).ToArray();
+            Action callingPartitionOnNullSource = () => EnumerableExtensions.Partition<int>(null, bucketSize.Item);
 
             // Assert
             callingPartitionOnNullSource.Should()
@@ -860,6 +879,56 @@ namespace Utilities.UnitTests
                 buckets.ElementAt(i).Should()
                                     .HaveCountLessOrEqualTo(Math.Min(bucketSize.Item, source.Item.Length));
             }
+        }
+
+        [Fact]
+        public void Given_right_and_left_expressions_when_right_is_null_Compose_should_throw_ArgumentNullException()
+        {
+            // Arrange
+            Expression<Func<int, string>> left = number => number.ToString();
+            Expression<Func<string, int>> right = null;
+
+            // Act
+            Action compose = () => ExpressionExtensions.Compose(left, right);
+
+            // Assert
+            compose.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Given_right_and_left_expressions_when_left_is_null_Compose_should_throw_ArgumentNullException()
+        {
+            // Arrange
+            Expression<Func<string, int>> left = null;
+            Expression<Func<int, string>> right = number => number.ToString();
+
+            // Act
+            Action compose = () => ExpressionExtensions.Compose(left, right);
+
+            // Assert
+            compose.Should().Throw<ArgumentNullException>();
+        }
+
+        [Property]
+        public void Given_right_and_left_expressions_Compose_should_behave_as_expected(NonEmptyArray<int> source)
+        {
+            // Arrange
+            Expression<Func<int, int>> addOne = number => number + 1;
+            Expression<Func<int, Tuple<int, string>>> writeNumberAsString = number => Tuple.Create(number, number.ToString());
+            Expression<Func<int, Tuple<int, string>>> expected = number => writeNumberAsString.Compile().Invoke(addOne.Compile().Invoke(number));
+
+            // Act
+            Expression<Func<int, Tuple<int, string>>> actual = addOne.Compose(writeNumberAsString);
+            IEnumerable < (int number, string numberAsString) > results = source.Item.Select(number => actual.Compile().Invoke(number))
+                                                                                     .Select(result => (result.Item1, result.Item2));
+
+            // Assert
+            actual.Parameters.Should()
+                             .ContainSingle(param => param.Name == "param"
+                                                     && param.Type == typeof(int));
+
+            results.Should()
+                   .BeEquivalentTo(source.Item.Select(number => expected.Compile().Invoke(number)));
         }
     }
 }

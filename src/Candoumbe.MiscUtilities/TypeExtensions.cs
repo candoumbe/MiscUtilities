@@ -15,7 +15,7 @@ namespace System
         /// </summary>
         /// <param name="givenType">The type under test</param>
         /// <param name="genericType">The targeted type</param>
-        /// <returns><c>true</c> if <paramref name="genericType"/> is an ancestor of <paramref name="givenType"/> and <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if <paramref name="genericType"/> is an ancestor of <paramref name="givenType"/> and <see langword="false"/> otherwise.</returns>
         public static bool IsAssignableToGenericType(this Type givenType, Type genericType)
             => givenType is not null && genericType is not null
                && (givenType == genericType || givenType.MapsToGenericTypeDefinition(genericType)
@@ -44,7 +44,7 @@ namespace System
         /// Tests if <paramref name="type"/> is an anonymous type
         /// </summary>
         /// <param name="type">The type under test</param>
-        /// <returns><c>true</c>if <paramref name="type"/> is an anonymous type and <c>false</c> otherwise</returns>
+        /// <returns><see langword="true"/>if <paramref name="type"/> is an anonymous type and <see langword="false"/> otherwise</returns>
         public static bool IsAnonymousType(this Type type)
         {
             bool hasCompilerGeneratedAttribute = type?.GetTypeInfo()?.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false)?.AtLeastOnce() ?? false;

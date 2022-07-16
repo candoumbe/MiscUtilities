@@ -46,14 +46,15 @@ namespace Utilities.UnitTests
                     yield return new object[] { culture, "bruce", "Bruce" };
                     yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
                     yield return new object[] { culture, "cyrille-alexandre", "Cyrille-Alexandre" };
-                    //#if NET5_0
-                    //                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
-                    //                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
-                    //#endif
+#if NET
+                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
+                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
+#endif
                 }
             }
         }
 
+#if !STRING_SEGMENT
         [Theory]
         [MemberData(nameof(ToTitleCases))]
         public void ToTitleCase(string cultureName, string input, string expectedString)
@@ -76,6 +77,30 @@ namespace Utilities.UnitTests
                 actual.Should().Be(expectedString);
             });
         }
+#else
+        [Theory]
+        [MemberData(nameof(ToTitleCases))]
+        public void ToTitleCase(string cultureName, StringSegment input, string expectedString)
+        {
+            // Arrange
+            _outputHelper.WriteLine($"Current culture : {CultureInfo.CurrentCulture}");
+            _outputHelper.WriteLine($"Culture to test : {cultureName}");
+            _outputHelper.WriteLine($"Input : {input}");
+            _outputHelper.WriteLine($"expected : {expectedString}");
+
+            using CultureSwitcher cultureSwitcher = new();
+
+            cultureSwitcher.Run(cultureName, () =>
+            {
+                _outputHelper.WriteLine($"Culture while testing : {CultureInfo.CurrentCulture}");
+                // Assert
+                string actual = input?.ToTitleCase(CultureInfo.CreateSpecificCulture(cultureName));
+
+                // Assert
+                actual.Should().Be(expectedString);
+            });
+        }
+#endif
 
         [Theory]
         [InlineData(null, null)]

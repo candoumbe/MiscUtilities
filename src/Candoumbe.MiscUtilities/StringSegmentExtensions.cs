@@ -1,10 +1,12 @@
-﻿#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿#if STRING_SEGMENT
 
 namespace Microsoft.Extensions.Primitives
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq.Expressions;
+
     /// <summary>
     /// Extension methods for <see cref="StringSegment"/> types
     /// </summary>
@@ -136,8 +138,8 @@ namespace Microsoft.Extensions.Primitives
         /// </summary>
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <param name="ignoreCase"><c>true</c> to ignore case</param>
-        /// <returns><c>true</c> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <c>false</c>
+        /// <param name="ignoreCase"><see langword="true"/> to ignore case</param>
+        /// <returns><see langword="true"/> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <see langword="false"/>
         /// otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
@@ -148,7 +150,7 @@ namespace Microsoft.Extensions.Primitives
         /// </summary>
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-        /// <returns><c>true</c> if input is like <paramref name="pattern"/> and <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if input is like <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
         public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
 
@@ -160,6 +162,22 @@ namespace Microsoft.Extensions.Primitives
         /// <returns><see cref="LambdaExpression"/></returns>
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
         public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
+
+
+        /// <summary>
+        /// Converts the <paramref name="input"/> to its Title Case equivalent
+        /// </summary>
+        /// <param name="input">the string to convert</param>
+        /// <param name="cultureInfo">The <see cref="CultureInfo"/> to use when performing the casing conversion</param>
+        /// <returns>the string converted to Title case</returns>
+        /// <example>
+        /// <c>"cyrille-alexandre".ToTitleCase(); // "Cyrille-Alexandre" </c>
+        /// </example>
+        public static string ToTitleCase(this StringSegment input, CultureInfo cultureInfo = null)
+        {
+            TextInfo textInfo = cultureInfo?.TextInfo ?? CultureInfo.CurrentCulture.TextInfo;
+            return textInfo.ToTitleCase(input.Value);
+        }
     }
 }
 #endif

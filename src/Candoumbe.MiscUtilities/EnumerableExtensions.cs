@@ -36,7 +36,7 @@ namespace System.Collections.Generic
         /// </summary>
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains exactly one element</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains exactly one element</returns>
         /// <see cref="Exactly{T}(IEnumerable{T}, Expression{Func{T, bool}}, int)"/>
         public static bool Once<T>(this IEnumerable<T> items) => Once(items, True<T>());
 
@@ -46,7 +46,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="predicate">re</param>
-        /// <returns><c>true</c> if <paramref name="items"/> does not contain any element that fullfills <paramref name="predicate"/> and <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> does not contain any element that fullfills <paramref name="predicate"/> and <see langword="false"/> otherwise.</returns>
         public static bool None<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
             if (items is null)
@@ -67,7 +67,7 @@ namespace System.Collections.Generic
         /// </summary>
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
-        /// <returns><c>true</c> if <paramref name="items"/> does not any element and <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> does not any element and <see langword="false"/> otherwise.</returns>
         public static bool None<T>(this IEnumerable<T> items) => None(items, True<T>());
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="predicate">re</param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains exactly one element that fullfills <paramref name="predicate"/></returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains exactly one element that fullfills <paramref name="predicate"/></returns>
         public static bool Once<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
             if (items is null)
@@ -98,7 +98,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="predicate">predicate to use</param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains one or more one element that fullfills <paramref name="predicate"/></returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains one or more one element that fullfills <paramref name="predicate"/></returns>
         public static bool AtLeastOnce<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
             if (items is null)
@@ -118,7 +118,7 @@ namespace System.Collections.Generic
         /// </summary>
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains one or more element.s</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains one or more element.s</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <c>null</c></exception>
         public static bool AtLeastOnce<T>(this IEnumerable<T> items) => AtLeast(items, True<T>(), 1);
 
@@ -128,7 +128,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="count"></param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains <paramref name="count"/> or more one elements.</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains <paramref name="count"/> or more one elements.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <c>null</c></exception>
         public static bool AtLeast<T>(this IEnumerable<T> items, int count) => AtLeast(items, True<T>(), count);
 
@@ -142,7 +142,7 @@ namespace System.Collections.Generic
         /// <param name="source">the collection to test</param>
         /// <param name="predicate">the predicate</param>
         /// <param name="count">the number of occurrence</param>
-        /// <returns><c>true</c> if <paramref name="source"/> contains <paramref name="count"/> elements or more that match <paramref name="predicate"/></returns>
+        /// <returns><see langword="true"/> if <paramref name="source"/> contains <paramref name="count"/> elements or more that match <paramref name="predicate"/></returns>
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="predicate"/> are null</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtLeast<T>(this IEnumerable<T> source, Expression<Func<T, bool>> predicate, int count)
@@ -174,7 +174,7 @@ namespace System.Collections.Generic
         /// <param name="items">collection under test</param>
         /// <param name="predicate">predicate to match</param>
         /// <param name="count">number of elements in <paramref name="items"/> that must match <paramref name="predicate"/> </param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements that match <paramref name="predicate"/> and <c>false</c> otherwise</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements that match <paramref name="predicate"/> and <see langword="false"/> otherwise</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/> or <paramref name="predicate"/> are null</exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
@@ -205,7 +205,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the elements of</typeparam>
         /// <param name="items">collection under test</param>
         /// <param name="count">number of elements in <paramref name="items"/> </param>
-        /// <returns><c>true</c> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements and <c>false</c> otherwise</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements and <see langword="false"/> otherwise</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, int count)
@@ -232,7 +232,7 @@ namespace System.Collections.Generic
         /// <param name="items"></param>
         /// <param name="predicate">Filter that <paramref name="count"/> elements should match.</param>
         /// <param name="count">Number of elements that match <paramref name="predicate"/></param>
-        /// <returns><c>true</c> if there are 0 to <paramref name="count"/> elements that matches <paramref name="predicate"/> and <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if there are 0 to <paramref name="count"/> elements that matches <paramref name="predicate"/> and <see langword="false"/> otherwise.</returns>
         /// <exception cref="ArgumentNullException">if either <paramref name="items"/> or <paramref name="predicate"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtMost<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
@@ -261,7 +261,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the elements of the collection to test</typeparam>
         /// <param name="items"></param>
         /// <param name="count">Number of elements that the current contains at most</param>
-        /// <returns><c>true</c> if there are 0 to <paramref name="count"/> elements and <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if there are 0 to <paramref name="count"/> elements and <see langword="false"/> otherwise.</returns>
         /// <exception cref="ArgumentNullException">if either <paramref name="items"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtMost<T>(this IEnumerable<T> items, int count) => AtMost(items, True<T>(), count);
@@ -423,8 +423,11 @@ namespace System.Collections.Generic
         /// <param name="source"></param>
         /// <param name="predicate"></param>
         /// <returns>
-        /// A tuple that contains two <see cref="IEnumerable{T}"/> parts : <c>Truthy</c> that contains all items from <paramref name="source"/>
-        /// that satifies <paramref name="predicate"/> and <c>Falsy</c> which contains all items that don't satify <paramref name="predicate"/>.
+        /// A tuple that contains two <see cref="IEnumerable{T}"/> parts :
+        /// <list type="bullet">
+        /// <item><c>Truthy</c> : that contains all items from <paramref name="source"/> that satifies <paramref name="predicate"/>.</item>
+        /// <item><c>Falsy</c> : that contains all items from <paramref name="source"/> that do not satifies <paramref name="predicate"/>.</item>
+        /// </list>
         /// </returns>
         /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is 
         /// <see langword="null"/>.</exception>
