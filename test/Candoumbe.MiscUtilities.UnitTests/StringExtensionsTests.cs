@@ -117,6 +117,10 @@ namespace Utilities.UnitTests
         [InlineData("Zsasz", "Zs[a-z]sz", false, true)]
         [InlineData("Zsasz", "Zs[A-Za-z]sz", false, true)]
         [InlineData("first/", "first/*", false, true)]
+        [InlineData("login@provider.domain", "?*@?*.?*", false, true)]
+        [InlineData("@provider.domain", "?*@?*.?*", false, false)]
+        [InlineData("login@.domain", "?*@?*.?*", false, false)]
+        [InlineData("a@b.c", "?*@?*.?*", false, true)]
         public void StringLike(string input, string pattern, bool ignoreCase, bool expectedResult)
         {
             _outputHelper.WriteLine($"input : '{input}'");
