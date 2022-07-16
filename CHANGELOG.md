@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added generic [`Range<T>`](/src/Candoumbe.MiscUtilities/Types/DateTimeRange.cs) type
 - Added [`MultiTimeOnlyRange<T>`](/src/Candoumbe.MiscUtilities/Types/MultiTimeOnlyTimeRange.cs) type
 - Added [`MultiDateOnlyRange<T>`](/src/Candoumbe.MiscUtilities/Types/MultiDateOnlyTimeRange.cs) type
+- Added `StringExtensions.ToTitleCase` string extension overload to use `CultureInfo`  when runtime is not `netstandard1.0` or `netstandard1.1`.
 
 ## [0.8.1] / 2022-07-16
 - Fixed validating a email pattern using `Like` extension method. 

@@ -1,10 +1,12 @@
-﻿#if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿#if STRING_SEGMENT
 
 namespace Microsoft.Extensions.Primitives
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq.Expressions;
+
     /// <summary>
     /// Extension methods for <see cref="StringSegment"/> types
     /// </summary>
@@ -160,6 +162,22 @@ namespace Microsoft.Extensions.Primitives
         /// <returns><see cref="LambdaExpression"/></returns>
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
         public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
+
+
+        /// <summary>
+        /// Converts the <paramref name="input"/> to its Title Case equivalent
+        /// </summary>
+        /// <param name="input">the string to convert</param>
+        /// <param name="cultureInfo">The <see cref="CultureInfo"/> to use when performing the casing conversion</param>
+        /// <returns>the string converted to Title case</returns>
+        /// <example>
+        /// <c>"cyrille-alexandre".ToTitleCase(); // "Cyrille-Alexandre" </c>
+        /// </example>
+        public static string ToTitleCase(this StringSegment input, CultureInfo cultureInfo = null)
+        {
+            TextInfo textInfo = cultureInfo?.TextInfo ?? CultureInfo.CurrentCulture.TextInfo;
+            return textInfo.ToTitleCase(input.Value);
+        }
     }
 }
 #endif
