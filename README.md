@@ -1,3 +1,6 @@
 # MiscUtilities
 
-[![Azure DevOps builds](https://img.shields.io/azure-devops/build/candoumbe/7684067c-f6c9-4e35-83ee-944ab5e7505b/29?style=for-the-badge)](https://dev.azure.com/candoumbe/Utilities/_build/latest?definitionId=28&branchName=main) ![Coverage](https://img.shields.io/azure-devops/coverage/candoumbe/Utilities/28?style=for-the-badge) ![Tests](https://img.shields.io/azure-devops/tests/candoumbe/Utilities/28?style=for-the-badge&compact_message) [![Nuget](https://img.shields.io/nuget/v/Candoumbe.MiscUtilities?label=Nuget&style=for-the-badge)](https://www.nuget.org/packages/Candoumbe.MiscUtilities) 
+[![GitHub raw issues](https://img.shields.io/github/issues-raw/candoumbe/miscutilities)](https://github.com/candoumbe/miscutilities/issues)
+[![Nuget](https://img.shields.io/nuget/vpre/candoumbe.miscutilities)](https://nuget.org/packages/candoumbe.miscutilities)
+
+A set of utility classes/functions for use in projects.

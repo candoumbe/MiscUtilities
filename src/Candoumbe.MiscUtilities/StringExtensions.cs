@@ -126,35 +126,50 @@ namespace System
         public static bool Like(this string input, string pattern) => input.Like(pattern, ignoreCase: true);
 
         /// <summary>
-        /// Perfoms a VB "Like" comparison
+        /// Perfoms a VB "Like" comparison.
+        /// <para>
+        /// The <paramref name="pattern"/> can be 
+        /// </para>
         /// </summary>
         /// <param name="input">the string to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
         /// <param name="ignoreCase"><c>true</c> to ignore case</param>
-        /// <returns></returns>
+        /// <returns><c>true</c> when <paramref name="input"/> matches <paramref name="pattern"/> and <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
         public static bool Like(this string input, string pattern, bool ignoreCase)
         {
-            if (input == null)
+            if (input is null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
 
-            if (pattern == null)
+            if (pattern is null)
             {
                 throw new ArgumentNullException(nameof(pattern));
             }
 
+            StringBuilder sbPattern = new (pattern.Length * 2);
             RegexOptions regexOptions = RegexOptions.Singleline;
+
             if (ignoreCase)
             {
                 regexOptions |= RegexOptions.IgnoreCase;
             }
-            pattern = pattern.Replace("?", ".")
-                .Replace("|", @"\|")
-                .Replace("*", ".*");
+            foreach (char chr in pattern)
+            {
+                sbPattern.Append(chr switch
+                {
+                    '+' => @"\+",
+                    '*' => ".*",
+                    '.' => @"\.",
+                    '?' => '.',
+                    '|' => @"\|",
+                    '^' => @"\^",
+                    _ => chr
+                });
+            }
 
-            return Regex.IsMatch(input, $"{pattern}$", regexOptions);
+            return Regex.IsMatch(input, $"{sbPattern}$", regexOptions, TimeSpan.FromSeconds(1));
         }
 
         /// <summary>
