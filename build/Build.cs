@@ -28,7 +28,7 @@ using System.Linq;
 using static Nuke.Common.ChangeLog.ChangelogTasks;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
-using static Nuke.Common.Logger;
+using static Serilog.Log;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Git.GitTasks;
 using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
@@ -81,7 +81,7 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
     GitHubActionsImage.UbuntuLatest,
     OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
     InvokedTargets = new[] { nameof(UnitTests), nameof(ReportCoverage), nameof(Publish), nameof(AddGithubRelease) },
-    ImportGitHubTokenAs = nameof(GitHubToken),
+    EnableGitHubToken = true,
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
     PublishArtifacts = true,
     ImportSecrets = new[]
@@ -245,7 +245,7 @@ public partial class Build : NukeBuild
             IEnumerable<Project> projects = Solution.GetProjects("*.UnitTests");
             IEnumerable<Project> testsProjects = TestPartition.GetCurrent(projects);
 
-            testsProjects.ForEach(project => Info(project));
+            testsProjects.ForEach(project => Information(project));
 
             DotNetTest(s => s
                 .SetConfiguration(Configuration)
@@ -282,7 +282,7 @@ public partial class Build : NukeBuild
         {
             IEnumerable<Project> projects = Solution.GetProjects("*.UnitTests");
             
-            Info($"Running mutation tests for {projects.Count()} project(s)");
+            Information($"Running mutation tests for {projects.Count()} project(s)");
 
             Arguments args = new ();
             args.Add("--open-report:html", IsLocalBuild);
@@ -290,7 +290,7 @@ public partial class Build : NukeBuild
 
             projects.ForEach(csproj =>
             {
-                Info($"Running tests for '{csproj.Name}' (directory : '{csproj.Path.Parent}') ");
+                Information($"Running tests for '{csproj.Name}' (directory : '{csproj.Path.Parent}') ");
                 DotNet($"stryker {args.RenderForExecution()}", workingDirectory: csproj.Path.Parent);
             });
         });
@@ -361,7 +361,7 @@ public partial class Build : NukeBuild
         .Executes(() =>
         {
             FinalizeChangelog(ChangeLogFile, GitVersion.MajorMinorPatch, GitRepository);
-            Info($"Please review CHANGELOG.md ({ChangeLogFile}) and press 'Y' to validate (any other key will cancel changes)...");
+            Information($"Please review CHANGELOG.md ({ChangeLogFile}) and press 'Y' to validate (any other key will cancel changes)...");
             ConsoleKeyInfo keyInfo = Console.ReadKey();
 
             if (keyInfo.Key == ConsoleKey.Y)
@@ -379,11 +379,11 @@ public partial class Build : NukeBuild
         {
             if (!GitRepository.IsOnFeatureBranch())
             {
-                Info("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
+                Information("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
                 AskBranchNameAndSwitchToIt(FeatureBranchPrefix, DevelopBranch);
 #pragma warning restore S2583 // Conditionally executed code should be reachable
 
-                    Info($"{EnvironmentInfo.NewLine}Good bye !");
+                    Information($"{EnvironmentInfo.NewLine}Good bye !");
             }
             else
             {
@@ -410,28 +410,28 @@ public partial class Build : NukeBuild
                 case string name when !string.IsNullOrWhiteSpace(name):
                     {
                         string branchName = $"{branchNamePrefix}/{featureName.Slugify()}";
-                        Info($"{Environment.NewLine}The branch '{branchName}' will be created.{Environment.NewLine}Confirm ? (Y/N) ");
+                        Information($"{Environment.NewLine}The branch '{branchName}' will be created.{Environment.NewLine}Confirm ? (Y/N) ");
 
                         switch (Console.ReadKey().Key)
                         {
                             case ConsoleKey.Y:
-                                Info($"{Environment.NewLine}Checking out branch '{branchName}' from '{sourceBranch}'");
+                                Information($"{Environment.NewLine}Checking out branch '{branchName}' from '{sourceBranch}'");
 
                                 Checkout(branchName, start: sourceBranch);
 
-                                Info($"{Environment.NewLine}'{branchName}' created successfully");
+                                Information($"{Environment.NewLine}'{branchName}' created successfully");
                                 exitCreatingFeature = true;
                                 break;
 
                             default:
-                                Info($"{Environment.NewLine}Exiting {nameof(Feature)} task.");
+                                Information($"{Environment.NewLine}Exiting {nameof(Feature)} task.");
                                 exitCreatingFeature = true;
                                 break;
                         }
                     }
                     break;
                 default:
-                    Info($"Exiting task.");
+                    Information($"Exiting task.");
                     exitCreatingFeature = true;
                     break;
             }
@@ -487,10 +487,10 @@ public partial class Build : NukeBuild
         {
             if (!GitRepository.Branch.Like($"{ColdfixBranchPrefix}/*"))
             {
-                Info("Enter the name of the coldfix. It will be used as the name of the coldfix/branch (leave empty to exit) :");
+                Information("Enter the name of the coldfix. It will be used as the name of the coldfix/branch (leave empty to exit) :");
                 AskBranchNameAndSwitchToIt(ColdfixBranchPrefix, DevelopBranch);
 #pragma warning restore S2583 // Conditionally executed code should be reachable
-                    Info($"{EnvironmentInfo.NewLine}Good bye !");
+                    Information($"{EnvironmentInfo.NewLine}Good bye !");
             }
             else
             {
@@ -555,7 +555,7 @@ public partial class Build : NukeBuild
     [Parameter(@"URI where packages should be published (default : ""https://api.nuget.org/v3/index.json""")]
     public string NugetPackageSource => "https://api.nuget.org/v3/index.json";
 
-    public string GitHubPackageSource => $"https://nuget.pkg.github.com/{GitHubActions.GitHubRepositoryOwner}/index.json";
+    public string GitHubPackageSource => $"https://nuget.pkg.github.com/{GitHubActions.RepositoryOwner}/index.json";
 
     public bool IsOnGithub => GitHubActions is not null;
 
@@ -574,14 +574,13 @@ public partial class Build : NukeBuild
         {
             void PushPackages(IReadOnlyCollection<AbsolutePath> nupkgs)
             {
-                Info($"Publishing {nupkgs.Count} package{(nupkgs.Count > 1 ? "s" : string.Empty)}");
-                Info(string.Join(EnvironmentInfo.NewLine, nupkgs));
+                Information($"Publishing {nupkgs.Count} package{(nupkgs.Count > 1 ? "s" : string.Empty)}");
+                Information(string.Join(EnvironmentInfo.NewLine, nupkgs));
 
                 DotNetNuGetPush(s => s.SetApiKey(NugetApiKey)
                     .SetSource(NugetPackageSource)
                     .EnableSkipDuplicate()
                     .EnableNoSymbols()
-                    .SetProcessLogTimestamp(true)
                     .CombineWith(nupkgs, (_, nupkg) => _
                                 .SetTargetPath(nupkg)),
                     degreeOfParallelism: 4,
@@ -591,7 +590,6 @@ public partial class Build : NukeBuild
                         .SetSource(GitHubPackageSource)
                         .EnableSkipDuplicate()
                         .EnableNoSymbols()
-                        .SetProcessLogTimestamp(true)
                         .CombineWith(nupkgs, (_, nupkg) => _
                                     .SetTargetPath(nupkg)),
                         degreeOfParallelism: 4,
@@ -609,14 +607,14 @@ public partial class Build : NukeBuild
         .OnlyWhenStatic(() => IsServerBuild && GitRepository.IsOnMainBranch())
         .Executes(async () =>
         {
-            Info("Creating a new release");
+            Information("Creating a new release");
             Octokit.GitHubClient gitHubClient = new(new Octokit.ProductHeaderValue(nameof(Utilities)))
             {
                 Credentials = new Octokit.Credentials(GitHubToken)
             };
 
-            string repositoryName = GitHubActions.GitHubRepository.Replace(GitHubActions.GitHubRepositoryOwner + "/", string.Empty);
-            IReadOnlyList<Octokit.Release> releases = await gitHubClient.Repository.Release.GetAll(GitHubActions.GitHubRepositoryOwner, repositoryName)
+            string repositoryName = GitHubActions.Repository.Replace(GitHubActions.RepositoryOwner + "/", string.Empty);
+            IReadOnlyList<Octokit.Release> releases = await gitHubClient.Repository.Release.GetAll(GitHubActions.RepositoryOwner, repositoryName)
                                                                                            .ConfigureAwait(false);
 
             if (!releases.AtLeastOnce(release => release.Name == MajorMinorPatchVersion))
@@ -630,14 +628,14 @@ public partial class Build : NukeBuild
                     Name = MajorMinorPatchVersion,
                 };
 
-                Octokit.Release release = await gitHubClient.Repository.Release.Create(GitHubActions.GitHubRepositoryOwner, repositoryName, newRelease)
+                Octokit.Release release = await gitHubClient.Repository.Release.Create(GitHubActions.RepositoryOwner, repositoryName, newRelease)
                                                                                .ConfigureAwait(false);
 
-                Info($"Github release {release.TagName} created successfully");
+                Information($"Github release {release.TagName} created successfully");
             }
             else
             {
-                Info($"Release '{MajorMinorPatchVersion}' already exists - skipping ");
+                Information($"Release '{MajorMinorPatchVersion}' already exists - skipping ");
             }
         });
 
