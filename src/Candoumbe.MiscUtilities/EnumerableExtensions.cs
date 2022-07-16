@@ -417,7 +417,7 @@ namespace System.Collections.Generic
         }
 
         /// <summary>
-        /// Sorts <paramref name="source"/> into 2 groups.
+        /// Sorts <paramref name="source"/> into 2 groups
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -429,6 +429,8 @@ namespace System.Collections.Generic
         /// <item><c>Falsy</c> : that contains all items from <paramref name="source"/> that do not satifies <paramref name="predicate"/>.</item>
         /// </list>
         /// </returns>
+        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is 
+        /// <see langword="null"/>.</exception>
         public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
             => (source.Where(predicate), source.Where(val => !predicate(val)));
 
