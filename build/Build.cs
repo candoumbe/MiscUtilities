@@ -37,7 +37,7 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
 
 [GitHubActions(
     "pull-request",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
     OnPullRequestBranches = new[] { DevelopBranch },
     PublishArtifacts = true,
     InvokedTargets = new[] { nameof(UnitTests), nameof(ReportCoverage) },
@@ -57,7 +57,7 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
 )]
 [GitHubActions(
     "integration",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
     OnPushBranchesIgnore = new[] { MainBranchName },
     PublishArtifacts = true,
     InvokedTargets = new[] { nameof(UnitTests), nameof(ReportCoverage), nameof(Pack) },
@@ -78,7 +78,7 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
 )]
 [GitHubActions(
     "delivery",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
     OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
     InvokedTargets = new[] { nameof(UnitTests), nameof(ReportCoverage), nameof(Publish), nameof(AddGithubRelease) },
     ImportGitHubTokenAs = nameof(GitHubToken),
