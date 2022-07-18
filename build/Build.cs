@@ -130,7 +130,7 @@ public partial class Build : NukeBuild
 
     [Required] [Solution] public readonly Solution Solution;
     [Required] [GitRepository] public readonly GitRepository GitRepository;
-    [Required] [GitVersion(Framework = "net5.0")] public GitVersion GitVersion;
+    [GitVersion] public readonly GitVersion GitVersion;
 
     [CI] public readonly AzurePipelines AzurePipelines;
     [CI] public readonly GitHubActions GitHubActions;
