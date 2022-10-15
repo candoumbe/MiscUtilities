@@ -43,12 +43,14 @@ namespace Utilities.UnitTests
 
                 foreach (string culture in cultures)
                 {
+                    CultureInfo cultureInfo = new (culture);
+                    TextInfo textInfo = cultureInfo.TextInfo;
                     yield return new object[] { culture, "bruce", "Bruce" };
                     yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
                     yield return new object[] { culture, "cyrille-alexandre", "Cyrille-Alexandre" };
 #if NET
-                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", "𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟" };
-                    yield return new object[] { culture, "𐐿𐐱𐐻", "𐐗𐐱𐐻" };
+                    yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", textInfo.ToTitleCase("𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟") };
+                    yield return new object[] { culture, "𐐿𐐱𐐻", textInfo.ToTitleCase("𐐗𐐱𐐻") };
 #endif
                 }
             }

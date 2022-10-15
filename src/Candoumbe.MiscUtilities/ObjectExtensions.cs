@@ -15,6 +15,7 @@ using System.Text.Json.Serialization;
 
 using static System.Text.Json.JsonSerializer;
 #endif
+
 namespace System
 {
     /// <summary>
@@ -243,5 +244,5 @@ namespace System
             return json;
         }
 #endif
-    }
+            }
 }
