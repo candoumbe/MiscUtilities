@@ -112,7 +112,7 @@ namespace System.Collections.Generic
             }
 
             return items
-#if NETSTANDARD1_1_OR_GREATER
+#if NETSTANDARD1_1_OR_GREATER || NET
                     .AsParallel()
 #endif
                     .Any(predicate.Compile());
@@ -169,7 +169,11 @@ namespace System.Collections.Generic
 
             return count == 0
                 ? source is not null
-                : source.Where(predicate.Compile()).Skip(count - 1).Any();
+                : source
+#if NETSTANDARD1_1_OR_GREATER || NET
+                    .AsParallel()
+#endif
+                    .Where(predicate.Compile()).Skip(count - 1).Any();
         }
 
         /// <summary>
@@ -199,9 +203,15 @@ namespace System.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value");
             }
 
+#if NETSTANDARD1_1_OR_GREATER || NET
+            return count == default
+                ? !items.AsParallel().Any(predicate.Compile())
+                : items.AsParallel().Count(predicate.Compile()) == count;
+#else
             return count == default
                 ? !items.Any(predicate.Compile())
                 : items.Count(predicate.Compile()) == count;
+#endif
         }
 
         /// <summary>
@@ -442,17 +452,21 @@ namespace System.Collections.Generic
 
 #if !NETSTANDARD1_0
         /// <summary>
-        /// Asynchronously run the
+        /// Asynchronously iterates over each element of <paramref name="source"/> and applies the specified <paramref name="body"/> function.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="body"></param>
-        /// <param name="dop"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// The implementation will define the 
+        /// </remarks>
+        /// <typeparam name="T">The type of elements <paramref name="source"/> contains</typeparam>
+        /// <param name="source">The collection to iterate over</param>
+        /// <param name="body">A function that will be called asynchronously</param>
+        /// <param name="dop">Defines the degre of parallelism</param>
+        /// <returns>A <see cref="Task"/> that will be completed as soon as <paramref name="source"/> was fully iterated</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="dop"/> is negative or <c>0</c></exception>
+        /// <exception cref="ArgumentNullException">either <paramref name="source"/> or <paramref name="body"/> is <see langword="null"/></exception>
         public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body, int? dop = null)
         {
-            Task t = Task.WhenAll(
+            return Task.WhenAll(
                 from partition in Partitioner.Create(source)
                         .GetPartitions(dop ?? Environment.ProcessorCount)
                 select Task.Run(async delegate
@@ -466,8 +480,6 @@ namespace System.Collections.Generic
                         }
                     }
                 }));
-
-            return t;
         }
 #endif
 
