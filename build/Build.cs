@@ -281,7 +281,7 @@ public class Build : NukeBuild
 
     public Target MutationTests => _ => _
         .Description("Runs mutational tests using Stryker tool")
-        .DependsOn(Restore, Compile)
+        .DependsOn(Clean, Compile)
         .Produces( TestDirectory / "*.html")
         .Executes(() =>
         {

@@ -4,6 +4,7 @@
       "progress",
       "html"
     ],
-    "target-framework": "net6.0"
+    "target-framework": "net6.0",
+    "mutation-level": "Advanced"
   }
 }
