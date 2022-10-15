@@ -53,7 +53,16 @@ public class TimeOnlyRangeTests
         TimeOnly start = faker.Date.RecentTimeOnly(mins: (int)(reference - TimeOnly.MinValue).TotalMinutes, refTime: reference) ;
 
         TimeOnlyRange first = new(start, end);
-        TimeOnlyRange other = new(start, end);
+
+        if (first.IsEmpty())
+        {
+            first = first.Union(new TimeOnlyRange(first.End, first.End.Add(1.Milliseconds())));
+        }
+
+        TimeOnlyRange other = new(first.Start, first.End);
+
+        _outputHelper.WriteLine($"First : {first}");
+        _outputHelper.WriteLine($"Other : {other}");
 
         // Act
         bool overlaps = first.Overlaps(other);

@@ -133,7 +133,7 @@ internal static class ValueGenerators
                     Gen.Constant(DateTimeRange.Empty))
         .ToArbitrary();
 
-    public static Arbitrary<Array> Arrays() => ArbMap.Default.ArbFor<int>().Generator.ArrayOf()
+    public static Arbitrary<Array> Arrays() => ArbMap.Default.ArbFor<int>().Generator.ArrayOf<int>()
                                                   .Select(numbers =>
                                                   {
                                                       Array array = Array.CreateInstance(typeof(int), numbers.Length);

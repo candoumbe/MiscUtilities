@@ -107,7 +107,7 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
 [UnsetVisualStudioEnvironmentVariables]
 [DotNetVerbosityMapping]
 [HandleVisualStudioDebugging]
-public partial class Build : NukeBuild
+public class Build : NukeBuild
 {
     public static int Main() => Execute<Build>(x => x.Compile);
 

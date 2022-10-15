@@ -133,10 +133,10 @@ namespace System.Collections.Generic
         public static bool AtLeast<T>(this IEnumerable<T> items, int count) => AtLeast(items, True<T>(), count);
 
         /// <summary>
-        /// Tests if <paramref name="source"/> contains at least <paramref name="count"/> elements that match <paramref name="predicate"/>
+        /// Check if <paramref name="source"/> contains at least <paramref name="count"/> elements that match <paramref name="predicate"/>
         /// </summary>
         /// <remarks>
-        ///
+        /// This implementation tries to avoid enumerating <paramref name="source"/>.
         /// </remarks>
         /// <typeparam name="T">Type of elements</typeparam>
         /// <param name="source">the collection to test</param>
@@ -163,7 +163,7 @@ namespace System.Collections.Generic
             }
 
             return count == 0
-                ? source != null
+                ? source is not null
                 : source.Where(predicate.Compile()).Skip(count - 1).Any();
         }
 
@@ -350,7 +350,8 @@ namespace System.Collections.Generic
         {
             IList<Exception> exceptions = null;
             int index = 0;
-            IEnumerator<T> enumerator = source.GetEnumerator();
+            using IEnumerator<T> enumerator = source.GetEnumerator();
+
             while (enumerator.MoveNext())
             {
                 try
@@ -398,7 +399,7 @@ namespace System.Collections.Generic
             {
                 if (bucketSize > 0)
                 {
-                    IEnumerator<T> enumerator = source.GetEnumerator();
+                    using IEnumerator<T> enumerator = source.GetEnumerator();
                     while (enumerator.MoveNext())
                     {
                         IList<T> bucket = new List<T>(bucketSize);
