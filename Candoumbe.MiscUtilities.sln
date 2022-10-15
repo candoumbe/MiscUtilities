@@ -23,6 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B584E2C0-7
 	ProjectSection(SolutionItems) = preProject
 		test\stryker-config.json = test\stryker-config.json
 	EndProjectSection
+	ProjectSection(FolderGlobals) = preProject
+		C_5_4Users_4ndoum_4Projects_4Perso_4MiscUtilities_4test_4stryker-config_1json__JsonSchema = stryker
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.MiscUtilities", "src\Candoumbe.MiscUtilities\Candoumbe.MiscUtilities.csproj", "{DBBB09FB-72CD-4DC6-8C55-DB12767781B2}"
 EndProject
