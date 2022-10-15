@@ -110,7 +110,12 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
-            return items.Any(predicate.Compile());
+
+            return items
+#if NETSTANDARD1_1_OR_GREATER
+                    .AsParallel()
+#endif
+                    .Any(predicate.Compile());
         }
 
         /// <summary>
