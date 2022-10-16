@@ -45,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{FA04
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candoumbe.MiscUtilities.PerformanceTests", "test\Candoumbe.MiscUtilities.PerformanceTests\Candoumbe.MiscUtilities.PerformanceTests.csproj", "{76F9C8D8-2F84-4C96-99F4-F71FF016368A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{07C41AF3-1F60-4940-9336-875A130660F9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F676DA76-FC0E-492C-B01C-194DE15E25E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F676DA76-FC0E-492C-B01C-194DE15E25E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76F9C8D8-2F84-4C96-99F4-F71FF016368A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76F9C8D8-2F84-4C96-99F4-F71FF016368A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76F9C8D8-2F84-4C96-99F4-F71FF016368A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76F9C8D8-2F84-4C96-99F4-F71FF016368A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +75,7 @@ Global
 		{DBBB09FB-72CD-4DC6-8C55-DB12767781B2} = {0CF6B24E-658F-43DE-BFE8-6020D9CC19A1}
 		{07C41AF3-1F60-4940-9336-875A130660F9} = {B584E2C0-7BBB-4325-AA7D-428A948E6033}
 		{BE129832-7169-431D-AD36-723C53CCCF3D} = {784F9DF5-C71A-440F-9D0F-2A43A97CA036}
+		{76F9C8D8-2F84-4C96-99F4-F71FF016368A} = {B584E2C0-7BBB-4325-AA7D-428A948E6033}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56B4888F-95AE-4DF1-A89A-96911D120E24}
