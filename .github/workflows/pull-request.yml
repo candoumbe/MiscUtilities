@@ -31,7 +31,9 @@ jobs:
     name: ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Cache .nuke/temp, ~/.nuget/packages
         uses: actions/cache@v2
         with:
@@ -44,6 +46,7 @@ jobs:
         env:
           CodecovToken: ${{ secrets.CODECOV_TOKEN }}
           StrykerDashboardApiKey: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v1
         with:
           name: tests-results

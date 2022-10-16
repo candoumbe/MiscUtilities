@@ -29,6 +29,13 @@ namespace System
         /// </example>
         public static string ToTitleCase(this string input)
         {
+#if NETSTANDARD2_0_OR_GREATER || NET5_0_OR_GREATER
+            CultureInfo culture = CultureInfo.CurrentCulture;
+            TextInfo textInfo = culture.TextInfo;
+
+            return textInfo.ToTitleCase(input);
+
+#else
             StringBuilder sbResult = null;
             if ((input?.Length ?? 0 ) > 0)
             {
@@ -48,6 +55,7 @@ namespace System
             }
 
             return sbResult?.ToString() ?? string.Empty;
+#endif
         }
 
         /// <summary>
