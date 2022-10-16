@@ -14,7 +14,6 @@ namespace Candoumbe.MiscUtilities.PerformanceTests;
 public class StringExtensionsTests
 {
 
-    [Params("Lorem ipsum dolor sin amet")]
     public string Text { get; set; }
 
     [Params("lorem", "dolor")]
@@ -24,10 +23,11 @@ public class StringExtensionsTests
     public async Task ReadFile()
     {
         Text = await File.ReadAllTextAsync("very-long-text.txt");
+        Console.WriteLine($"Text of {Text.Length} characters");
     }
 
-    [Benchmark(Description = "Searches for occurences of a specific word")]
-    public int[] Occurrences_for_a_word() => Text.Occurrences(Search).ToArray();
+    [Benchmark()]
+    public int[] Occurrences_extension() => Text.Occurrences(Search).ToArray();
 
     [Benchmark(Baseline = true)]
     public int[] Occurences_with_Linq()
