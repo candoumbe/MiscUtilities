@@ -51,8 +51,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v1
         with:
-          name: tests-results
-          path: output/tests-results
+          name: unit-tests
+          path: output/tests-results/unit-tests
       - uses: actions/upload-artifact@v1
         with:
           name: coverage-report
@@ -63,5 +63,9 @@ jobs:
           path: output/coverage-history
       - uses: actions/upload-artifact@v1
         with:
-          name: artifacts
-          path: output/artifacts
+          name: mutation-tests
+          path: output/tests-results/mutation-tests
+      - uses: actions/upload-artifact@v1
+        with:
+          name: packages
+          path: output/artifacts/packages

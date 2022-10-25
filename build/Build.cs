@@ -3,47 +3,31 @@
 
 namespace Utilities.ContinuousIntegration;
 
+using Candoumbe.Pipelines.Components;
+
 using Nuke.Common;
 using Nuke.Common.CI;
-using Nuke.Common.CI.AzurePipelines;
 using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
-using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
-using Nuke.Common.Tools.Codecov;
-using Nuke.Common.Tools.ReportGenerator;
-using Nuke.Common.Utilities;
-using Nuke.Common.Tools.GitReleaseManager;
 
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
-using static Nuke.Common.ChangeLog.ChangelogTasks;
-using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
-using static Serilog.Log;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.Tools.Git.GitTasks;
-using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
-using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
-using static Nuke.Common.Tools.Codecov.CodecovTasks;
-
 
 [GitHubActions(
     "pull-request",
     GitHubActionsImage.UbuntuLatest,
-    OnPullRequestBranches = new[] { DevelopBranch },
+    OnPullRequestBranches = new[] { IGitFlow.DevelopBranch },
     PublishArtifacts = true,
     FetchDepth = 0,
     EnableGitHubToken = true,
-    InvokedTargets = new[] { nameof(UnitTests), nameof(ReportCoverage) },
+    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IReportCoverage.ReportCoverage) },
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
     ImportSecrets = new[]
     {
@@ -61,11 +45,11 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
 [GitHubActions(
     "integration",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranchesIgnore = new[] { MainBranchName },
+    OnPushBranchesIgnore = new[] { IGitFlow.MainBranchName },
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = new[] { nameof(UnitTests), nameof(ReportCoverage), nameof(Pack) },
+    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IReportCoverage.ReportCoverage), nameof(IPack.Pack) },
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
     ImportSecrets = new[]
     {
@@ -84,8 +68,8 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
 [GitHubActions(
     "delivery",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranches = new[] { MainBranchName, ReleaseBranchPrefix + "/*" },
-    InvokedTargets = new[] { nameof(UnitTests), nameof(ReportCoverage), nameof(Publish), nameof(AddGithubRelease) },
+    OnPushBranches = new[] { IGitFlow.MainBranchName, IGitFlow.ReleaseBranch + "/*" },
+    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IReportCoverage.ReportCoverage), nameof(IPublish.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
     EnableGitHubToken = true,
     FetchDepth = 0,
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
@@ -107,50 +91,73 @@ using static Nuke.Common.Tools.Codecov.CodecovTasks;
 [UnsetVisualStudioEnvironmentVariables]
 [DotNetVerbosityMapping]
 [HandleVisualStudioDebugging]
-public class Build : NukeBuild
+public class Build : NukeBuild,
+    IHaveConfiguration,
+    IHaveSolution,
+    IHaveChangeLog,
+    IHaveSourceDirectory,
+    IHaveTestDirectory,
+    IHaveGitRepository,
+    IHaveGitVersion,
+    IGitFlow,
+    IClean,
+    IRestore,
+    ICompile,
+    IBenchmark,
+    IUnitTest,
+    IReportCoverage,
+    IMutationTest,
+    IPack,
+    IPublish,
+    ICreateGithubRelease
 {
-    public static int Main() => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
 
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+    [Required]
+    [Solution]
+    public readonly Solution Solution;
 
-    [Parameter("Indicates wheter to restore nuget in interactive mode - Default is false")]
-    public readonly bool Interactive = false;
+    ///<inheritdoc/>
+    Solution IHaveSolution.Solution => Solution;
 
-    [Parameter("Generic name placeholder. Can be used wherever a name is required")]
-    public readonly string Name;
-
+    /// <summary>
+    /// Token to interact with GitHub's API
+    /// </summary>
     [Parameter]
     [Secret]
     public readonly string GitHubToken;
 
+    /// <summary>
+    /// Token to interact with Nuget's API
+    /// </summary>
+    [Parameter("Token to interact with Nuget's API")]
+    [Secret]
+    public readonly string NugetApiKey;
+
     [Parameter]
     [Secret]
     public readonly string CodecovToken;
-    
+
+    ///<inheritdoc/>
+    string IReportCoverage.CodecovToken => CodecovToken;
+
     [Parameter("API Key used to submit Stryker dashboard")]
     [Secret]
     public readonly string StrykerDashboardApiKey;
 
-    public readonly string DotnetRollForward;
+    [GitVersion(NoFetch = true, Framework = "net5.0")]
+    public readonly GitVersion GitVersion;
 
-    [Required] [Solution] public readonly Solution Solution;
-    [Required] [GitRepository] public readonly GitRepository GitRepository;
-    [GitVersion] public readonly GitVersion GitVersion;
+    [GitRepository]
+    public readonly GitRepository GitRepository;
 
-    [CI] public readonly AzurePipelines AzurePipelines;
+    ///<inheritdoc/>
+    GitRepository IHaveGitRepository.GitRepository => GitRepository;
+
+    ///<inheritdoc/>
+    GitVersion IHaveGitVersion.GitVersion => GitVersion;
+
     [CI] public readonly GitHubActions GitHubActions;
-
-
-    /// <summary>
-    /// Directory of source code projects
-    /// </summary>
-    public AbsolutePath SourceDirectory => RootDirectory / "src";
-
-    /// <summary>
-    /// Directory of test projects
-    /// </summary>
-    public AbsolutePath TestDirectory => RootDirectory / "test";
 
     /// <summary>
     /// Directory where to store all output builds output
@@ -183,489 +190,44 @@ public class Build : NukeBuild
     /// </summary>
     public AbsolutePath BenchmarkDirectory => OutputDirectory / "benchmarks";
 
-    public const string MainBranchName = "main";
+    ///<inheritdoc/>
+    IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => From<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
+                                                            .Concat(From<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
 
-    public const string DevelopBranch = "develop";
+    ///<inheritdoc/>
+    IEnumerable<AbsolutePath> IClean.DirectoriesToClean => new[] { From<IPack>().ArtifactsDirectory, From<IReportCoverage>().CoverageReportDirectory };
 
-    public const string FeatureBranchPrefix = "feature";
+    ///<inheritdoc/>
+    IEnumerable<AbsolutePath> IClean.DirectoriesToEnsureExistance => new[]
+    {
+        From<IReportCoverage>().CoverageReportHistoryDirectory,
+        From<IMutationTest>().MutationTestResultDirectory,
 
-    public const string HotfixBranchPrefix = "hotfix";
+    };
 
-    public const string ColdfixBranchPrefix = "coldfix";
+    ///<inheritdoc/>
+    IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(From<IHaveSolution>().Solution.GetProjects("*.UnitTests"));
 
-    public const string ReleaseBranchPrefix = "release";
+    ///<inheritdoc/>
+    IEnumerable<Project> IMutationTest.MutationTestsProjects => Partition.GetCurrent(From<IUnitTest>().UnitTestsProjects);
 
-    [Parameter("Indicates if any changes should be stashed automatically prior to switching branch (Default : true)")]
-    public readonly bool AutoStash = true;
+    ///<inheritdoc/>
+    IEnumerable<Project> IBenchmark.BenchmarkProjects => From<IHaveSolution>().Solution.GetProjects("*.PerformanceTests");
 
-    public Target Clean => _ => _
-        .Before(Restore)
-        .Executes(() =>
-        {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-            TestDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-            EnsureCleanDirectory(ArtifactsDirectory);
-            EnsureCleanDirectory(CoverageReportDirectory);
-            EnsureExistingDirectory(CoverageReportHistoryDirectory);
-        });
+    ///<inheritdoc/>
+    AbsolutePath IBenchmark.BenchmarkResultDirectory => From<IHaveArtifacts>().ArtifactsDirectory / "benchmarks";
 
-    public Target Restore => _ => _
-        .Executes(() =>
-        {
-            DotNetRestore(s => s
-                .SetProjectFile(Solution)
-                .SetIgnoreFailedSources(true)
-                .SetDisableParallel(false)
-                .When(IsLocalBuild && Interactive, _ => _.SetProperty("NugetInteractive", IsLocalBuild && Interactive))
+    ///<inheritdoc/>
+    IEnumerable<AbsolutePath> IPack.PackableProjects => From<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
-            );
-
-            DotNetToolRestore();
-        });
-
-    public Target Compile => _ => _
-        .DependsOn(Restore)
-        .Executes(() =>
-        {
-            DotNetBuild(s => s
-                .SetNoRestore(InvokedTargets.Contains(Restore) || SkippedTargets.Contains(Restore))
-                .SetConfiguration(Configuration)
-                .SetProjectFile(Solution)
-                .SetAssemblyVersion(GitVersion.AssemblySemVer)
-                .SetFileVersion(GitVersion.AssemblySemFileVer)
-                .SetInformationalVersion(GitVersion.InformationalVersion)
-            );
-        });
-
-
-
-    public Target UnitTests => _ => _
-        .DependsOn(Compile)
-        .Description("Run unit tests and collect code coverage")
-        .Produces(TestResultDirectory / "*.trx")
-        .Produces(TestResultDirectory / "*.xml")
-        .Triggers(ReportCoverage)
-        .Executes(() =>
-        {
-            IEnumerable<Project> projects = Solution.GetProjects("*.UnitTests");
-            IEnumerable<Project> testsProjects = Partition.GetCurrent(projects);
-
-            testsProjects.ForEach(project => Verbose(project));
-
-            DotNetTest(s => s
-                .SetConfiguration(Configuration)
-                .EnableCollectCoverage()
-                .EnableUseSourceLink()
-                .SetNoBuild(InvokedTargets.Contains(Compile))
-                .SetResultsDirectory(TestResultDirectory)
-                .SetCoverletOutputFormat(CoverletOutputFormat.lcov)
-                .AddProperty("ExcludeByAttribute", "Obsolete")
-                .CombineWith(testsProjects, (cs, project) => cs.SetProjectFile(project)
-                                                               .CombineWith(project.GetTargetFrameworks(), (setting, framework) => setting.SetFramework(framework)
-                                                                                                                                          .AddLoggers($"trx;LogFileName={project.Name}.trx")
-                                                                                                                                          .SetCoverletOutput(TestResultDirectory / $"{project.Name}.{framework}.xml")))
-                ,
-                completeOnFailure: true);
-
-            TestResultDirectory.GlobFiles("*.trx")
-                                    .ForEach(testFileResult => AzurePipelines?.PublishTestResults(type: AzurePipelinesTestResultsType.VSTest,
-                                                                                                    title: $"{Path.GetFileNameWithoutExtension(testFileResult)} ({AzurePipelines.StageDisplayName})",
-                                                                                                    files: new string[] { testFileResult })
-                    );
-
-            TestResultDirectory.GlobFiles("*.xml")
-                            .ForEach(file => AzurePipelines?.PublishCodeCoverage(coverageTool: AzurePipelinesCodeCoverageToolType.Cobertura,
-                                                                                    summaryFile: file,
-                                                                                    reportDirectory: CoverageReportDirectory));
-        });
-
-    public Target MutationTests => _ => _
-        .Description("Runs mutational tests using Stryker tool")
-        .DependsOn(Clean, Compile)
-        .Produces( TestDirectory / "*.html")
-        .Executes(() =>
-        {
-            IEnumerable<Project> projects = Solution.GetProjects("*.UnitTests")
-                                                    .ToArray();
-            
-
-            Arguments args = new ();
-            args.Add("--open-report:html", IsLocalBuild);
-            args.Add($"--dashboard-api-key {StrykerDashboardApiKey}", IsServerBuild || StrykerDashboardApiKey is not null);
-
-            projects.ForEach(csproj =>
-            {
-                Verbose("Running mutation tests for '{ProjectName}' (directory : '{Directory}') ", csproj.Name, csproj.Path.Parent);
-                DotNet($"stryker {args.RenderForExecution()}", workingDirectory: csproj.Path.Parent);
-            });
-        });
+    ///<inheritdoc/>
+    bool IReportCoverage.ReportToCodeCov => CodecovToken is not null;
 
     public Target Tests => _ => _
         .Description("Run all tests")
-        .DependsOn(UnitTests, MutationTests);
+        .DependsOn(From<IUnitTest>().UnitTests, From<IMutationTest>().MutationTests);
 
-    public Target ReportCoverage => _ => _
-        .DependsOn(UnitTests)
-        .OnlyWhenDynamic(() => IsServerBuild || CodecovToken != null)
-        .Consumes(UnitTests, TestResultDirectory / "*.xml")
-        .Produces(CoverageReportDirectory / "*.xml")
-        .Produces(CoverageReportHistoryDirectory / "*.xml")
-        .Executes(() =>
-        {
-            ReportGenerator(_ => _
-                    .SetFramework("net5.0")
-                    .SetReports(TestResultDirectory / "*.xml")
-                    .SetReportTypes(ReportTypes.Badges, ReportTypes.HtmlChart, ReportTypes.HtmlInline_AzurePipelines_Dark)
-                    .SetTargetDirectory(CoverageReportDirectory)
-                    .SetHistoryDirectory(CoverageReportHistoryDirectory)
-                    .SetTag(GitRepository.Commit)
-                );
-
-            Codecov(s => s
-                .SetFiles(TestResultDirectory.GlobFiles("*.xml").Select(x => x.ToString()))
-                .SetToken(CodecovToken)
-                .SetBranch(GitRepository.Branch)
-                .SetSha(GitRepository.Commit)
-                .SetBuild(GitVersion.FullSemVer)
-                .SetFramework("netcoreapp3.0")
-            );
-        });
-
-    public Target Pack => _ => _
-        .DependsOn(UnitTests, Compile)
-        .Consumes(Compile)
-        .Produces(ArtifactsDirectory / "*.nupkg")
-        .Produces(ArtifactsDirectory / "*.snupkg")
-        .Executes(() =>
-        {
-            DotNetPack(s => s
-                .EnableIncludeSource()
-                .EnableIncludeSymbols()
-                .SetOutputDirectory(ArtifactsDirectory)
-                .SetProject(Solution)
-                .SetConfiguration(Configuration)
-                .SetAssemblyVersion(GitVersion.AssemblySemVer)
-                .SetFileVersion(GitVersion.AssemblySemFileVer)
-                .SetInformationalVersion(GitVersion.InformationalVersion)
-                .SetVersion(GitVersion.NuGetVersion)
-                .SetSymbolPackageFormat(DotNetSymbolPackageFormat.snupkg)
-                .SetPackageReleaseNotes(GetNuGetReleaseNotes(ChangeLogFile, GitRepository))
-                .SetRepositoryType("git")
-                .SetRepositoryUrl(GitRepository.HttpsUrl)
-            );
-        });
-
-
-    public Target Benchmarks => _ => _
-            .Description("Run all performance tests.")
-            .DependsOn(Compile)
-            .Produces(BenchmarkDirectory / "*")
-            .Executes(() =>
-            {
-                IEnumerable<Project> benchmarkProjects = Solution.GetProjects("*.PerformanceTests");
-                benchmarkProjects.ForEach(csproj =>
-                {
-                    DotNetRun(s =>
-                    {
-                        IReadOnlyCollection<string> frameworks = csproj.GetTargetFrameworks();
-                        return s.SetConfiguration(Configuration.Release)
-                                .SetProjectFile(csproj)
-                                .SetProcessWorkingDirectory(ArtifactsDirectory)
-                                .SetProcessArgumentConfigurator(args => args.Add("-- --filter {0}", "*", customValue: true)
-                                                                            .Add("--artifacts {0}", BenchmarkDirectory)
-                                                                            .Add("--join"))
-                                .CombineWith(frameworks, (setting, framework) => setting.SetFramework(framework));
-                    });
-                });
-            });
-
-
-    private AbsolutePath ChangeLogFile => RootDirectory / "CHANGELOG.md";
-
-    #region Git flow section
-
-    public Target Changelog => _ => _
-        .Requires(() => IsLocalBuild)
-        .OnlyWhenStatic(() => GitRepository.IsOnReleaseBranch() || GitRepository.IsOnHotfixBranch())
-        .Description("Finalizes the change log so that its up to date for the release. ")
-        .Executes(() =>
-        {
-            FinalizeChangelog(ChangeLogFile, GitVersion.MajorMinorPatch, GitRepository);
-            Information("Please review CHANGELOG.md ({ChangeLogFile}) and press 'Y' to validate (any other key will cancel changes)...", ChangeLogFile);
-            ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-            if (keyInfo.Key == ConsoleKey.Y)
-            {
-                Git($"add {ChangeLogFile}");
-                Git($"commit -m \"Finalize {Path.GetFileName(ChangeLogFile)} for {GitVersion.MajorMinorPatch}\"");
-            }
-        });
-
-    public Target Feature => _ => _
-        .Description($"Starts a new feature development by creating the associated branch {FeatureBranchPrefix}/{{feature-name}} from {DevelopBranch}")
-        .Requires(() => IsLocalBuild)
-        .Requires(() => !GitRepository.IsOnFeatureBranch() || GitHasCleanWorkingCopy())
-        .Executes(() =>
-        {
-            if (!GitRepository.IsOnFeatureBranch())
-            {
-                Information("Enter the name of the feature. It will be used as the name of the feature/branch (leave empty to exit) :");
-                AskBranchNameAndSwitchToIt(FeatureBranchPrefix, DevelopBranch);
-#pragma warning restore S2583 // Conditionally executed code should be reachable
-
-                    Information("Good bye !");
-            }
-            else
-            {
-                FinishFeature();
-            }
-        });
-
-    /// <summary>
-    /// Asks the user for a branch name
-    /// </summary>
-    /// <param name="branchNamePrefix">A prefix to preprend in front of the user branch name</param>
-    /// <param name="sourceBranch">Branch from which a new branch will be created</param>
-    private void AskBranchNameAndSwitchToIt(string branchNamePrefix, string sourceBranch)
-    {
-        string featureName;
-        bool exitCreatingFeature = false;
-        do
-        {
-            featureName = (Name ?? Console.ReadLine() ?? string.Empty).Trim()
-                                                            .Trim('/');
-
-            switch (featureName)
-            {
-                case string name when !string.IsNullOrWhiteSpace(name):
-                    {
-                        string branchName = $"{branchNamePrefix}/{featureName.Slugify()}";
-                        Information($"The branch '{{BranchName}}' will be created.{Environment.NewLine}Confirm ? (Y/N)", branchName);
-
-                        switch (Console.ReadKey().Key)
-                        {
-                            case ConsoleKey.Y:
-                                Information("Checking out branch '{BranchName}' from '{SourceBranch}'", branchName, sourceBranch);
-
-                                Checkout(branchName, start: sourceBranch);
-
-                                Information("'{branchName}' created successfully", branchName);
-                                exitCreatingFeature = true;
-                                break;
-
-                            default:
-                                Information("Exiting {nameof(Feature)} task.", nameof(Feature));
-                                exitCreatingFeature = true;
-                                break;
-                        }
-                    }
-                    break;
-                default:
-                    Information("Exiting task.");
-                    exitCreatingFeature = true;
-                    break;
-            }
-        } while (string.IsNullOrWhiteSpace(featureName) && !exitCreatingFeature);
-    }
-
-    public Target Release => _ => _
-        .DependsOn(Changelog)
-        .Description($"Starts a new {ReleaseBranchPrefix}/{{version}} from {DevelopBranch}")
-        .Requires(() => !GitRepository.IsOnReleaseBranch() || GitHasCleanWorkingCopy())
-        .Executes(() =>
-        {
-            if (!GitRepository.IsOnReleaseBranch())
-            {
-                Checkout($"{ReleaseBranchPrefix}/{GitVersion.MajorMinorPatch}", start: DevelopBranch);
-            }
-            else
-            {
-                FinishReleaseOrHotfix();
-            }
-        });
-
-    public Target Hotfix => _ => _
-        .DependsOn(Changelog)
-        .Description($"Starts a new hotfix branch '{HotfixBranchPrefix}/*' from {MainBranchName}")
-        .Requires(() => !GitRepository.IsOnHotfixBranch() || GitHasCleanWorkingCopy())
-        .Executes(() =>
-        {
-            (GitVersion mainBranchVersion, IReadOnlyCollection<Output> _) = GitVersion(s => s
-                .SetFramework("net5.0")
-                .SetUrl(RootDirectory)
-                .SetBranch(MainBranchName)
-                //.EnableNoFetch()
-                .DisableProcessLogOutput());
-
-            if (!GitRepository.IsOnHotfixBranch())
-            {
-                Checkout($"{HotfixBranchPrefix}/{mainBranchVersion.Major}.{mainBranchVersion.Minor}.{mainBranchVersion.Patch + 1}", start: MainBranchName);
-            }
-            else
-            {
-                FinishReleaseOrHotfix();
-            }
-        });
-
-    public Target Coldfix => _ => _
-        .Description($"Starts a new coldfix development by creating the associated '{ColdfixBranchPrefix}/{{name}}' from {DevelopBranch}")
-        .Requires(() => IsLocalBuild)
-        .Requires(() => !GitRepository.Branch.Like($"{ColdfixBranchPrefix}/*", true) || GitHasCleanWorkingCopy())
-        .Executes(() =>
-        {
-            if (!GitRepository.Branch.Like($"{ColdfixBranchPrefix}/*"))
-            {
-                Information("Enter the name of the coldfix. It will be used as the name of the coldfix/branch (leave empty to exit) :");
-                AskBranchNameAndSwitchToIt(ColdfixBranchPrefix, DevelopBranch);
-                Information("Good bye !");
-            }
-            else
-            {
-                FinishColdfix();
-            }
-        });
-
-    /// <summary>
-    /// Merge a coldfix/* branch back to the develop branch
-    /// </summary>
-    private void FinishColdfix() => FinishFeature();
-
-    private void Checkout(string branch, string start)
-    {
-        bool hasCleanWorkingCopy = GitHasCleanWorkingCopy();
-
-        if (!hasCleanWorkingCopy && AutoStash)
-        {
-            Git("stash");
-        }
-        Git($"checkout -b {branch} {start}");
-
-        if (!hasCleanWorkingCopy && AutoStash)
-        {
-            Git("stash apply");
-        }
-    }
-
-    private string MajorMinorPatchVersion => GitVersion.MajorMinorPatch;
-
-    private void FinishReleaseOrHotfix()
-    {
-        Git($"checkout {MainBranchName}");
-        Git($"merge --no-ff --no-edit {GitRepository.Branch}");
-        Git($"tag {MajorMinorPatchVersion}");
-
-        Git($"checkout {DevelopBranch}");
-        Git("pull");
-        Git($"merge --no-ff --no-edit {GitRepository.Branch}");
-
-        Git($"branch -D {GitRepository.Branch}");
-
-        Git($"push origin --follow-tags {MainBranchName} {DevelopBranch} {MajorMinorPatchVersion}");
-    }
-
-    private void FinishFeature()
-    {
-        Git($"rebase {DevelopBranch}");
-        Git($"checkout {DevelopBranch}");
-        Git("pull");
-        Git($"merge --no-ff --no-edit {GitRepository.Branch}");
-
-        Git($"branch -D {GitRepository.Branch}");
-        Git($"push origin {DevelopBranch}");
-    }
-    #endregion
-
-    [Parameter("API key used to publish artifacts to Nuget.org")]
-    [Secret]
-    public readonly string NugetApiKey;
-
-    [Parameter(@"URI where packages should be published (default : ""https://api.nuget.org/v3/index.json""")]
-    public string NugetPackageSource => "https://api.nuget.org/v3/index.json";
-
-    public string GitHubPackageSource => $"https://nuget.pkg.github.com/{GitHubActions.RepositoryOwner}/index.json";
-
-    public bool IsOnGithub => GitHubActions is not null;
-
-    public Target Publish => _ => _
-        .Description($"Publish packages (*.nupkg and *.snupkg) to the destination server set with {nameof(NugetPackageSource)} settings ")
-        .DependsOn(UnitTests, Pack)
-        .Triggers(AddGithubRelease)
-        .Consumes(Pack, ArtifactsDirectory / "*.nupkg", ArtifactsDirectory / "*.snupkg")
-        .Requires(() => !(NugetApiKey.IsNullOrEmpty() || GitHubToken.IsNullOrEmpty()))
-        .Requires(() => GitHasCleanWorkingCopy())
-        .Requires(() => GitRepository.IsOnMainBranch()
-                        || GitRepository.IsOnReleaseBranch()
-                        || GitRepository.IsOnDevelopBranch())
-        .Requires(() => Configuration.Equals(Configuration.Release))
-        .Executes(() =>
-        {
-            void PushPackages(IReadOnlyCollection<AbsolutePath> nupkgs)
-            {
-                Information($"Publishing {{PackageCount}} package{(nupkgs.Count > 1 ? "s" : string.Empty)}", nupkgs.Count);
-                Information(string.Join(EnvironmentInfo.NewLine, nupkgs));
-
-                DotNetNuGetPush(s => s.SetApiKey(NugetApiKey)
-                    .SetSource(NugetPackageSource)
-                    .EnableSkipDuplicate()
-                    .EnableNoSymbols()
-                    .CombineWith(nupkgs, (_, nupkg) => _
-                                .SetTargetPath(nupkg)),
-                    degreeOfParallelism: 4,
-                    completeOnFailure: true);
-
-                DotNetNuGetPush(s => s.SetApiKey(GitHubToken)
-                        .SetSource(GitHubPackageSource)
-                        .EnableSkipDuplicate()
-                        .EnableNoSymbols()
-                        .CombineWith(nupkgs, (_, nupkg) => _
-                                    .SetTargetPath(nupkg)),
-                        degreeOfParallelism: 4,
-                        completeOnFailure: true);
-            }
-
-            PushPackages(ArtifactsDirectory.GlobFiles("*.nupkg", "!*TestObjects.*nupkg", "!*PerformanceTests.*nupkg"));
-            PushPackages(ArtifactsDirectory.GlobFiles("*.snupkg", "!*TestObjects.*nupkg", "!*PerformanceTests.*nupkg"));
-        });
-
-    public Target AddGithubRelease => _ => _
-        .After(Publish)
-        .Unlisted()
-        .Description("Creates a new GitHub release after *.nupkgs/*.snupkg were successfully published.")
-        .OnlyWhenStatic(() => IsServerBuild && GitRepository.IsOnMainBranch())
-        .Executes(async () =>
-        {
-            Information("Creating a new release");
-            Octokit.GitHubClient gitHubClient = new(new Octokit.ProductHeaderValue(nameof(Utilities)))
-            {
-                Credentials = new Octokit.Credentials(GitHubToken)
-            };
-
-            string repositoryName = GitHubActions.Repository.Replace(GitHubActions.RepositoryOwner + "/", string.Empty);
-            IReadOnlyList<Octokit.Release> releases = await gitHubClient.Repository.Release.GetAll(GitHubActions.RepositoryOwner, repositoryName)
-                                                                                           .ConfigureAwait(false);
-
-            if (!releases.AtLeastOnce(release => release.Name == MajorMinorPatchVersion))
-            {
-                string[] lines = ExtractChangelogSectionNotes(ChangeLogFile, MajorMinorPatchVersion).Select(line => $"{line}\n").ToArray();
-
-                Octokit.NewRelease newRelease = new(MajorMinorPatchVersion)
-                {
-                    TargetCommitish = GitRepository.Commit,
-                    Body = string.Join("- ", lines),
-                    Name = MajorMinorPatchVersion,
-                };
-
-                Octokit.Release release = await gitHubClient.Repository.Release.Create(GitHubActions.RepositoryOwner, repositoryName, newRelease)
-                                                                               .ConfigureAwait(false);
-
-                Information("Github release {TagName} created successfully", release.TagName);
-            }
-            else
-            {
-                Information("Release '{Version}' already exists - skipping ", MajorMinorPatchVersion);
-            }
-        });
-
+    ///<inheritdoc/>
     protected override void OnBuildCreated()
     {
         if (IsServerBuild)
@@ -673,4 +235,6 @@ public class Build : NukeBuild
             EnvironmentInfo.SetVariable("DOTNET_ROLL_FORWARD", "Major");
         }
     }
+
+    private T From<T>() where T : INukeBuild => (T)(object)this;
 }

@@ -16,11 +16,7 @@
         },
         "Configuration": {
           "type": "string",
-          "description": "Configuration to build - Default is 'Debug' (local) or 'Release' (server)",
-          "enum": [
-            "Debug",
-            "Release"
-          ]
+          "enum": []
         },
         "Continue": {
           "type": "boolean",
@@ -55,13 +51,17 @@
             "VSCode"
           ]
         },
-        "Interactive": {
+        "IgnoreFailedSources": {
           "type": "boolean",
-          "description": "Indicates wheter to restore nuget in interactive mode - Default is false"
+          "description": "Ignore unreachable sources during Restore"
+        },
+        "Major": {
+          "type": "boolean",
+          "description": "Hint to create a major release"
         },
         "Name": {
           "type": "string",
-          "description": "Generic name placeholder. Can be used wherever a name is required"
+          "description": "Name of the branch to create"
         },
         "NoLogo": {
           "type": "boolean",
@@ -69,12 +69,8 @@
         },
         "NugetApiKey": {
           "type": "string",
-          "description": "API key used to publish artifacts to Nuget.org",
+          "description": "Token to interact with Nuget's API",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
-        },
-        "NugetPackageSource": {
-          "type": "string",
-          "description": "URI where packages should be published (default : \"https://api.nuget.org/v3/index.json\""
         },
         "Partition": {
           "type": "string",
