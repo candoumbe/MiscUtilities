@@ -51,8 +51,8 @@ public class MultiDateOnlyRange
     /// The algorithm will first tries to find if any other <see cref="DateOnlyRange"/> overlaps or abuts with <paramref name="range"/> and if so,
     /// will swap that element with the result of <c>range.Union(element)</c>
     /// </remarks>
-    /// <param name="range"></param>
-    /// <exception cref="ArgumentNullException">if <paramref name="range"/> is <c>null</c>.</exception>
+    /// <param name="range">a range to add to the current instance</param>
+    /// <exception cref="ArgumentNullException">if <paramref name="range"/> is <see langword="null"/>.</exception>
     public void Add(DateOnlyRange range)
     {
         ArgumentNullException.ThrowIfNull(range);
@@ -88,7 +88,7 @@ public class MultiDateOnlyRange
     /// Builds a <see cref="MultiDateOnlyRange"/> instance that represents the union of the current instance with <paramref name="other"/>.
     /// </summary>
     /// <param name="other">The other instance to add</param>
-    /// <exception cref="ArgumentNullException">if <paramref name="other"/> is <c>null</c></exception>
+    /// <exception cref="ArgumentNullException">if <paramref name="other"/> is <see langword="null"/></exception>
     /// <returns>a <see cref="MultiDateOnlyRange"/> that represents the union of the current instance with <paramref name="other"/>.</returns>
     public MultiDateOnlyRange Union(MultiDateOnlyRange other) => new(_ranges.Union(other.Ranges).ToArray());
 
@@ -101,7 +101,7 @@ public class MultiDateOnlyRange
     public static MultiDateOnlyRange operator +(MultiDateOnlyRange left, MultiDateOnlyRange right) => left.Union(right);
 
     /// <summary>
-    /// Tests if the current instance contains one or more ranges which, combined together, covers the specified <paramref name="range"/>. 
+    /// Tests if the current instance contains one or more <see cref="DateOnlyRange"/> which, combined together, covers the specified <paramref name="range"/>.
     /// </summary>
     /// <param name="range">The range to test</param>
     /// <returns><see langword="true"/> if the current instance contains <see cref="DateOnlyRange"/>s which combined together covers <paramref name="range"/> and <see langword="false"/> otherwise.</returns>

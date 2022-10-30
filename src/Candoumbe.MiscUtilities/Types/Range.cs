@@ -16,7 +16,7 @@ namespace Candoumbe.MiscUtilities.Types;
 public abstract class Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>
     where T : IComparable<T>
 #else
-public record Range<T>(T Start, T End): IComparable<Range<T>> where T : IComparable<T>
+public record Range<T>(T Start, T End) : IComparable<Range<T>> where T : IComparable<T>
 #endif
 {
 #if !NET5_0_OR_GREATER
@@ -53,8 +53,8 @@ public record Range<T>(T Start, T End): IComparable<Range<T>> where T : ICompara
     public override int GetHashCode()
     {
         int hashCode = -1676728671;
-        hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(Start);
-        hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(End);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<T>.Default.GetHashCode(Start);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<T>.Default.GetHashCode(End);
         return hashCode;
     }
 
@@ -73,4 +73,15 @@ public record Range<T>(T Start, T End): IComparable<Range<T>> where T : ICompara
 
     ///<inheritdoc/>
     public int CompareTo(Range<T> other) => Start.CompareTo(other.Start);
+
+    /// <summary>
+    /// Checks if <paramref name="value"/> is between <see cref="Start"/> and <see cref="End"/>.
+    /// </summary>
+    /// <param name="value">The value to check</param>
+    /// <returns></returns>
+    public virtual ContainsResult Contains(T value) => (IsEmpty(), value.CompareTo(Start), value.CompareTo(End)) switch
+    {
+        (true, _, _) or (_, <= 0, _) or (_, _, >= 1) => ContainsResult.No,
+        _ => ContainsResult.Yes
+    };
 }

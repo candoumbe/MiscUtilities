@@ -13,14 +13,14 @@ namespace Candoumbe.MiscUtilities.Types;
 public record DateOnlyRange : Range<DateOnly>
 {
     /// <summary>
-    /// A <see cref="DateOnlyRange"/> that overlaps any other <see cref="DateOnlyRange"/> except (<see cref="Empty"/>).
+    /// A <see cref="DateOnlyRange"/> that <see cref="Overlaps(DateOnlyRange)">overlaps</see> any other <see cref="DateOnlyRange"/> except (<see cref="Empty"/>).
     /// </summary>
     public static DateOnlyRange Infinite => new(DateOnly.MinValue, DateOnly.MaxValue);
 
     /// <summary>
-    /// An empty <see cref="DateOnlyRange"/>.
+    /// A <see cref="DateOnlyRange"/> that <see cref="Overlaps(DateOnlyRange)">overlaps</see> no other <see cref="DateOnlyRange"/>.
     /// </summary>
-    public static DateOnlyRange Empty => new(DateOnly.MinValue, DateOnly.MinValue); 
+    public static DateOnlyRange Empty => new(DateOnly.MinValue, DateOnly.MinValue);
 
     /// <summary>
     /// Builds a new <see cref="DateTimeRange"/>
@@ -49,7 +49,7 @@ public record DateOnlyRange : Range<DateOnly>
         ;
 
     /// <summary>
-    /// Checks if <paramref name="other"/> and current instances are contiguoous.
+    /// Checks if the current instance is contiguous with <paramref name="other"/>.
     /// </summary>
     /// <param name="other"></param>
     /// <returns><see langword="true"/> when current instance and <paramref name="other"/> are contiguous and <see langword="false"/> otherwise.</returns>
@@ -61,7 +61,7 @@ public record DateOnlyRange : Range<DateOnly>
     /// </summary>
     /// <param name="date">The desired upper limit</param>
     /// <returns>a <see cref="DateOnlyRange"/> that spans up to <paramref name="date"/>.</returns>
-    public static DateOnlyRange UpTo(DateOnly date) => new (DateOnly.MinValue, date);
+    public static DateOnlyRange UpTo(DateOnly date) => new(DateOnly.MinValue, date);
 
     /// <summary>
     /// Builds a new <see cref="DateOnlyRange"/> that spans from <paramref name="date"/> up to <see cref="DateOnly.MaxValue"/>.
@@ -78,7 +78,7 @@ public record DateOnlyRange : Range<DateOnly>
     /// </summary>
     /// <param name="other">The other <see cref="DateOnlyRange"/> to span over</param>
     /// <returns>A new <see cref="DateOnlyRange"/> than spans over both current and <paramref name="other"/> range</returns>
-    /// <exception cref="InvalidOperationException">if either : current instance does not overlap or is not continuous with <paramref name="other"/>.</exception>
+    /// <exception cref="InvalidOperationException">if current instance does not overlap or is not contiguous with <paramref name="other"/>.</exception>
     public DateOnlyRange Union(DateOnlyRange other)
     {
         DateOnlyRange result = Empty;
@@ -106,27 +106,27 @@ public record DateOnlyRange : Range<DateOnly>
         return result;
     }
 
-        /// <summary>
-        /// Returns the oldest <see cref="DateOnly"/> between <paramref name="left"/> and <paramref name="right"/>.
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        private static DateOnly GetMinimum(DateOnly left, DateOnly right) => left.CompareTo(right) switch
-        {
-            < 0 => left,
-            _ => right
-        };
+    /// <summary>
+    /// Returns the oldest <see cref="DateOnly"/> between <paramref name="left"/> and <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    private static DateOnly GetMinimum(DateOnly left, DateOnly right) => left.CompareTo(right) switch
+    {
+        < 0 => left,
+        _ => right
+    };
 
-        /// <summary>
-        /// Returns the furthest <see cref="DateOnly"/> between <paramref name="left"/> and <paramref name="right"/>.
-        /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        private static DateOnly GetMaximum(DateOnly left, DateOnly right) => left.CompareTo(right) switch
-        {
-            > 0 => left,
-            _ => right
-        };
+    /// <summary>
+    /// Returns the furthest <see cref="DateOnly"/> between <paramref name="left"/> and <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    private static DateOnly GetMaximum(DateOnly left, DateOnly right) => left.CompareTo(right) switch
+    {
+        > 0 => left,
+        _ => right
+    };
 
     /// <summary>
     /// Computes  <see cref="DateOnlyRange"/> value that is common between the current instance and <paramref name="other"/>.
@@ -144,7 +144,7 @@ public record DateOnlyRange : Range<DateOnly>
         {
             result = other;
         }
-        else if(other == Infinite)
+        else if (other == Infinite)
         {
             result = this;
         }
@@ -155,6 +155,13 @@ public record DateOnlyRange : Range<DateOnly>
 
         return result;
 
-    } 
+    }
+
+    ///<inheritdoc/>
+    public override ContainsResult Contains(DateOnly value) => (IsEmpty(), this == Infinite) switch
+    {
+        (true, _) or (_, true) => base.Contains(value),
+        _ => (Start <= value && value <= End) ? ContainsResult.Yes : ContainsResult.No
+    };
 }
 #endif

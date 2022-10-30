@@ -1,6 +1,7 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+#if NET6_0_OR_GREATER
 using Bogus;
 
 using Candoumbe.MiscUtilities.Types;
@@ -22,7 +23,6 @@ using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Candoumbe.MiscUtilities.UnitTests.Types;
-#if NET6_0_OR_GREATER
 [UnitTest]
 public class DateOnlyRangeTests
 {
@@ -320,11 +320,11 @@ public class DateOnlyRangeTests
         actual.Should().Be(expected);
     }
 
-    [Property(Arbitrary = new[] {typeof(ValueGenerators)})]
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
     public void Given_non_empty_TimeOnlyRange_When_merging_with_empty_range_Union_should_returns_the_non_empty_range(DateOnlyRange range, DateOnly date)
     {
         // Arrange
-        DateOnlyRange empty = new (date, date);
+        DateOnlyRange empty = new(date, date);
 
         // Act
         DateOnlyRange union = range.Union(empty);
@@ -333,11 +333,11 @@ public class DateOnlyRangeTests
         union.Should().Be(range);
     }
 
-    [Property(Arbitrary =new[] {typeof(ValueGenerators)})]
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
     public void Given_non_empty_TimeOnlyRange_When_merging_with_an_other_TimeOnlyRange_that_does_not_overlaps_nor_is_contiguous_Union_should_throw_InvalidOperationException(DateOnly date)
     {
         // Arrange
-        DateOnlyRange left = new (date.AddDays(1), faker.Date.FutureDateOnly(refDate: date.AddDays(2)));
+        DateOnlyRange left = new(date.AddDays(1), faker.Date.FutureDateOnly(refDate: date.AddDays(2)));
         DateOnlyRange right = new(faker.Date.RecentDateOnly(refDate: date.AddDays(-2)), date.AddDays(-1));
 
         _outputHelper.WriteLine($"{nameof(left)} : {left}");
@@ -448,7 +448,7 @@ public class DateOnlyRangeTests
     public FsCheck.Property Intersect_should_be_symetric(DateOnlyRange left, DateOnlyRange right)
         => (left.Intersect(right) == right.Intersect(left)).ToProperty();
 
-    [Property(Arbitrary = new[] { typeof(ValueGenerators)})]
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
     public void Empty_should_be_the_neutral_element_of_DateOnlyRange(DateOnlyRange range)
     {
         // Act
@@ -457,6 +457,70 @@ public class DateOnlyRangeTests
         // Assert
         result.Should()
               .Be(range);
+    }
+
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    public void Given_DateOnlyRange_is_empty_When_value_is_anything_Contains_should_returns_Inconclusive(DateOnly date)
+    {
+        // Act
+        ContainsResult result = DateOnlyRange.Empty.Contains(date);
+
+        // Assert
+        result.Should().Be(ContainsResult.No, $"The {nameof(DateOnlyRange)} is empty");
+    }
+
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    public void Given_DateOnlyRange_is_infinite_When_value_anything_Contains_should_returns_Yes(DateOnly date)
+    {
+        // Act
+        ContainsResult result = DateOnlyRange.Infinite.Contains(date);
+
+        // Assert
+        result.Should().Be(ContainsResult.Yes, $"The {nameof(DateOnlyRange.Infinite)} 7678333contains all {nameof(DateOnly)} values");
+    }
+
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    public void Given_DateOnlyRange_is_not_empty_and_not_infinite_When_value_is_between_Start_and_End_Contains_should_returns_Yes(DateOnly date)
+    {
+        // Arrange
+        DateOnly start = faker.PickRandom(faker.Date.RecentDateOnly(refDate: date),
+                                          faker.Date.PastDateOnly(refDate: date));
+
+        DateOnly end = faker.PickRandom(faker.Date.SoonDateOnly(refDate: date),
+                                        faker.Date.FutureDateOnly(refDate: date));
+
+        DateOnlyRange dateRange = (start == end) switch
+        {
+            true => new DateOnlyRange(start.AddDays(-1), end.AddDays(1)),
+            _ => new DateOnlyRange(start, end)
+        };
+
+        // Act
+        ContainsResult result = dateRange.Contains(date);
+
+        // Assert
+        result.Should().Be(ContainsResult.Yes, $"{dateRange} contains {date} value");
+    }
+
+    [Fact]
+    public void Given_DateOnlyRange_is_not_empty_and_not_infinite_When_value_is_not_between_Start_and_End_Contains_should_returns_No()
+    {
+        // Arrange
+        DateOnly start = DateOnly.FromDateTime(12.July(2012));
+        DateOnly end = DateOnly.FromDateTime(16.July(2012));
+
+        DateOnlyRange dateRange = new(start, end);
+
+        DateOnly value = faker.PickRandom(faker.Date.RecentDateOnly(refDate: start.AddDays(-1)),
+                                          faker.Date.PastDateOnly(refDate: start.AddDays(-1)),
+                                          faker.Date.SoonDateOnly(refDate: end.AddDays(1)),
+                                          faker.Date.FutureDateOnly(refDate: end.AddDays(1)));
+
+        // Act
+        ContainsResult result = dateRange.Contains(value);
+
+        // Assert
+        result.Should().Be(ContainsResult.No, $"{dateRange} does not contains {value} value");
     }
 }
 #endif

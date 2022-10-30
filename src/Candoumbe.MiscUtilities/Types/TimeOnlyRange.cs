@@ -18,10 +18,22 @@ namespace Candoumbe.MiscUtilities.Types;
 ///     <item>"from 22PM to 6AM" : <c>new TimeOnlyRange(new TimeOnly(22, 0), new TimeOnly(6))</c></item>
 ///     <item>"all day" : <c>TimeOnlyRange.AllDay</c></item>
 /// </list>
+/// <para>
+/// <see cref="TimeOnlyRange"/> behaves mostly like a set so that you can :
+/// <list type="bullet">
+///     <item>get the complement, of a given <see cref="TimeOnlyRange"/> by applying the <c>-</c> operator</item>
+///     <item>merge two <see cref="TimeOnlyRange"/>s by calling the <see cref="Merge(TimeOnlyRange)"/></item>
+/// </list>
+/// </para>
 /// </remarks>
 public record TimeOnlyRange : Range<TimeOnly>
 {
-    private TimeSpan Span => End - Start;
+    private TimeSpan Span => Start <= End ? End - Start : Start - End;
+
+    /// <summary>
+    /// Represents the largest Time
+    /// </summary>
+    private static TimeSpan AllDayTimeSpan => TimeOnly.MaxValue - TimeOnly.MinValue;
 
     /// <summary>
     /// Builds a new <see cref="TimeOnlyRange"/> instance.
@@ -33,29 +45,27 @@ public record TimeOnlyRange : Range<TimeOnly>
     }
 
     /// <summary>
-    /// Tests wheters the current instance overlaps with <paramref name="other"/>.
+    /// Checks if the current instance overlaps with <paramref name="other"/>.
     /// </summary>
     /// <param name="other"></param>
     /// <returns><see langword="true"/> when current instance and <paramref name="other"/> overlaps each other and <see langword="false"/> otherwise.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
     public bool Overlaps(TimeOnlyRange other)
-        => (other.IsEmpty(), Start < End) switch
+        => IsAllDay() || other.IsAllDay() || (!(IsEmpty() || other.IsEmpty()) && (Start < End) switch
         {
-            (false, true) => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
+            true => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
                                || (End.IsBetween(other.Start, other.End) && End != other.Start && End != other.End)
                                || (Start <= other.Start && other.End <= End)
                                || (other.Start.IsBetween(Start, End) && Start != other.Start && Start != other.End)
                                || (other.End.IsBetween(Start, End) && End != other.Start && End != other.End)
-                               || (other.Start <= Start && End <= other.End)
-            ,
-            (false, false) => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
+                               || (other.Start <= Start && End <= other.End),
+            false => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
                                || (End.IsBetween(other.Start, other.End) && End != other.Start && End != other.End)
                                || (Start <= other.Start && other.End <= End)
                                || (other.Start.IsBetween(Start, End) && Start != other.Start && Start != other.End)
                                || (other.End.IsBetween(Start, End) && End != other.Start && End != other.End)
-                               || (other.Start <= End && Start <= other.End),
-            (true, _) => this == AllDay || (Start < other.Start && other.Start < End)
-        };
+                               || (other.Start <= End && Start <= other.End)
+        });
 
     /// <summary>
     /// Checks if <paramref name="other"/> and current instances are contiguoous.
@@ -91,7 +101,7 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// <param name="other">The other <see cref="TimeOnlyRange"/> to span over</param>
     /// <returns>A new <see cref="TimeOnlyRange"/> than spans over both current and <paramref name="other"/> range</returns>
     /// <exception cref="InvalidOperationException">if either : current instance does not overlap or is not continuous with <paramref name="other"/>.</exception>
-    public TimeOnlyRange Union(TimeOnlyRange other)
+    public TimeOnlyRange Merge(TimeOnlyRange other)
     {
         TimeOnlyRange result = Empty;
         if (this == AllDay || other == AllDay)
@@ -208,11 +218,11 @@ public record TimeOnlyRange : Range<TimeOnly>
     public TimeOnlyRange Intersect(TimeOnlyRange other)
     {
         TimeOnlyRange intersection = Empty;
-        if (this == AllDay)
+        if (IsAllDay())
         {
             intersection = other;
         }
-        else if (other == AllDay)
+        else if (IsAllDay())
         {
             intersection = this;
         }
@@ -280,5 +290,26 @@ public record TimeOnlyRange : Range<TimeOnly>
     /// <param name="source"></param>
     /// <returns>A <see cref="TimeOnlyRange"/> does not overlaps the source and </returns>
     public static TimeOnlyRange operator -(TimeOnlyRange source) => Complement(source);
+
+    ///<inheritdoc/>
+    public override ContainsResult Contains(TimeOnly value) => (IsEmpty(), IsAllDay()) switch
+    {
+        (true, _) => ContainsResult.No,
+        (_, true) => ContainsResult.Yes,
+        _ => value.IsBetween(Start, End)
+            ? ContainsResult.Yes
+            : ContainsResult.No,
+    };
+
+    /// <summary>
+    /// Checks if the current instance covers all other <see cref="TimeOnlyRange"/>s
+    /// </summary>
+    /// <returns><see langword="true"/> when the current instance covers all day and <see langword="false"/> otherwise.</returns>
+    public bool IsAllDay() => (Start < End, Start > End) switch
+    {
+        (true, _) => Span == AllDayTimeSpan,
+        (_, true) => Complement(new TimeOnlyRange(Start, End)).Span <= TimeOnly.MinValue.ToTimeSpan(),
+        _ => Span == AllDayTimeSpan,
+    };
 }
 #endif
