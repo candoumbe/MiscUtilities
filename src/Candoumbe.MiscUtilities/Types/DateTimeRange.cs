@@ -164,6 +164,5 @@ public record DateTimeRange : Range<DateTime>
         }
 
         return result;
-
     }
 }

@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### New features
+- Added `Range.Contains`
+
+### Breaking changes
+- Renamed `MultiTimeOnlyRange.Union` method to `MultiTimeOnlyRange.Merge`
+- Renamed `TimeOnlyRange.Union` method to `TimeOnlyRange.Merge`
 
 ## [0.10.0] / 2022-10-16
-### New feature
+### New features
 - Added [`DateOnlyRange`](/src/Candoumbe.MiscUtilities/Types/DateOnlyRange.cs) type
 - Added [`TimeOnlyRange`](/src/Candoumbe.MiscUtilities/Types/TimeOnlyRange.cs) type
 - Added [`DateTimeRange`](/src/Candoumbe.MiscUtilities/Types/DateTimeRange.cs) type

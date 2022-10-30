@@ -415,4 +415,68 @@ public class DateTimeRangeTests
         result.Should()
               .Be(range);
     }
+
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    public void Given_DateTimeRange_is_empty_When_value_is_anything_Contains_should_returns_Inconclusive(DateTime date)
+    {
+        // Act
+        ContainsResult result = DateTimeRange.Empty.Contains(date);
+
+        // Assert
+        result.Should().Be(ContainsResult.No, $"The {nameof(DateTimeRange)} is empty");
+    }
+
+    [Property]
+    public void Given_DateTimeRange_is_infinite_When_value_anything_Contains_should_returns_Yes(DateTime date)
+    {
+        // Act
+        ContainsResult result = DateTimeRange.Infinite.Contains(date);
+
+        // Assert
+        result.Should().Be(ContainsResult.Yes, $"The {nameof(DateTimeRange.Infinite)} 7678333contains all {nameof(DateTime)} values");
+    }
+
+    [Property]
+    public void Given_DateTimeRange_is_not_empty_and_not_infinite_When_value_is_between_Start_and_End_Contains_should_returns_Yes(DateTime date)
+    {
+        // Arrange
+        DateTime start = faker.PickRandom(faker.Date.Recent(refDate: date),
+                                          faker.Date.Past(refDate: date));
+
+        DateTime end = faker.PickRandom(faker.Date.Soon(refDate: date),
+                                        faker.Date.Future(refDate: date));
+
+        DateTimeRange dateRange = (start == end) switch
+        {
+            true => new DateTimeRange(start.AddMicroseconds(-1), end.AddMicroseconds(1)),
+            _ => new DateTimeRange(start, end)
+        };
+
+        // Act
+        ContainsResult result = dateRange.Contains(date);
+
+        // Assert
+        result.Should().Be(ContainsResult.Yes, $"{dateRange} contains {date} value");
+    }
+
+    [Fact]
+    public void Given_DateTimeRange_is_not_empty_and_not_infinite_When_value_is_not_between_Start_and_End_Contains_should_returns_No()
+    {
+        // Arrange
+        DateTime start = 12.July(2012);
+        DateTime end = 16.July(2012);
+
+        DateTimeRange dateRange = new(start, end);
+
+        DateTime value = faker.PickRandom(faker.Date.Recent(refDate: start.AddDays(-1)),
+                                          faker.Date.Past(refDate: start.AddDays(-1)),
+                                          faker.Date.Soon(refDate: end.AddDays(1)),
+                                          faker.Date.Future(refDate: end.AddDays(1)));
+
+        // Act
+        ContainsResult result = dateRange.Contains(value);
+
+        // Assert
+        result.Should().Be(ContainsResult.No, $"{dateRange} does not contains {value} value");
+    }
 }

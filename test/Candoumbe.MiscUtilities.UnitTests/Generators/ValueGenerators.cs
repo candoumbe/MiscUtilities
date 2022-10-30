@@ -31,7 +31,9 @@ internal static class ValueGenerators
     public static Arbitrary<TimeOnly> TimeOnlys()
         => ArbMap.Default.ArbFor<DateTime>()
                          .Generator
-                         .Select(dateTime => TimeOnly.FromDateTime(dateTime))
+                         .Zip(ArbMap.Default.ArbFor<NonNegativeInt>().Generator)
+                         .Select(tuple => (dateTime: tuple.Item1, milliseconds: tuple.Item2.Get))
+                         .Select((dateTimeAndMillisecobds) => TimeOnly.FromDateTime(dateTimeAndMillisecobds.dateTime).Add(TimeSpan.FromMilliseconds(dateTimeAndMillisecobds.milliseconds)))
                          .ToArbitrary();
 
     public static Arbitrary<DateOnlyRange> DateOnlyRanges()
@@ -69,8 +71,10 @@ internal static class ValueGenerators
         {
             case 0:
                 {
-                    gen = TimeOnlyRanges().Generator.ArrayOf(2)
-                                     .Select(ranges => new MultiTimeOnlyRange(ranges));
+                    gen = Gen.OneOf(TimeOnlyRanges().Generator.ArrayOf(2)
+                                     .Select(ranges => new MultiTimeOnlyRange(ranges)),
+                                    Gen.Constant(MultiTimeOnlyRange.Empty),
+                                    Gen.Constant(MultiTimeOnlyRange.Infinite));
                     break;
                 }
 
@@ -99,8 +103,10 @@ internal static class ValueGenerators
         {
             case 0:
                 {
-                    gen = DateOnlyRanges().Generator.ArrayOf(2)
-                                     .Select(ranges => new MultiDateOnlyRange(ranges));
+                    gen = Gen.OneOf(DateOnlyRanges().Generator.ArrayOf(2)
+                                     .Select(ranges => new MultiDateOnlyRange(ranges)),
+                                    Gen.Constant(MultiDateOnlyRange.Empty),
+                                    Gen.Constant(MultiDateOnlyRange.Infinite));
                     break;
                 }
 

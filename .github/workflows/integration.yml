@@ -52,19 +52,19 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: unit-tests
-          path: output/tests-results/unit-tests
+          path: output/artifacts/tests-results/unit-tests
       - uses: actions/upload-artifact@v1
         with:
           name: coverage-report
-          path: output/coverage-report
+          path: output/artifacts/reports/coverage-report
       - uses: actions/upload-artifact@v1
         with:
           name: coverage-history
-          path: output/coverage-history
+          path: output/artifacts/reports/coverage-history
       - uses: actions/upload-artifact@v1
         with:
           name: mutation-tests
-          path: output/tests-results/mutation-tests
+          path: output/artifacts/tests-results/mutation-tests
       - uses: actions/upload-artifact@v1
         with:
           name: packages

@@ -29,7 +29,7 @@ namespace System.Linq.Expressions
         /// <param name="first">the first expression</param>
         /// <param name="second">An expressions</param>
         /// <returns>The combined expression</returns>
-        /// <exception cref="ArgumentNullException">if either <paramref name="first"/> or <paramref name="second"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if either <paramref name="first"/> or <paramref name="second"/> is <see langword="null"/>.</exception>
         public static Expression<Func<T1, T3>> Compose<T1, T2, T3>(this Expression<Func<T1, T2>> first, Expression<Func<T2, T3>> second)
         {
             if (first == null)
@@ -58,7 +58,7 @@ namespace System.Linq.Expressions
         /// <param name="first">the first expression</param>
         /// <param name="second">the second expression</param>
         /// <returns>A new expression that represents <c>(T x) => f &amp;&amp; g</c></returns>
-        /// <exception cref="ArgumentNullException">either<paramref name="first"/> or <paramref name="second"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">either<paramref name="first"/> or <paramref name="second"/> is <see langword="null"/>.</exception>
         public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
         {
             if (first == null)

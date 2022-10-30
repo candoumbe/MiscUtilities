@@ -105,8 +105,8 @@ public class Build : NukeBuild,
     ICompile,
     IBenchmark,
     IUnitTest,
-    IReportCoverage,
     IMutationTest,
+    IReportCoverage,
     IPack,
     IPublish,
     ICreateGithubRelease
@@ -141,6 +141,7 @@ public class Build : NukeBuild,
     ///<inheritdoc/>
     string IReportCoverage.CodecovToken => CodecovToken;
 
+
     [Parameter("API Key used to submit Stryker dashboard")]
     [Secret]
     public readonly string StrykerDashboardApiKey;
@@ -158,37 +159,6 @@ public class Build : NukeBuild,
     GitVersion IHaveGitVersion.GitVersion => GitVersion;
 
     [CI] public readonly GitHubActions GitHubActions;
-
-    /// <summary>
-    /// Directory where to store all output builds output
-    /// </summary>
-    public AbsolutePath OutputDirectory => RootDirectory / "output";
-
-    /// <summary>
-    /// Directory where to pu
-    /// </summary>
-    public AbsolutePath CoverageReportDirectory => OutputDirectory / "coverage-report";
-
-    /// <summary>
-    /// Directory where to publish all test results
-    /// </summary>
-    public AbsolutePath TestResultDirectory => OutputDirectory / "tests-results";
-
-    /// <summary>
-    /// Directory where to publish all artifacts
-    /// </summary>
-    public AbsolutePath ArtifactsDirectory => OutputDirectory / "artifacts";
-
-    /// <summary>
-    /// Directory where to publish converage history report
-    /// </summary>
-    public AbsolutePath CoverageReportHistoryDirectory => OutputDirectory / "coverage-history";
-
-
-    /// <summary>
-    /// Directory where to publish benchmark results.
-    /// </summary>
-    public AbsolutePath BenchmarkDirectory => OutputDirectory / "benchmarks";
 
     ///<inheritdoc/>
     IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => From<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
@@ -213,9 +183,6 @@ public class Build : NukeBuild,
 
     ///<inheritdoc/>
     IEnumerable<Project> IBenchmark.BenchmarkProjects => From<IHaveSolution>().Solution.GetProjects("*.PerformanceTests");
-
-    ///<inheritdoc/>
-    AbsolutePath IBenchmark.BenchmarkResultDirectory => From<IHaveArtifacts>().ArtifactsDirectory / "benchmarks";
 
     ///<inheritdoc/>
     IEnumerable<AbsolutePath> IPack.PackableProjects => From<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");

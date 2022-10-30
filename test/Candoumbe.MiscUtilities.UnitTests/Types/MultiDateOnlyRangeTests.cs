@@ -2,6 +2,8 @@
 // Licenced under GNU General Public Licence, version 3.0"
 
 #if NET6_0_OR_GREATER
+using Bogus;
+
 using Candoumbe.MiscUtilities.Types;
 using Candoumbe.MiscUtilities.UnitTests.Generators;
 
@@ -26,6 +28,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
     public class MultiDateOnlyRangeTests
     {
         private readonly ITestOutputHelper _outputHelper;
+        private static readonly Faker faker = new();
 
         public MultiDateOnlyRangeTests(ITestOutputHelper outputHelper)
         {
@@ -267,7 +270,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
             });
         }
 
-        [Property(Arbitrary = new [] { typeof(ValueGenerators) })]
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
         public void Given_two_non_null_instances_when_calling_plus_operator_should_have_same_result_as_calling_Union_method(NonNull<MultiDateOnlyRange> leftSource, NonNull<MultiDateOnlyRange> rightSource)
         {
             // Arrange
@@ -328,7 +331,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
             actual.Should().Be(expected);
         }
 
-        [Property(Arbitrary = new[] {typeof(ValueGenerators)})]
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
         public void Given_non_null_MultiDateOnlyRange_instance_When_adding_to_its_complement_Union_should_return_Infinite(MultiDateOnlyRange original)
         {
             // Arrange
@@ -427,6 +430,25 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types
 
             // Assert
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+        public void Given_MultiDateOnlyRange_When_computing_its_Complement_an_even_number_of_times_Then_result_should_be_the_initial_range(MultiDateOnlyRange range, PositiveInt positiveInt)
+        {
+            // Arrange
+            int numberOfComplementToCompute = faker.Random.Even(1, positiveInt.Get + 1);
+            MultiDateOnlyRange complement = range.Complement();
+            int computationCount = 1;
+
+            // Act
+            do
+            {
+                complement = complement.Complement();
+                computationCount++;
+            } while (computationCount < numberOfComplementToCompute);
+
+            // Assert
+            complement.Should().BeEquivalentTo(range, $"calling {nameof(MultiDateOnlyRange.Complement)} on {range} should return a {nameof(MultiDateOnlyRange)} that is equivalent to itself");
         }
 
         public static IEnumerable<object[]> UnionCases

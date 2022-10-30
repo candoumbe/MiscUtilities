@@ -167,7 +167,7 @@ namespace System
         /// <typeparam name="TDest">targeted type</typeparam>
         /// <param name="obj">The object to cast</param>
         /// <returns>The "safe cast" result</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="obj"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="obj"/> is <see langword="null"/></exception>
         public static TDest As<TDest>(this object obj) => (TDest)As(obj, typeof(TDest));
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace System
         /// <param name="obj">The object to cast</param>
         /// <param name="targetType">type to cast </param>
         /// <returns>The "safe cast" result</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="targetType"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="targetType"/> is <see langword="null"/></exception>
         public static object As(this object obj, Type targetType)
         {
             if (targetType == null)

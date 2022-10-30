@@ -105,7 +105,7 @@ namespace System
         /// <param name="input">the string to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         public static bool Like(this string input, string pattern) => input.Like(pattern, ignoreCase: true);
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace System
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
         /// <param name="ignoreCase"><see langword="true"/> to ignore case</param>
         /// <returns><see langword="true"/> when <paramref name="input"/> matches <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         public static bool Like(this string input, string pattern, bool ignoreCase)
         {
             if (input is null)
@@ -161,7 +161,7 @@ namespace System
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
         public static LambdaExpression ToLambda<TSource>(this string source)
         {
             if (source == null)
@@ -426,7 +426,7 @@ namespace System
         /// the index where <paramref name="search"/>
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <see langword="null"/></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int FirstOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
