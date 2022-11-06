@@ -17,15 +17,15 @@ public record DateTimeRange : Range<DateTime>
     /// <summary>
     /// A <see cref="DateTimeRange"/> that cannot contains other <see cref="DateTimeRange"/> range.
     /// </summary>
-    public static DateTimeRange Empty = new(DateTime.MinValue, DateTime.MinValue);
+    public static readonly DateTimeRange Empty = new(DateTime.MinValue, DateTime.MinValue);
 
     /// <summary>
     /// A <see cref="DateTimeRange"/> that overlaps any other <see cref="DateTimeRange"/> (except <see cref="Empty"/>)
     /// </summary>
-    public static DateTimeRange Infinite = new(DateTime.MinValue, DateTime.MaxValue);
+    public static readonly DateTimeRange Infinite = new(DateTime.MinValue, DateTime.MaxValue);
 
     /// <summary>
-    /// Builds a new <see cref="DateTimeRange"/>
+    /// Builds a new <see cref="DateTimeRange"/> that span from <paramref name="start"/> to <paramref name="end"/>.
     /// </summary>
     /// <param name="start">lower bound</param>
     /// <param name="end">Upper bound</param>

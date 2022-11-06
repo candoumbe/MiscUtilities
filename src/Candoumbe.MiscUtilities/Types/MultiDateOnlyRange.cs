@@ -3,7 +3,6 @@
 // Licenced under GNU General Public Licence, version 3.0"
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +12,7 @@ namespace Candoumbe.MiscUtilities.Types;
 /// <summary>
 /// A type that optimize the storage of several <see cref="DateOnlyRange"/>.
 /// </summary>
-public class MultiDateOnlyRange
+public class MultiDateOnlyRange : IEquatable<MultiDateOnlyRange>
 {
     /// <summary>
     /// Ranges holded by the current instance.
@@ -25,16 +24,17 @@ public class MultiDateOnlyRange
     /// <summary>
     /// A <see cref="MultiDateOnlyRange"/> that contains no <see cref="DateOnlyRange"/>.
     /// </summary>
-    public readonly static MultiDateOnlyRange Empty = new();
+    public static MultiDateOnlyRange Empty => new();
 
     /// <summary>
     /// A <see cref="MultiDateOnlyRange"/> that overlaps any other <see cref="MultiDateOnlyRange"/>.
     /// </summary>
-    public readonly static MultiDateOnlyRange Infinite = new(DateOnlyRange.Infinite);
+    public static MultiDateOnlyRange Infinite => new(DateOnlyRange.Infinite);
 
     /// <summary>
     /// Builds a new <see cref="MultiDateOnlyRange"/> instance
     /// </summary>
+    /// <param name="ranges"></param>
     public MultiDateOnlyRange(params DateOnlyRange[] ranges)
     {
         _ranges = new HashSet<DateOnlyRange>(ranges.Length);
@@ -48,7 +48,7 @@ public class MultiDateOnlyRange
     /// Adds <paramref name="range"/>.
     /// </summary>
     /// <remarks>
-    /// The algorithm will first tries to find if any other <see cref="DateOnlyRange"/> overlaps or abuts with <paramref name="range"/> and if so,
+    /// The algorithm will first try to find if any other <see cref="DateOnlyRange"/> overlaps or abuts with <paramref name="range"/> and if so,
     /// will swap that element with the result of <c>range.Union(element)</c>
     /// </remarks>
     /// <param name="range">a range to add to the current instance</param>
@@ -57,12 +57,22 @@ public class MultiDateOnlyRange
     {
         ArgumentNullException.ThrowIfNull(range);
 
-        if (range == DateOnlyRange.Infinite)
+        if (IsInfinite())
+        {
+            return;
+        }
+
+        if (range.IsEmpty())
+        {
+            return;
+        }
+
+        if (range.IsInfinite())
         {
             _ranges.Clear();
             _ranges.Add(range);
         }
-        else if (!range.IsEmpty())
+        else
         {
             DateOnlyRange[] previous = _ranges.Where(item => item.IsContiguousWith(range) || item.Overlaps(range))
                                               .OrderBy(x => x.Start)
@@ -70,7 +80,7 @@ public class MultiDateOnlyRange
             if (previous.Length != 0)
             {
                 previous.ForEach(item => _ranges.Remove(item));
-                DateOnlyRange union = previous.Aggregate(range, (a, b) => a.Union(range).Union(b));
+                DateOnlyRange union = previous.Aggregate(range, (a, b) => a.Merge(b));
                 _ranges.Add(union);
             }
             else
@@ -78,10 +88,7 @@ public class MultiDateOnlyRange
                 _ranges.Add(range);
             }
         }
-        else if (!_ranges.Contains(DateOnlyRange.Infinite))
-        {
-            _ranges.Add(range);
-        }
+
     }
 
     /// <summary>
@@ -101,11 +108,11 @@ public class MultiDateOnlyRange
     public static MultiDateOnlyRange operator +(MultiDateOnlyRange left, MultiDateOnlyRange right) => left.Union(right);
 
     /// <summary>
-    /// Tests if the current instance contains one or more <see cref="DateOnlyRange"/> which, combined together, covers the specified <paramref name="range"/>.
+    /// Tests if the current instance contains one or more <see cref="DateOnlyRange"/> which, combined together, overlap the specified <paramref name="range"/>.
     /// </summary>
     /// <param name="range">The range to test</param>
-    /// <returns><see langword="true"/> if the current instance contains <see cref="DateOnlyRange"/>s which combined together covers <paramref name="range"/> and <see langword="false"/> otherwise.</returns>
-    public bool Covers(DateOnlyRange range)
+    /// <returns><see langword="true"/> if the current instance contains <see cref="DateOnlyRange"/>s which combined together overlap <paramref name="range"/> and <see langword="false"/> otherwise.</returns>
+    public bool Overlaps(DateOnlyRange range)
     {
         bool covers = false;
 
@@ -115,14 +122,22 @@ public class MultiDateOnlyRange
         }
         else
         {
-            covers = _ranges.Any(item => (item.Overlaps(range)
-                                         && item.Start <= range.Start && range.End <= item.End)
-                                         || item == range
-            );
+            covers = _ranges.AsParallel().Any(item => (item.Overlaps(range)
+                                                       && item.Start <= range.Start && range.End <= item.End)
+                                                        || item == range);
         }
 
         return covers;
     }
+
+    /// <summary>
+    /// Checks if the current instance contains one or more <see cref="TimeOnlyRange"/>s which, combined together, covers the specified <paramref name="other"/>.
+    /// </summary>
+    /// <param name="other">The range to test</param>
+    /// <returns><see langword="true"/> if the current instance contains <see cref="TimeOnlyRange"/>s which combined together covers <paramref name="other"/> and <see langword="false"/> otherwise.</returns>
+    public bool Overlaps(MultiDateOnlyRange other) => other is not null
+                                                    && other.Ranges.AsParallel().All(range => Overlaps(range))
+                                                    && _ranges.AsParallel().All(range => other.Overlaps(range));
 
     ///<inheritdoc/>
     public override string ToString()
@@ -146,45 +161,109 @@ public class MultiDateOnlyRange
     /// </summary>
     public MultiDateOnlyRange Complement()
     {
-        MultiDateOnlyRange complement = new();
+        MultiDateOnlyRange complement;
 
-        if (this == Infinite)
+        if (IsInfinite())
         {
             complement = Empty;
         }
-        else if (this == Empty)
+        else if (IsEmpty())
         {
             complement = Infinite;
         }
         else
         {
-            DateOnlyRange[] ranges = _ranges.OrderBy(x => x.Start).ToArray();
-            if (ranges.Length > 0)
+            complement = new();
+            switch (_ranges)
             {
-                DateOnlyRange localComplement = DateOnlyRange.UpTo(ranges[0].Start);
-                if (!localComplement.IsEmpty())
-                {
-                    complement.Add(localComplement);
-                }
-
-                for (int i = 1; i < ranges.Length; i++)
-                {
-                    localComplement = new(ranges[i - 1].End, ranges[i].Start);
-                    if (!localComplement.IsEmpty())
+                case { Count: 1 }:
                     {
-                        complement.Add(localComplement);
+                        DateOnlyRange current = _ranges.ElementAt(0);
+                        complement.Add(DateOnlyRange.UpTo(current.Start));
+                        complement.Add(DateOnlyRange.DownTo(current.End));
                     }
-                }
-
-                localComplement = DateOnlyRange.DownTo(ranges[^1].End);
-                if (!localComplement.IsEmpty())
-                {
-                    complement.Add(localComplement);
-                }
+                    break;
+                default:
+                    {
+                        DateOnlyRange[] ranges = _ranges.OrderBy(range => range.Start)
+                                                        .ToArray();
+                        for (int i = 0; i < ranges.Length; i++)
+                        {
+                            DateOnlyRange current = ranges[i];
+                            switch (i)
+                            {
+                                case 0:
+                                    complement.Add(DateOnlyRange.UpTo(current.Start));
+                                    break;
+                                case int index when index <= ranges.Length - 2:
+                                    {
+                                        DateOnlyRange previous = ranges[i - 1];
+                                        DateOnlyRange next = ranges[i + 1];
+                                        complement.Add(new DateOnlyRange(previous.End, current.Start));
+                                        complement.Add(new DateOnlyRange(current.End, next.Start));
+                                    }
+                                    break;
+                                default:
+                                    {
+                                        DateOnlyRange previous = ranges[i - 1];
+                                        complement.Add(new DateOnlyRange(previous.End, current.Start));
+                                        complement.Add(DateOnlyRange.DownTo(current.End));
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    break;
             }
         }
 
         return complement;
+    }
+
+    /// <summary>
+    /// Checks if the current instance is empty.
+    /// </summary>
+    /// <returns><see langword="true"/> when the current instance cannot cover any other </returns>
+    public bool IsEmpty() => _ranges.Count == 0 || _ranges.All(range => range.IsEmpty());
+
+    /// <summary>
+    /// Checks if the current instance is "infinite" which, if <see langword="true" />, means that it overlaps any other <see cref="DateOnlyRange"/>.
+    /// </summary>
+    /// <returns></returns>
+    public bool IsInfinite() => _ranges.AtLeastOnce() && _ranges.All(range => range.IsInfinite());
+
+    ///<inheritdoc/>
+    public bool Equals(MultiDateOnlyRange other)
+    {
+        bool equals = false;
+        if (other is not null)
+        {
+            if (!ReferenceEquals(this, other))
+            {
+                equals = Overlaps(other) && other.Overlaps(this);
+            }
+            else
+            {
+                equals = true;
+            }
+        }
+        return equals;
+    }
+
+    ///<inheritdoc/>
+    public override bool Equals(object obj) => Equals(obj as MultiDateOnlyRange);
+
+    ///<inheritdoc/>
+    public override int GetHashCode()
+    {
+        HashCode hashCode = new();
+
+        foreach (DateOnlyRange range in _ranges)
+        {
+            hashCode.Add(range);
+        }
+
+        return hashCode.ToHashCode();
     }
 }
 

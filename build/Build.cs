@@ -4,6 +4,7 @@
 namespace Utilities.ContinuousIntegration;
 
 using Candoumbe.Pipelines.Components;
+using Candoumbe.Pipelines.Components.GitHub;
 
 using Nuke.Common;
 using Nuke.Common.CI;
@@ -109,6 +110,7 @@ public class Build : NukeBuild,
     IReportCoverage,
     IPack,
     IPublish,
+    IPullRequest,
     ICreateGithubRelease
 {
     public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);

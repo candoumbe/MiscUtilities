@@ -42,7 +42,8 @@ public record DateOnlyRange : Range<DateOnly>
     /// <param name="other"></param>
     /// <returns><see langword="true"/> when current instance and <paramref name="other"/> overlaps each other <see langword="false"/> otherwise.</returns>
     public bool Overlaps(DateOnlyRange other)
-        => (Start <= other.Start && other.End <= End)
+        => (!IsEmpty() && other.IsEmpty())
+           || (Start <= other.Start && other.End <= End)
            || (Start <= other.Start && other.Start < End && End <= other.End)
            || (other.Start <= Start && End <= other.End)
            || (other.Start <= Start && Start <= other.End && other.End <= End)
@@ -79,10 +80,10 @@ public record DateOnlyRange : Range<DateOnly>
     /// <param name="other">The other <see cref="DateOnlyRange"/> to span over</param>
     /// <returns>A new <see cref="DateOnlyRange"/> than spans over both current and <paramref name="other"/> range</returns>
     /// <exception cref="InvalidOperationException">if current instance does not overlap or is not contiguous with <paramref name="other"/>.</exception>
-    public DateOnlyRange Union(DateOnlyRange other)
+    public DateOnlyRange Merge(DateOnlyRange other)
     {
         DateOnlyRange result = Empty;
-        if (this == Infinite || other == Infinite)
+        if (IsInfinite() || other.IsInfinite())
         {
             result = Infinite;
         }
@@ -140,11 +141,11 @@ public record DateOnlyRange : Range<DateOnly>
     {
         DateOnlyRange result = Empty;
 
-        if (this == Infinite)
+        if (IsInfinite())
         {
             result = other;
         }
-        else if (other == Infinite)
+        else if (other.IsInfinite())
         {
             result = this;
         }
@@ -154,7 +155,6 @@ public record DateOnlyRange : Range<DateOnly>
         }
 
         return result;
-
     }
 
     ///<inheritdoc/>
@@ -163,5 +163,11 @@ public record DateOnlyRange : Range<DateOnly>
         (true, _) or (_, true) => base.Contains(value),
         _ => (Start <= value && value <= End) ? ContainsResult.Yes : ContainsResult.No
     };
+
+    ///<inheritdoc/>
+    public bool IsInfinite() => (Start, End).Equals((DateOnly.MinValue, DateOnly.MaxValue));
+
+    ///<inheritdoc/>
+    public override bool IsEmpty() => Start == End;
 }
 #endif

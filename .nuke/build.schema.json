@@ -22,6 +22,18 @@
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
         },
+        "DeleteLocalOnSuccess": {
+          "type": "boolean",
+          "description": "Should the local branch be deleted after the pull request was created successfully ?"
+        },
+        "Description": {
+          "type": "string",
+          "description": "Description of the pull request"
+        },
+        "Draft": {
+          "type": "boolean",
+          "description": "Indicates to open the pull request as 'draft'"
+        },
         "GitHubToken": {
           "type": "string",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
@@ -54,6 +66,13 @@
         "IgnoreFailedSources": {
           "type": "boolean",
           "description": "Ignore unreachable sources during Restore"
+        },
+        "Issues": {
+          "type": "array",
+          "description": "Issues that will be closed once the pull request is merged",
+          "items": {
+            "type": "string"
+          }
         },
         "Major": {
           "type": "boolean",
@@ -105,6 +124,7 @@
               "Compile",
               "Feature",
               "Hotfix",
+              "ManageSecrets",
               "MutationTests",
               "Pack",
               "Publish",
@@ -139,6 +159,7 @@
               "Compile",
               "Feature",
               "Hotfix",
+              "ManageSecrets",
               "MutationTests",
               "Pack",
               "Publish",
@@ -149,6 +170,15 @@
               "UnitTests"
             ]
           }
+        },
+        "Title": {
+          "type": "string",
+          "description": "Title that will be used when creating a PR"
+        },
+        "Token": {
+          "type": "string",
+          "description": "Token used to create a pull request",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Verbosity": {
           "type": "string",
