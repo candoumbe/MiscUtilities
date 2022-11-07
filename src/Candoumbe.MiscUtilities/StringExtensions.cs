@@ -111,7 +111,7 @@ namespace System
         /// <summary>
         /// Perfoms a VB "Like" comparison.
         /// <para>
-        /// The <paramref name="pattern"/> can be 
+        /// The <paramref name="pattern"/> can be
         /// </para>
         /// </summary>
         /// <param name="input">the string to test</param>

@@ -128,6 +128,7 @@ internal static class ValueGenerators
     public static Arbitrary<DateTimeRange> DateTimeRanges()
         => Gen.OneOf(ArbMap.Default.ArbFor<DateTime>()
                          .Generator
+                         .Select(date => new DateTime(date.Ticks, DateTimeKind.Utc))
                          .Two()
                          .Where(dates => dates.Item1 != dates.Item2)
                          .Select(dates => (dates.Item1 < dates.Item2) switch

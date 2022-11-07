@@ -9,7 +9,7 @@ namespace Candoumbe.MiscUtilities.Types;
 /// A <see cref="DateTime"/> range
 /// </summary>
 #if !NET5_0_OR_GREATER
-public class DateTimeRange : Range<DateTime>
+public class DateTimeRange : Range<DateTime>, IEquatable<DateTimeRange>
 #else
 public record DateTimeRange : Range<DateTime>
 #endif
@@ -38,26 +38,6 @@ public record DateTimeRange : Range<DateTime>
         }
     }
 
-    /// <summary>
-    /// Tests wheters the current instance overlaps with <paramref name="other"/>.
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> overlaps each other <see langword="false"/> otherwise.</returns>
-    public bool Overlaps(DateTimeRange other)
-        => (Start <= other.Start && other.End <= End)
-           || (Start <= other.Start && other.Start < End && End <= other.End)
-           || (other.Start <= Start && End <= other.End)
-           || (other.Start <= Start && Start <= other.End && other.End <= End)
-        ;
-
-    /// <summary>
-    /// Checks if <paramref name="other"/> and current instances are contiguoous.
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> are contiguous and <see langword="false"/> otherwise.</returns>
-    public bool IsContiguousWith(DateTimeRange other)
-        => End == other.Start || Start == other.End;
-
     ///<inheritdoc/>
     public override string ToString() => $"{Start} - {End}";
 
@@ -81,10 +61,10 @@ public record DateTimeRange : Range<DateTime>
     /// <param name="other">The other <see cref="DateTimeRange"/> to span over</param>
     /// <returns>A new <see cref="DateTimeRange"/> than spans over both current and <paramref name="other"/> range</returns>
     /// <exception cref="InvalidOperationException">if either : current instance does not overlap or is not continuous with <paramref name="other"/>.</exception>
-    public DateTimeRange Union(DateTimeRange other)
+    public DateTimeRange Merge(DateTimeRange other)
     {
         DateTimeRange result = Empty;
-        if (this == Infinite || other == Infinite)
+        if (IsInfinite() || other.IsInfinite())
         {
             result = Infinite;
         }
@@ -101,7 +81,7 @@ public record DateTimeRange : Range<DateTime>
 #if NET5_0_OR_GREATER
             result = this with { Start = GetMinimum(Start, other.Start), End = GetMaximum(other.End, End) };
 #else
-            result = new(GetMinimum(Start, other.Start), GetMaximum(other.End, End) );
+            result = new(GetMinimum(Start, other.Start), GetMaximum(other.End, End));
 #endif
         }
         else
@@ -138,7 +118,7 @@ public record DateTimeRange : Range<DateTime>
     /// Computes  <see cref="DateTimeRange"/> value that is common between the current instance and <paramref name="other"/>.
     /// </summary>
     /// <remarks>
-    /// This methods relies on <see cref="Overlaps(DateTimeRange)"/> to see if there can be a intersection with <paramref name="other"/>.
+    /// This methods relies on <see cref="Range{T}.Overlaps(Range{T})"/> to see if there can be a intersection with <paramref name="other"/>.
     /// </remarks>
     /// <param name="other">The other instance to test</param>
     /// <returns>a <see cref="DateTimeRange"/> that represent the overlap between the current instance and <paramref name="other"/> or <see cref="Empty"/> when no intersection found.</returns>
@@ -146,11 +126,11 @@ public record DateTimeRange : Range<DateTime>
     {
         DateTimeRange result = Empty;
 
-        if (this == Infinite)
+        if (IsInfinite())
         {
             result = other;
         }
-        else if (other == Infinite)
+        else if (other.IsInfinite())
         {
             result = this;
         }
@@ -159,10 +139,64 @@ public record DateTimeRange : Range<DateTime>
 #if NET5_0_OR_GREATER
             result = this with { Start = GetMaximum(Start, other.Start), End = GetMinimum(End, other.End) };
 #else
-            result = new (GetMaximum(Start, other.Start), GetMinimum(End, other.End));
+            result = new(GetMaximum(Start, other.Start), GetMinimum(End, other.End));
 #endif
         }
 
         return result;
     }
+
+    /// <summary>
+    /// Checks if the current instance spans over or is contiguous with any other <see cref="DateTimeRange"/>
+    /// </summary>
+    /// <returns></returns>
+    public bool IsInfinite() => (Start, End) == (Infinite.Start, Infinite.End);
+
+#if !NET5_0_OR_GREATER
+
+
+    /// <summary>
+    /// Checks if <paramref name="left"/> is not equal to <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is equal to <paramref name="right"/> and <see langword="false"/> otherwise.</returns>
+    public static bool operator ==(DateTimeRange left, DateTimeRange right) => left?.Equals(right) ?? false;
+
+    /// <summary>
+    /// Checks if <paramref name="left"/> is not equal to <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is not equal to <paramref name="right"/> and <see langword="false"/> otherwise.</returns>
+    public static bool operator !=(DateTimeRange left, DateTimeRange right) => !(left == right);
+
+
+#endif
+
+    ///<inheritdoc/>
+    public override bool Overlaps(Range<DateTime> other)
+        => (IsInfinite() && other.IsEmpty()) || (IsEmpty() && (DateTime.MinValue, DateTime.MaxValue) == (other.Start, other.End)) || base.Overlaps(other);
+
+#if !NET5_0_OR_GREATER
+
+    ///<inheritdoc/>
+    public override bool Equals(object obj) => Equals(obj as DateTimeRange);
+
+    ///<inheritdoc/>
+    public override int GetHashCode()
+    {
+        int hashCode = -1245466969;
+        hashCode = (hashCode * -1521134295) + base.GetHashCode();
+        hashCode = (hashCode * -1521134295) + Start.GetHashCode();
+        hashCode = (hashCode * -1521134295) + End.GetHashCode();
+        return hashCode;
+    }
+#endif
+
+    ///<inheritdoc/>
+    public virtual bool Equals(DateTimeRange other) => other is not null &&
+               base.Equals(other) &&
+               Start == other.Start &&
+               End == other.End;
 }

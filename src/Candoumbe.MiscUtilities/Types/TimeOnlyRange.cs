@@ -4,6 +4,7 @@
 #if NET6_0_OR_GREATER
 using System;
 using System.Diagnostics;
+using System.Text;
 
 namespace Candoumbe.MiscUtilities.Types;
 
@@ -59,24 +60,13 @@ public record TimeOnlyRange : Range<TimeOnly>
                                || (other.Start.IsBetween(Start, End) && Start != other.Start && Start != other.End)
                                || (other.End.IsBetween(Start, End) && End != other.Start && End != other.End)
                                || (other.Start <= Start && End <= other.End),
-            false => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
+            _ => (Start.IsBetween(other.Start, other.End) && Start != other.Start && Start != other.End)
                                || (End.IsBetween(other.Start, other.End) && End != other.Start && End != other.End)
                                || (Start <= other.Start && other.End <= End)
                                || (other.Start.IsBetween(Start, End) && Start != other.Start && Start != other.End)
                                || (other.End.IsBetween(Start, End) && End != other.Start && End != other.End)
                                || (other.Start <= End && Start <= other.End)
         });
-
-    /// <summary>
-    /// Checks if <paramref name="other"/> and current instances are contiguoous.
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> are contiguous and <see langword="false"/> otherwise.</returns>
-    public bool IsContiguousWith(TimeOnlyRange other) => IsContiguousWithStart(other) || IsContiguousWithEnd(other);
-
-    private bool IsContiguousWithStart(TimeOnlyRange other) => End == other.Start;
-
-    private bool IsContiguousWithEnd(TimeOnlyRange other) => Start == other.End;
 
     ///<inheritdoc/>
     public override sealed string ToString() => $"{Start} - {End}";
@@ -104,7 +94,7 @@ public record TimeOnlyRange : Range<TimeOnly>
     public TimeOnlyRange Merge(TimeOnlyRange other)
     {
         TimeOnlyRange result = Empty;
-        if (this == AllDay || other == AllDay)
+        if (IsAllDay() || other.IsAllDay())
         {
             result = AllDay;
         }
@@ -132,7 +122,7 @@ public record TimeOnlyRange : Range<TimeOnly>
 
                     if (IsContiguousWith(intersection))
                     {
-                        result = IsContiguousWithStart(intersection)
+                        result = End.Equals(intersection.Start)
                                         ? this with { End = End.Add(intersection.Span) }
                                         : this with { Start = Start.Add(-intersection.Span) };
 

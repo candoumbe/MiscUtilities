@@ -432,7 +432,6 @@ public class TimeOnlyRangeTests
     {
         // Act
         TimeOnlyRange actual = current.Merge(other);
-        _outputHelper.WriteLine($"Result: {actual}");
 
         // Assert
         actual.Should().Be(expected);

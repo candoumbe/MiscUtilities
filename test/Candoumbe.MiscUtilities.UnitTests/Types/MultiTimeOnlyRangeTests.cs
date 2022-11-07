@@ -29,7 +29,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types;
 public class MultiTimeOnlyRangeTests
 {
     private readonly ITestOutputHelper _outputHelper;
-    private readonly Faker faker = new();
 
     public MultiTimeOnlyRangeTests(ITestOutputHelper outputHelper)
     {
@@ -49,7 +48,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :  ------------------------
              *                 |--------|
-             *          
+             *
              * ranges : ------------------------
              */
             yield return new object[]
@@ -67,7 +66,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :       |--------|
              *          ------------------------
-             *          
+             *
              * ranges : ------------------------
              */
             yield return new object[]
@@ -85,7 +84,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :       |--------|
              *           |--------|
-             *          
+             *
              * ranges :  |-------------|
              */
             yield return new object[]
@@ -103,7 +102,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :  |--------|
              *                |--------|
-             *          
+             *
              * ranges :  |-------------|
              */
             yield return new object[]
@@ -121,7 +120,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :  |--|
              *                |------|
-             *          
+             *
              * ranges :  |--|
              *                |------|
              */
@@ -453,7 +452,6 @@ public class MultiTimeOnlyRangeTests
         // Assert
         actual.Should().Be(range);
     }
-
 }
 
 #endif

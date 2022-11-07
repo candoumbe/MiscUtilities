@@ -1,4 +1,7 @@
-﻿#if NET6_0_OR_GREATER
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+#if NET6_0_OR_GREATER
 // "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
@@ -88,7 +91,6 @@ public class MultiDateOnlyRange : IEquatable<MultiDateOnlyRange>
                 _ranges.Add(range);
             }
         }
-
     }
 
     /// <summary>

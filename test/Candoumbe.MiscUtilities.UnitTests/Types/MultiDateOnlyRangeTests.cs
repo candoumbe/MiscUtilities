@@ -28,7 +28,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types;
 public class MultiDateOnlyRangeTests
 {
     private readonly ITestOutputHelper _outputHelper;
-    private static readonly Faker faker = new();
 
     public MultiDateOnlyRangeTests(ITestOutputHelper outputHelper)
     {
@@ -48,7 +47,7 @@ public class MultiDateOnlyRangeTests
             /**
              * inputs :  ------------------------
              *                 |--------|
-             *          
+             *
              * ranges : ------------------------
              */
             yield return new object[]
@@ -66,7 +65,7 @@ public class MultiDateOnlyRangeTests
             /**
              * inputs :       |--------|
              *          ------------------------
-             *          
+             *
              * ranges : ------------------------
              */
             yield return new object[]
@@ -84,7 +83,7 @@ public class MultiDateOnlyRangeTests
             /**
              * inputs :       |--------|
              *           |--------|
-             *          
+             *
              * ranges :  |-------------|
              */
             yield return new object[]
@@ -102,7 +101,7 @@ public class MultiDateOnlyRangeTests
             /**
              * inputs :  |--------|
              *                |--------|
-             *          
+             *
              * ranges :  |-------------|
              */
             yield return new object[]
@@ -120,7 +119,7 @@ public class MultiDateOnlyRangeTests
             /**
              * inputs :  |--|
              *                |------|
-             *          
+             *
              * ranges :  |--|
              *                |------|
              */
