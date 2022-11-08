@@ -13,12 +13,12 @@ namespace Candoumbe.MiscUtilities.Types;
 public record DateOnlyRange : Range<DateOnly>
 {
     /// <summary>
-    /// A <see cref="DateOnlyRange"/> that <see cref="Overlaps(DateOnlyRange)">overlaps</see> any other <see cref="DateOnlyRange"/> except (<see cref="Empty"/>).
+    /// A <see cref="DateOnlyRange"/> that <see cref="Range{T}.Overlaps(Range{T})">overlaps</see> any other <see cref="DateOnlyRange"/> except <see cref="Empty"/>.
     /// </summary>
     public static DateOnlyRange Infinite => new(DateOnly.MinValue, DateOnly.MaxValue);
 
     /// <summary>
-    /// A <see cref="DateOnlyRange"/> that <see cref="Overlaps(DateOnlyRange)">overlaps</see> no other <see cref="DateOnlyRange"/>.
+    /// A <see cref="DateOnlyRange"/> that <see cref="Range{T}.Overlaps(Range{T})">overlaps</see> no other <see cref="DateOnlyRange"/>.
     /// </summary>
     public static DateOnlyRange Empty => new(DateOnly.MinValue, DateOnly.MinValue);
 
@@ -35,26 +35,6 @@ public record DateOnlyRange : Range<DateOnly>
             throw new ArgumentOutOfRangeException(nameof(start), $"{nameof(start)} cannot be after {nameof(end)}");
         }
     }
-
-    /// <summary>
-    /// Tests wheters the current instance overlaps with <paramref name="other"/>.
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> overlaps each other <see langword="false"/> otherwise.</returns>
-    public bool Overlaps(DateOnlyRange other)
-        => (Start <= other.Start && other.End <= End)
-           || (Start <= other.Start && other.Start < End && End <= other.End)
-           || (other.Start <= Start && End <= other.End)
-           || (other.Start <= Start && Start <= other.End && other.End <= End)
-        ;
-
-    /// <summary>
-    /// Checks if the current instance is contiguous with <paramref name="other"/>.
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns><see langword="true"/> when current instance and <paramref name="other"/> are contiguous and <see langword="false"/> otherwise.</returns>
-    public bool IsContiguousWith(DateOnlyRange other)
-        => End == other.Start || Start == other.End;
 
     /// <summary>
     /// Builds a new <see cref="DateOnlyRange"/> that spans from <see cref="DateOnly.MinValue"/> up to <paramref name="date"/>
@@ -79,10 +59,10 @@ public record DateOnlyRange : Range<DateOnly>
     /// <param name="other">The other <see cref="DateOnlyRange"/> to span over</param>
     /// <returns>A new <see cref="DateOnlyRange"/> than spans over both current and <paramref name="other"/> range</returns>
     /// <exception cref="InvalidOperationException">if current instance does not overlap or is not contiguous with <paramref name="other"/>.</exception>
-    public DateOnlyRange Union(DateOnlyRange other)
+    public DateOnlyRange Merge(DateOnlyRange other)
     {
         DateOnlyRange result = Empty;
-        if (this == Infinite || other == Infinite)
+        if (IsInfinite() || other.IsInfinite())
         {
             result = Infinite;
         }
@@ -132,7 +112,7 @@ public record DateOnlyRange : Range<DateOnly>
     /// Computes  <see cref="DateOnlyRange"/> value that is common between the current instance and <paramref name="other"/>.
     /// </summary>
     /// <remarks>
-    /// This methods relies on <see cref="Overlaps(DateOnlyRange)"/> to see if there can be a intersection with <paramref name="other"/>.
+    /// This methods relies on <see cref="Range{T}.Overlaps(Range{T})"/> to see if there can be a intersection with <paramref name="other"/>.
     /// </remarks>
     /// <param name="other">The other instance to test</param>
     /// <returns>a <see cref="DateOnlyRange"/> that represent the overlap between the current instance and <paramref name="other"/> or <see cref="Empty"/> when no intersection found.</returns>
@@ -140,11 +120,11 @@ public record DateOnlyRange : Range<DateOnly>
     {
         DateOnlyRange result = Empty;
 
-        if (this == Infinite)
+        if (IsInfinite())
         {
             result = other;
         }
-        else if (other == Infinite)
+        else if (other.IsInfinite())
         {
             result = this;
         }
@@ -154,7 +134,6 @@ public record DateOnlyRange : Range<DateOnly>
         }
 
         return result;
-
     }
 
     ///<inheritdoc/>
@@ -163,5 +142,11 @@ public record DateOnlyRange : Range<DateOnly>
         (true, _) or (_, true) => base.Contains(value),
         _ => (Start <= value && value <= End) ? ContainsResult.Yes : ContainsResult.No
     };
+
+    ///<inheritdoc/>
+    public bool IsInfinite() => (Start, End).Equals((DateOnly.MinValue, DateOnly.MaxValue));
+
+    ///<inheritdoc/>
+    public override bool IsEmpty() => Start == End;
 }
 #endif

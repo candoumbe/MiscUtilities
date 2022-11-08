@@ -313,7 +313,7 @@ public class DateOnlyRangeTests
     public void Given_two_instances_Union_should_behave_as_expected(DateOnlyRange current, DateOnlyRange other, DateOnlyRange expected)
     {
         // Act
-        DateOnlyRange actual = current.Union(other);
+        DateOnlyRange actual = current.Merge(other);
         _outputHelper.WriteLine($"Result: {actual}");
 
         // Assert
@@ -327,7 +327,7 @@ public class DateOnlyRangeTests
         DateOnlyRange empty = new(date, date);
 
         // Act
-        DateOnlyRange union = range.Union(empty);
+        DateOnlyRange union = range.Merge(empty);
 
         // Assert
         union.Should().Be(range);
@@ -344,7 +344,7 @@ public class DateOnlyRangeTests
         _outputHelper.WriteLine($"{nameof(right)} : {right}");
 
         // Act
-        Action callingUnionWhenLeftAndRightDontOverlapsAndAreNotContiguous = () => left.Union(right);
+        Action callingUnionWhenLeftAndRightDontOverlapsAndAreNotContiguous = () => left.Merge(right);
 
         // Assert
         callingUnionWhenLeftAndRightDontOverlapsAndAreNotContiguous.Should()
@@ -452,7 +452,7 @@ public class DateOnlyRangeTests
     public void Empty_should_be_the_neutral_element_of_DateOnlyRange(DateOnlyRange range)
     {
         // Act
-        DateOnlyRange result = range.Union(DateOnlyRange.Empty);
+        DateOnlyRange result = range.Merge(DateOnlyRange.Empty);
 
         // Assert
         result.Should()

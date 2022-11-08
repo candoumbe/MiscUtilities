@@ -29,7 +29,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Types;
 public class MultiTimeOnlyRangeTests
 {
     private readonly ITestOutputHelper _outputHelper;
-    private readonly Faker faker = new();
 
     public MultiTimeOnlyRangeTests(ITestOutputHelper outputHelper)
     {
@@ -49,7 +48,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :  ------------------------
              *                 |--------|
-             *          
+             *
              * ranges : ------------------------
              */
             yield return new object[]
@@ -67,7 +66,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :       |--------|
              *          ------------------------
-             *          
+             *
              * ranges : ------------------------
              */
             yield return new object[]
@@ -85,7 +84,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :       |--------|
              *           |--------|
-             *          
+             *
              * ranges :  |-------------|
              */
             yield return new object[]
@@ -103,7 +102,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :  |--------|
              *                |--------|
-             *          
+             *
              * ranges :  |-------------|
              */
             yield return new object[]
@@ -121,7 +120,7 @@ public class MultiTimeOnlyRangeTests
             /**
              * inputs :  |--|
              *                |------|
-             *          
+             *
              * ranges :  |--|
              *                |------|
              */
@@ -441,6 +440,18 @@ public class MultiTimeOnlyRangeTests
         actual.Should().Be(expected);
     }
 
+    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    public void Given_MultiTimeOnlyRange_When_calling_Complement_on_the_complement_of_initial_value_Then_result_should_be_eq_to_the_initial_value(MultiTimeOnlyRange range)
+    {
+        // Arrange
+        MultiTimeOnlyRange complement = range.Complement();
+
+        // Act
+        MultiTimeOnlyRange actual = complement.Complement();
+
+        // Assert
+        actual.Should().Be(range);
+    }
 }
 
 #endif

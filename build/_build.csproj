@@ -11,16 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Candoumbe.Pipelines" Version="0.2.0-alpha0022" />
+    <PackageReference Include="Candoumbe.Pipelines" Version="0.2.0-alpha0032" />
+    <PackageReference Include="Candoumbe.Miscutilities" version="0.10.0" />
     <PackageReference Include="ReportGenerator" Version="5.1.9" />
     <PackageDownload Include="GitVersion.Tool" Version="[5.8.0]" />
     <PackageDownload Include="Codecov.Tool" Version="[1.12.3]" />
-    <PackageDownload Include="dotnet-stryker" Version="[3.0.1]"/>
-    
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\src\Candoumbe.MiscUtilities\Candoumbe.MiscUtilities.csproj" />
+    <PackageDownload Include="dotnet-stryker" Version="[3.0.1]" />
   </ItemGroup>
 
 </Project>

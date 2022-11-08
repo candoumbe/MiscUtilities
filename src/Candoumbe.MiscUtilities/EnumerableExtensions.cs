@@ -1,5 +1,9 @@
-﻿using System.Linq;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+using System.Linq;
 using System.Linq.Expressions;
+
 using static System.Linq.Expressions.ExpressionExtensions;
 
 #if !NETSTANDARD1_0
@@ -445,7 +449,7 @@ namespace System.Collections.Generic
         /// <item><c>Falsy</c> : that contains all items from <paramref name="source"/> that do not satifies <paramref name="predicate"/>.</item>
         /// </list>
         /// </returns>
-        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is 
+        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is
         /// <see langword="null"/>.</exception>
         public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
             => (source.Where(predicate), source.Where(val => !predicate(val)));
@@ -455,20 +459,21 @@ namespace System.Collections.Generic
         /// Asynchronously iterates over each element of <paramref name="source"/> and applies the specified <paramref name="body"/> function.
         /// </summary>
         /// <remarks>
-        /// The implementation will define the 
+        /// If <paramref name="degreeOfParallelism"/> is not provided, this method will relies on the value returned by <see cref="Environment.ProcessorCount"/>
+        /// in order to run <paramref name="body"/> in a concurrent manner.
         /// </remarks>
         /// <typeparam name="T">The type of elements <paramref name="source"/> contains</typeparam>
         /// <param name="source">The collection to iterate over</param>
         /// <param name="body">A function that will be called asynchronously</param>
-        /// <param name="dop">Defines the degre of parallelism</param>
+        /// <param name="degreeOfParallelism">Defines the degree of parallelism to use when running</param>
         /// <returns>A <see cref="Task"/> that will be completed as soon as <paramref name="source"/> was fully iterated</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="dop"/> is negative or <c>0</c></exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="degreeOfParallelism"/> is negative or <c>0</c></exception>
         /// <exception cref="ArgumentNullException">either <paramref name="source"/> or <paramref name="body"/> is <see langword="null"/></exception>
-        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body, int? dop = null)
+        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body, int? degreeOfParallelism = null)
         {
             return Task.WhenAll(
                 from partition in Partitioner.Create(source)
-                        .GetPartitions(dop ?? Environment.ProcessorCount)
+                        .GetPartitions(degreeOfParallelism ?? Environment.ProcessorCount / 2)
                 select Task.Run(async delegate
                 {
                     using (partition)

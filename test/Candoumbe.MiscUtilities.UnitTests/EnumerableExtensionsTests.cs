@@ -1,19 +1,27 @@
-﻿using AutoFixture.Xunit2;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+using AutoFixture.Xunit2;
 
 using Bogus;
+
 using FluentAssertions;
+
+using FsCheck;
+using FsCheck.Xunit;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
+
 using static Newtonsoft.Json.JsonConvert;
 using static System.Linq.Expressions.ExpressionExtensions;
-using FsCheck;
-using FsCheck.Xunit;
 
 namespace Utilities.UnitTests
 {
@@ -22,7 +30,7 @@ namespace Utilities.UnitTests
     public class EnumerableExtensionsTests
     {
         private readonly ITestOutputHelper _outputHelper;
-        private readonly static Faker _faker = new ();
+        private readonly static Faker _faker = new();
 
         public EnumerableExtensionsTests(ITestOutputHelper outputHelper)
         {
@@ -885,28 +893,30 @@ namespace Utilities.UnitTests
         public void Given_right_and_left_expressions_when_right_is_null_Compose_should_throw_ArgumentNullException()
         {
             // Arrange
-            Expression<Func<int, string>> left = number => number.ToString();
-            Expression<Func<string, int>> right = null;
+            Expression<Func<int, string>> first = number => number.ToString();
+            Expression<Func<string, int>> second = null;
 
             // Act
-            Action compose = () => ExpressionExtensions.Compose(left, right);
+            Action compose = () => first.Compose(second);
 
             // Assert
-            compose.Should().Throw<ArgumentNullException>();
+            compose.Should().Throw<ArgumentNullException>()
+                .WithParameterName("second");
         }
 
         [Fact]
         public void Given_right_and_left_expressions_when_left_is_null_Compose_should_throw_ArgumentNullException()
         {
             // Arrange
-            Expression<Func<string, int>> left = null;
-            Expression<Func<int, string>> right = number => number.ToString();
+            Expression<Func<string, int>> first = null;
+            Expression<Func<int, string>> second = number => number.ToString();
 
             // Act
-            Action compose = () => ExpressionExtensions.Compose(left, right);
+            Action compose = () => first.Compose(second);
 
             // Assert
-            compose.Should().Throw<ArgumentNullException>();
+            compose.Should().Throw<ArgumentNullException>()
+                .WithParameterName("first");
         }
 
         [Property]
@@ -919,7 +929,7 @@ namespace Utilities.UnitTests
 
             // Act
             Expression<Func<int, Tuple<int, string>>> actual = addOne.Compose(writeNumberAsString);
-            IEnumerable < (int number, string numberAsString) > results = source.Item.Select(number => actual.Compile().Invoke(number))
+            IEnumerable<(int number, string numberAsString)> results = source.Item.Select(number => actual.Compile().Invoke(number))
                                                                                      .Select(result => (result.Item1, result.Item2));
 
             // Assert

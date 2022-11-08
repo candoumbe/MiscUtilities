@@ -58,32 +58,27 @@ public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
     {
         ArgumentNullException.ThrowIfNull(range);
 
-        if (!IsInfinite())
+        if (!IsInfinite() && !range.IsEmpty())
         {
-            if (!range.IsEmpty())
+            if (range.IsAllDay())
             {
-                if (range == TimeOnlyRange.AllDay)
+                _ranges.Clear();
+                _ranges.Add(range);
+            }
+            else
+            {
+                TimeOnlyRange[] previous = _ranges.Where(item => item.IsContiguousWith(range) || item.Overlaps(range))
+                                                  .OrderBy(x => x.Start)
+                                                  .ToArray();
+                if (previous.Length != 0)
                 {
-                    _ranges.Clear();
-                    _ranges.Add(range);
+                    previous.ForEach(item => _ranges.Remove(item));
+                    TimeOnlyRange union = previous.Aggregate(range, (left, right) => left.Merge(right));
+                    _ranges.Add(union);
                 }
                 else
                 {
-                    TimeOnlyRange complement = -range;
-
-                    TimeOnlyRange[] previous = _ranges.Where(item => item.IsContiguousWith(range) || item.Overlaps(range))
-                                                      .OrderBy(x => x.Start)
-                                                      .ToArray();
-                    if (previous.Length != 0)
-                    {
-                        previous.ForEach(item => _ranges.Remove(item));
-                        TimeOnlyRange union = previous.Aggregate(range, (left, right) => left.Merge(right));
-                        _ranges.Add(union);
-                    }
-                    else
-                    {
-                        _ranges.Add(range);
-                    }
+                    _ranges.Add(range);
                 }
             }
         }
@@ -151,7 +146,7 @@ public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
-    /// <returns>A <see cref="MultiTimeOnlyRange"/> that contains <see cref="TimeOnlyRange"/>s that are not covered by neither <paramref name="left"/> nor <paramref name="right"/>.</returns>
+    /// <returns>A <see cref="MultiTimeOnlyRange"/> that contains <see cref="TimeOnlyRange"/>s that are not covered by both <paramref name="left"/> and <paramref name="right"/>.</returns>
     public static MultiTimeOnlyRange operator -(MultiTimeOnlyRange left, MultiTimeOnlyRange right) => left.Diff(right);
 
     /// <summary>
@@ -202,7 +197,7 @@ public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
                             case 0:
                                 complement.Add(TimeOnlyRange.UpTo(current.Start));
                                 break;
-                            case int index when 0 < index && index < _ranges.Count - 2:
+                            case int index when index <= _ranges.Count - 2:
                                 {
                                     TimeOnlyRange previous = _ranges.ElementAt(i - 1);
                                     TimeOnlyRange next = _ranges.ElementAt(i + 1);
@@ -252,7 +247,9 @@ public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
     /// </summary>
     /// <param name="other">The range to test</param>
     /// <returns><see langword="true"/> if the current instance contains <see cref="TimeOnlyRange"/>s which combined together covers <paramref name="other"/> and <see langword="false"/> otherwise.</returns>
-    public bool Covers(MultiTimeOnlyRange other) => other is not null && other.Ranges.AsParallel().All(range => Covers(range)) && _ranges.AsParallel().All(range => other.Covers(range));
+    public bool Covers(MultiTimeOnlyRange other) => other is not null
+                                                    && other.Ranges.AsParallel().All(range => Covers(range))
+                                                    && _ranges.AsParallel().All(range => other.Covers(range));
 
     ///<inheritdoc/>
     public override string ToString()

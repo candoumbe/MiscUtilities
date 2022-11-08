@@ -166,7 +166,6 @@ namespace Microsoft.Extensions.Primitives
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
         public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
 
-
         /// <summary>
         /// Converts the <paramref name="input"/> to its Title Case equivalent
         /// </summary>

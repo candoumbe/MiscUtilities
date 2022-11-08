@@ -203,6 +203,50 @@ public class DateTimeRangeTests
                 new DateTimeRange(14.July(1789), 5.April(1950)),
                 true
             };
+
+            /* 
+             * first:    |
+             * other:      |---------------| 
+             */
+            yield return new object[]
+            {
+                new DateTimeRange(1.April(1430), 1.April(1430)),
+                new DateTimeRange(14.July(1789), 5.April(1950)),
+                false
+            };
+
+            /* 
+             * first:          |
+             * other:      |---------------| 
+             */
+            yield return new object[]
+            {
+                new DateTimeRange(17.July(1859), 17.July(1859)),
+                new DateTimeRange(14.July(1789), 5.April(1950)),
+                true
+            };
+
+            /* 
+             * first:      |
+             * other:      |---------------| 
+             */
+            yield return new object[]
+            {
+                new DateTimeRange(14.July(1859), 14.July(1859)),
+                new DateTimeRange(14.July(1789), 5.April(1950)),
+                true
+            };
+
+            /* 
+             * first:                      |
+             * other:      |---------------| 
+             */
+            yield return new object[]
+            {
+                new DateTimeRange(5.July(1859), 5.July(1950)),
+                new DateTimeRange(14.July(1789), 5.April(1950)),
+                true
+            };
         }
     }
 
@@ -232,12 +276,12 @@ public class DateTimeRangeTests
               .BeTrue($"AllTime range overlaps every other {nameof(DateTimeRange)}s");
     }
 
-    public static IEnumerable<object[]> UnionCases
+    public static IEnumerable<object[]> MergeCases
     {
         get
         {
             /* 
-             * curernt   : |---------------|
+             * current   : |---------------|
              * other     :         |---------------| 
              * expected  : |-----------------------| 
              */
@@ -295,15 +339,27 @@ public class DateTimeRangeTests
                 new DateTimeRange(3.January(1990), 5.January(1990)),
                 new DateTimeRange(1.January(1990), 6.January(1990)),
             };
+
+            /* 
+             * current     : |---------------------|
+             * other       :         | 
+             * expected    : |---------------------|
+             */
+            yield return new object[]
+            {
+                new DateTimeRange(1.January(1990), 6.January(1990)),
+                new DateTimeRange(4.January(1990), 4.January(1990)),
+                new DateTimeRange(1.January(1990), 6.January(1990)),
+            };
         }
     }
 
     [Theory]
-    [MemberData(nameof(UnionCases))]
-    public void Given_two_instances_Union_should_behave_as_expected(DateTimeRange current, DateTimeRange other, DateTimeRange expected)
+    [MemberData(nameof(MergeCases))]
+    public void Given_two_instances_Merge_should_behave_as_expected(DateTimeRange current, DateTimeRange other, DateTimeRange expected)
     {
         // Act
-        DateTimeRange actual = current.Union(other);
+        DateTimeRange actual = current.Merge(other);
         _outputHelper.WriteLine($"Result: {actual}");
 
         // Assert
@@ -409,7 +465,7 @@ public class DateTimeRangeTests
     public void Empty_should_be_the_neutral_element_of_DateTimeRange(DateTimeRange range)
     {
         // Act
-        DateTimeRange result = range.Union(DateTimeRange.Empty);
+        DateTimeRange result = range.Merge(DateTimeRange.Empty);
 
         // Assert
         result.Should()

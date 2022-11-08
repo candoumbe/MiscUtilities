@@ -12,14 +12,14 @@ namespace System
     public static class EnumExtensions
     {
         /// <summary>
-        /// Gets the values of the underlying 
+        /// Gets the values of the underlying
         /// </summary>
         /// <typeparam name="TEnum">Type of the enum</typeparam>
         /// <returns></returns>
         public static IEnumerable<TEnum> GetValues<TEnum>()
         {
             Array array = Enum.GetValues(typeof(TEnum));
-            List<TEnum> values = new (array.Length);
+            List<TEnum> values = new(array.Length);
 
             foreach (TEnum @enum in array)
             {
