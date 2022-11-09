@@ -473,27 +473,33 @@ public class DateTimeRangeTests
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-    public void Given_DateTimeRange_is_empty_When_value_is_anything_Contains_should_returns_Inconclusive(DateTime date)
+    public void Given_DateTimeRange_is_empty_When_value_is_anything_Overlaps_should_returns_Inconclusive(DateTime date)
     {
+        // Arrange
+        DateTimeRange empty = DateTimeRange.Empty;
+
         // Act
-        ContainsResult result = DateTimeRange.Empty.Contains(date);
+        bool actual = empty.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.No, $"The {nameof(DateTimeRange)} is empty");
+        actual.Should().Be(empty.Start == date, $"The {nameof(DateTimeRange)} is empty");
     }
 
     [Property]
-    public void Given_DateTimeRange_is_infinite_When_value_anything_Contains_should_returns_Yes(DateTime date)
+    public void Given_DateTimeRange_is_infinite_When_value_anything_Overlaps_should_returns_Yes(DateTime date)
     {
+        // Arrange
+        DateTimeRange infinite = DateTimeRange.Infinite;
+
         // Act
-        ContainsResult result = DateTimeRange.Infinite.Contains(date);
+        bool actual = infinite.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.Yes, $"The {nameof(DateTimeRange.Infinite)} 7678333contains all {nameof(DateTime)} values");
+        actual.Should().BeTrue($"The {nameof(DateTimeRange.Infinite)} contains all {nameof(DateTime)} values");
     }
 
     [Property]
-    public void Given_DateTimeRange_is_not_empty_and_not_infinite_When_value_is_between_Start_and_End_Contains_should_returns_Yes(DateTime date)
+    public void Given_DateTimeRange_is_not_empty_and_not_infinite_When_value_is_between_Start_and_End_Overlaps_should_returns_Yes(DateTime date)
     {
         // Arrange
         DateTime start = faker.PickRandom(faker.Date.Recent(refDate: date),
@@ -509,14 +515,14 @@ public class DateTimeRangeTests
         };
 
         // Act
-        ContainsResult result = dateRange.Contains(date);
+        bool actual = dateRange.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.Yes, $"{dateRange} contains {date} value");
+        actual.Should().BeTrue($"{dateRange} contains {date} value");
     }
 
     [Fact]
-    public void Given_DateTimeRange_is_not_empty_and_not_infinite_When_value_is_not_between_Start_and_End_Contains_should_returns_No()
+    public void Given_DateTimeRange_is_not_empty_and_not_infinite_When_value_is_not_between_Start_and_End_Overlaps_should_returns_No()
     {
         // Arrange
         DateTime start = 12.July(2012);
@@ -530,9 +536,9 @@ public class DateTimeRangeTests
                                           faker.Date.Future(refDate: end.AddDays(1)));
 
         // Act
-        ContainsResult result = dateRange.Contains(value);
+        bool actual = dateRange.Overlaps(value);
 
         // Assert
-        result.Should().Be(ContainsResult.No, $"{dateRange} does not contains {value} value");
+        actual.Should().BeFalse($"{dateRange} does not contains {value} value");
     }
 }

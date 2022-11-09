@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Numerics;
 
 namespace Candoumbe.MiscUtilities.Types;
 
@@ -11,6 +12,9 @@ namespace Candoumbe.MiscUtilities.Types;
 /// A <see cref="DateOnly"/> range
 /// </summary>
 public record DateOnlyRange : Range<DateOnly>
+#if NET7_0_OR_GREATER
+    , IAdditionOperators<DateOnlyRange, DateOnlyRange, DateOnlyRange>
+#endif
 {
     /// <summary>
     /// A <see cref="DateOnlyRange"/> that <see cref="Range{T}.Overlaps(Range{T})">overlaps</see> any other <see cref="DateOnlyRange"/> except <see cref="Empty"/>.
@@ -62,7 +66,7 @@ public record DateOnlyRange : Range<DateOnly>
     public DateOnlyRange Merge(DateOnlyRange other)
     {
         DateOnlyRange result = Empty;
-        if (IsInfinite() || other.IsInfinite())
+        if (IsInfinite() || other == Infinite)
         {
             result = Infinite;
         }
@@ -85,6 +89,9 @@ public record DateOnlyRange : Range<DateOnly>
 
         return result;
     }
+
+    ///<inheritdoc/>
+    public static DateOnlyRange operator +(DateOnlyRange left, DateOnlyRange right) => left?.Merge(right);
 
     /// <summary>
     /// Returns the oldest <see cref="DateOnly"/> between <paramref name="left"/> and <paramref name="right"/>.
@@ -135,13 +142,6 @@ public record DateOnlyRange : Range<DateOnly>
 
         return result;
     }
-
-    ///<inheritdoc/>
-    public override ContainsResult Contains(DateOnly value) => (IsEmpty(), this == Infinite) switch
-    {
-        (true, _) or (_, true) => base.Contains(value),
-        _ => (Start <= value && value <= End) ? ContainsResult.Yes : ContainsResult.No
-    };
 
     ///<inheritdoc/>
     public bool IsInfinite() => (Start, End).Equals((DateOnly.MinValue, DateOnly.MaxValue));

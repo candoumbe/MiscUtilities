@@ -2,6 +2,7 @@
 // Licenced under GNU General Public Licence, version 3.0"
 
 using System;
+using System.Numerics;
 
 namespace Candoumbe.MiscUtilities.Types;
 
@@ -12,6 +13,9 @@ namespace Candoumbe.MiscUtilities.Types;
 public class DateTimeRange : Range<DateTime>, IEquatable<DateTimeRange>
 #else
 public record DateTimeRange : Range<DateTime>
+#endif
+#if NET7_0_OR_GREATER
+    , IAdditionOperators<DateTimeRange, DateTimeRange, DateTimeRange>
 #endif
 {
     /// <summary>
@@ -92,6 +96,9 @@ public record DateTimeRange : Range<DateTime>
         return result;
     }
 
+    ///<inheritdoc/>
+    public static DateTimeRange operator +(DateTimeRange left, DateTimeRange right) => left?.Merge(right);
+
     /// <summary>
     /// Returns the oldest <see cref="DateTime"/> between <paramref name="left"/> and <paramref name="right"/>.
     /// </summary>
@@ -153,8 +160,6 @@ public record DateTimeRange : Range<DateTime>
     public bool IsInfinite() => (Start, End) == (Infinite.Start, Infinite.End);
 
 #if !NET5_0_OR_GREATER
-
-
     /// <summary>
     /// Checks if <paramref name="left"/> is not equal to <paramref name="right"/>.
     /// </summary>
@@ -170,8 +175,6 @@ public record DateTimeRange : Range<DateTime>
     /// <param name="right"></param>
     /// <returns><see langword="true"/> if <paramref name="left"/> is not equal to <paramref name="right"/> and <see langword="false"/> otherwise.</returns>
     public static bool operator !=(DateTimeRange left, DateTimeRange right) => !(left == right);
-
-
 #endif
 
     ///<inheritdoc/>
@@ -182,6 +185,7 @@ public record DateTimeRange : Range<DateTime>
 
     ///<inheritdoc/>
     public override bool Equals(object obj) => Equals(obj as DateTimeRange);
+#endif
 
     ///<inheritdoc/>
     public override int GetHashCode()
@@ -192,7 +196,6 @@ public record DateTimeRange : Range<DateTime>
         hashCode = (hashCode * -1521134295) + End.GetHashCode();
         return hashCode;
     }
-#endif
 
     ///<inheritdoc/>
     public virtual bool Equals(DateTimeRange other) => other is not null &&

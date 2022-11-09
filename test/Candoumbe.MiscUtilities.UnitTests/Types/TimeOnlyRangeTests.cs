@@ -544,27 +544,33 @@ public class TimeOnlyRangeTests
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-    public void Given_TimeOnlyRange_is_empty_When_value_is_anything_Contains_should_returns_Inconclusive(TimeOnly date)
+    public void Given_TimeOnlyRange_is_empty_When_value_is_anything_Overlaps_should_returns_Inconclusive(TimeOnly date)
     {
+        // Arrange
+        TimeOnlyRange empty = TimeOnlyRange.Empty;
+
         // Act
-        ContainsResult result = TimeOnlyRange.Empty.Contains(date);
+        bool result = empty.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.No, $"The {nameof(TimeOnlyRange)} is empty");
+        result.Should().BeFalse($"The {nameof(TimeOnlyRange)} is empty");
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-    public void Given_TimeOnlyRange_is_AllDay_When_value_anything_Contains_should_returns_Yes(TimeOnly date)
+    public void Given_TimeOnlyRange_is_AllDay_When_value_anything_Overlaps_should_returns_Yes(TimeOnly date)
     {
+        // Arrange
+        TimeOnlyRange allDay = TimeOnlyRange.AllDay;
+
         // Act
-        ContainsResult result = TimeOnlyRange.AllDay.Contains(date);
+        bool result = allDay.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.Yes, $"The {nameof(TimeOnlyRange.AllDay)} contains all {nameof(TimeOnly)} values");
+        result.Should().BeTrue($"The {nameof(TimeOnlyRange.AllDay)} contains all {nameof(TimeOnly)} values");
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-    public void Given_TimeOnlyRange_is_not_empty_and_not_infinite_When_value_is_between_Start_and_End_Contains_should_returns_Yes(TimeOnly value)
+    public void Given_TimeOnlyRange_is_not_empty_and_not_infinite_When_value_is_between_Start_and_End_Overlaps_should_returns_Yes(TimeOnly value)
     {
         // Arrange
         TimeOnly start = faker.Date.RecentTimeOnly(refTime: value);
@@ -577,14 +583,14 @@ public class TimeOnlyRangeTests
         };
 
         // Act
-        ContainsResult result = timeRange.Contains(value);
+        bool result = timeRange.Overlaps(value);
 
         // Assert
-        result.Should().Be(ContainsResult.Yes, $"{timeRange} contains {value} value");
+        result.Should().BeTrue($"{timeRange} contains {value} value");
     }
 
     [Fact]
-    public void Given_TimeOnlyRange_is_not_empty_and_not_infinite_When_value_is_not_between_Start_and_End_Contains_should_returns_No()
+    public void Given_TimeOnlyRange_is_not_empty_and_not_infinite_When_value_is_not_between_Start_and_End_Overlaps_should_returns_No()
     {
         // Arrange
         TimeOnly start = TimeOnly.FromDateTime(12.July(2012));
@@ -596,10 +602,10 @@ public class TimeOnlyRangeTests
                                           faker.Date.SoonTimeOnly(refTime: end.AddMinutes(1)));
 
         // Act
-        ContainsResult result = timeRange.Contains(value);
+        bool result = timeRange.Overlaps(value);
 
         // Assert
-        result.Should().Be(ContainsResult.No, $"{timeRange} does not contains {value} value");
+        result.Should().BeFalse($"{timeRange} does not contain {value} value");
     }
 
     public static IEnumerable<object[]> IsAllDayCases

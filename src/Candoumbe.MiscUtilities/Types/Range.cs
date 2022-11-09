@@ -8,24 +8,24 @@ namespace Candoumbe.MiscUtilities.Types;
 
 /// <summary>
 /// It's quite common to see comparisons where a value is checked against a range of values. Ranges are most of the time handled by a pair of values
-/// and you check against them both. <see cref="Range{T}"/> instead uses a single object to represent the range as a whole, and then provides the relevant operations
-/// to test to see if values fall in the <see cref="Range{T}"/> and to compare <see cref="Range{T}"/>s.
+/// and you check against them both. <see cref="Range{TBound}"/> instead uses a single object to represent the range as a whole, and then provides the relevant operations
+/// to test to see if values fall in the <see cref="Range{TBound}"/> and to compare <see cref="Range{TBound}"/>s.
 /// </summary>
-/// <typeparam name="T">Type of the <see cref="Start"/> and <see cref="End"/> bounds.</typeparam>
+/// <typeparam name="TBound">Type of the <see cref="Start"/> and <see cref="End"/> bounds.</typeparam>
 #if !NET5_0_OR_GREATER
-public abstract class Range<T> : IEquatable<Range<T>>, IComparable<Range<T>>
-    where T : IComparable<T>
+public abstract class Range<TBound> : IEquatable<Range<TBound>>, IComparable<Range<TBound>>
+    where TBound : IComparable<TBound>
 #else
-public abstract record Range<T>(T Start, T End) : IComparable<Range<T>> where T : IComparable<T>
+public abstract record Range<TBound>(TBound Start, TBound End) : IComparable<Range<TBound>> where TBound : IComparable<TBound>
 #endif
 {
 #if !NET5_0_OR_GREATER
     /// <summary>
-    /// Builds a new <see cref="Range{T}"/> instance
+    /// Builds a new <see cref="Range{TBound}"/> instance
     /// </summary>
     /// <param name="start">start of the interval</param>
     /// <param name="end">end of the interval</param>
-    protected Range(T start, T end)
+    protected Range(TBound start, TBound end)
     {
         Start = start;
         End = end;
@@ -34,28 +34,28 @@ public abstract record Range<T>(T Start, T End) : IComparable<Range<T>> where T 
     /// <summary>
     /// Start of the interval
     /// </summary>
-    public T Start { get; }
+    public TBound Start { get; }
 
     /// <summary>
     /// End of the interval
     /// </summary>
-    public T End { get; }
+    public TBound End { get; }
 
     ///<inheritdoc/>
-    public override bool Equals(object obj) => Equals(obj as Range<T>);
+    public override bool Equals(object obj) => Equals(obj as Range<TBound>);
 
     /// <inheritdoc/>
-    public virtual bool Equals(Range<T> other) => other is not null
-                                          && EqualityComparer<T>.Default.Equals(Start, other.Start)
-                                          && EqualityComparer<T>.Default.Equals(End, other.End);
+    public virtual bool Equals(Range<TBound> other) => other is not null
+                                          && EqualityComparer<TBound>.Default.Equals(Start, other.Start)
+                                          && EqualityComparer<TBound>.Default.Equals(End, other.End);
 
     ///<inheritdoc/>
 #if !NETSTANDARD2_1
     public override int GetHashCode()
     {
         int hashCode = -1676728671;
-        hashCode = (hashCode * -1521134295) + EqualityComparer<T>.Default.GetHashCode(Start);
-        hashCode = (hashCode * -1521134295) + EqualityComparer<T>.Default.GetHashCode(End);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<TBound>.Default.GetHashCode(Start);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<TBound>.Default.GetHashCode(End);
         return hashCode;
     }
 #else
@@ -63,10 +63,10 @@ public abstract record Range<T>(T Start, T End) : IComparable<Range<T>> where T 
 #endif
 
     ///<inheritdoc/>
-    public static bool operator ==(Range<T> left, Range<T> right) => EqualityComparer<Range<T>>.Default.Equals(left, right);
+    public static bool operator ==(Range<TBound> left, Range<TBound> right) => EqualityComparer<Range<TBound>>.Default.Equals(left, right);
 
     ///<inheritdoc/>
-    public static bool operator !=(Range<T> left, Range<T> right) => !(left == right);
+    public static bool operator !=(Range<TBound> left, Range<TBound> right) => !(left == right);
 #endif
 
     /// <summary>
@@ -76,17 +76,17 @@ public abstract record Range<T>(T Start, T End) : IComparable<Range<T>> where T 
     public virtual bool IsEmpty() => Start.Equals(End);
 
     ///<inheritdoc/>
-    public int CompareTo(Range<T> other) => Start.CompareTo(other.Start);
+    public int CompareTo(Range<TBound> other) => Start.CompareTo(other.Start);
 
     /// <summary>
-    /// Checks if <paramref name="value"/> is between <see cref="Start"/> and <see cref="End"/>.
+    /// Checks if the currrent instance overlaps with <paramref name="other"/>
     /// </summary>
-    /// <param name="value">The value to check</param>
-    /// <returns></returns>
-    public virtual ContainsResult Contains(T value) => (IsEmpty(), value.CompareTo(Start), value.CompareTo(End)) switch
+    /// <param name="other">The other instance</param>
+    /// <returns><see langword="true"/> if the current instance overlaps <paramref name="other"/> and <see langword="false"/> otherwise.</returns>
+    public bool Overlaps(TBound other) => (Start.CompareTo(other), other.CompareTo(End)) switch
     {
-        (true, _, _) or (_, <= 0, _) or (_, _, >= 1) => ContainsResult.No,
-        _ => ContainsResult.Yes
+        ( <= 0, >= 0) => true,
+        _ => false
     };
 
     /// <summary>
@@ -94,7 +94,7 @@ public abstract record Range<T>(T Start, T End) : IComparable<Range<T>> where T 
     /// </summary>
     /// <param name="other">The other instance</param>
     /// <returns><see langword="true"/> if the current instance overlaps <paramref name="other"/> and <see langword="false"/> otherwise.</returns>
-    public virtual bool Overlaps(Range<T> other) => other is not null && (Start.CompareTo(other.Start), Start.CompareTo(other.End), End.CompareTo(other.Start), End.CompareTo(other.End)) switch
+    public virtual bool Overlaps(Range<TBound> other) => other is not null && (Start.CompareTo(other.Start), Start.CompareTo(other.End), End.CompareTo(other.Start), End.CompareTo(other.End)) switch
     {
         ( > 0, < 0, _, _) => true,
         // current :   |-------|
@@ -111,7 +111,7 @@ public abstract record Range<T>(T Start, T End) : IComparable<Range<T>> where T 
     /// </summary>
     /// <param name="other"></param>
     /// <returns><see langword="true"/> when current instance and <paramref name="other"/> are contiguous and <see langword="false"/> otherwise.</returns>
-    public virtual bool IsContiguousWith(Range<T> other) => End.Equals(other.Start) || Start.Equals(other.End);
+    public virtual bool IsContiguousWith(Range<TBound> other) => End.Equals(other.Start) || Start.Equals(other.End);
 
     ///<inheritdoc/>
     public override string ToString() => $"[{Start} - {End}]";
