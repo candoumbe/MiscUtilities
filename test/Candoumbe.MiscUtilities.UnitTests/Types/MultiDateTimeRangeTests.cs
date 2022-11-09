@@ -218,7 +218,7 @@ public class MultiDateTimeRangeTests
         _outputHelper.WriteLine($"{nameof(right)} : {right}");
 
         // Act
-        MultiDateTimeRange union = left.Union(right);
+        MultiDateTimeRange union = left.Merge(right);
 
         // Assert
         _outputHelper.WriteLine($"Union : {union}");
@@ -254,7 +254,7 @@ public class MultiDateTimeRangeTests
 
         _outputHelper.WriteLine($"{nameof(left)} : {left}");
         _outputHelper.WriteLine($"{nameof(right)} : {right}");
-        MultiDateTimeRange expected = left.Union(right);
+        MultiDateTimeRange expected = left.Merge(right);
 
         // Act
         MultiDateTimeRange actual = left + right;

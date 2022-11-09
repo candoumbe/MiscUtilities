@@ -63,7 +63,7 @@ public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
     /// </remarks>
     /// <param name="range"></param>
     /// <exception cref="ArgumentNullException">if <paramref name="range"/> is <see langword="null"/>.</exception>
-    public MultiTimeOnlyRange Add(TimeOnlyRange range)
+    public void Add(TimeOnlyRange range)
     {
         ArgumentNullException.ThrowIfNull(range);
 
@@ -91,12 +91,15 @@ public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
                 }
             }
         }
-
-        return this;
     }
 
     ///<inheritdoc/>
-    public static MultiTimeOnlyRange operator +(MultiTimeOnlyRange left, TimeOnlyRange right) => left?.Add(right);
+    public static MultiTimeOnlyRange operator +(MultiTimeOnlyRange left, TimeOnlyRange right)
+    {
+        left?.Add(right);
+
+        return left;
+    }
 
     /// <summary>
     /// Builds a <see cref="MultiTimeOnlyRange"/> instance that represents the union of the current instance with <paramref name="other"/>.

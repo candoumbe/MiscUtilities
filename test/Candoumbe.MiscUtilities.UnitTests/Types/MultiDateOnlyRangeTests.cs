@@ -234,7 +234,7 @@ public class MultiDateOnlyRangeTests
         _outputHelper.WriteLine($"{nameof(right)} : {right}");
 
         // Act
-        MultiDateOnlyRange union = left.Union(right);
+        MultiDateOnlyRange union = left.Merge(right);
 
         // Assert
         _outputHelper.WriteLine($"Union : {union}");
@@ -270,7 +270,7 @@ public class MultiDateOnlyRangeTests
 
         _outputHelper.WriteLine($"{nameof(left)} : {left}");
         _outputHelper.WriteLine($"{nameof(right)} : {right}");
-        MultiDateOnlyRange expected = left.Union(right);
+        MultiDateOnlyRange expected = left.Merge(right);
 
         // Act
         MultiDateOnlyRange actual = left + right;

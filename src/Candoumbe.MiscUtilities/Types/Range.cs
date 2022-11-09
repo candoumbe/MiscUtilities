@@ -83,9 +83,9 @@ public abstract record Range<TBound>(TBound Start, TBound End) : IComparable<Ran
     /// </summary>
     /// <param name="other">The other instance</param>
     /// <returns><see langword="true"/> if the current instance overlaps <paramref name="other"/> and <see langword="false"/> otherwise.</returns>
-    public bool Overlaps(TBound other) => (Start.CompareTo(other), other.CompareTo(End)) switch
+    public virtual bool Overlaps(TBound other) => (Start.CompareTo(other), other.CompareTo(End)) switch
     {
-        ( <= 0, >= 0) => true,
+        ( <= 0, <= 0) => true,
         _ => false
     };
 

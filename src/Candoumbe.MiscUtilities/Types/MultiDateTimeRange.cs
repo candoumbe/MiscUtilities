@@ -4,6 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NET7_0_OR_GREATER
+using System.Numerics;
+#endif
 using System.Text;
 
 namespace Candoumbe.MiscUtilities.Types;
@@ -12,6 +15,11 @@ namespace Candoumbe.MiscUtilities.Types;
 /// A type that optimize the storage of several <see cref="DateTimeRange"/>.
 /// </summary>
 public class MultiDateTimeRange : IEquatable<MultiDateTimeRange>
+#if NET7_0_OR_GREATER
+    , IAdditionOperators<MultiDateTimeRange, MultiDateTimeRange, MultiDateTimeRange>
+    , IAdditionOperators<MultiDateTimeRange, DateTimeRange, MultiDateTimeRange>
+    , IUnaryNegationOperators<MultiDateTimeRange, MultiDateTimeRange>
+#endif
 {
     /// <summary>
     /// Ranges holded by the current instance.
@@ -95,13 +103,20 @@ public class MultiDateTimeRange : IEquatable<MultiDateTimeRange>
         }
     }
 
+    public static MultiDateTimeRange operator +(MultiDateTimeRange left, DateTimeRange right)
+    {
+        left.Add(right);
+
+        return left;
+    }
+
     /// <summary>
     /// Builds a <see cref="MultiDateTimeRange"/> instance that represents the union of the current instance with <paramref name="other"/>.
     /// </summary>
     /// <param name="other">The other instance to add</param>
     /// <exception cref="ArgumentNullException">if <paramref name="other"/> is <see langword="null"/></exception>
     /// <returns>a <see cref="MultiDateTimeRange"/> that represents the union of the current instance with <paramref name="other"/>.</returns>
-    public MultiDateTimeRange Union(MultiDateTimeRange other) => new(_ranges.Union(other.Ranges).ToArray());
+    public MultiDateTimeRange Merge(MultiDateTimeRange other) => new(_ranges.Union(other.Ranges).ToArray());
 
     /// <summary>
     /// Performs a "union" operation between <paramref name="left"/> and <paramref name="right"/> elements.
@@ -109,7 +124,7 @@ public class MultiDateTimeRange : IEquatable<MultiDateTimeRange>
     /// <param name="left">The left element of the operator</param>
     /// <param name="right">The right element of the operator</param>
     /// <returns>a <see cref="MultiDateTimeRange"/> that represents <paramref name="left"/> and <paramref name="right"/> values.</returns>
-    public static MultiDateTimeRange operator +(MultiDateTimeRange left, MultiDateTimeRange right) => left.Union(right);
+    public static MultiDateTimeRange operator +(MultiDateTimeRange left, MultiDateTimeRange right) => left.Merge(right);
 
     /// <summary>
     /// Tests if the current instance contains one or more <see cref="DateTimeRange"/> which, combined together, overlap the specified <paramref name="range"/>.
@@ -236,6 +251,9 @@ public class MultiDateTimeRange : IEquatable<MultiDateTimeRange>
 
         return complement;
     }
+
+    ///<inheritdoc/>
+    public static MultiDateTimeRange operator -(MultiDateTimeRange range) => range.Complement();
 
     /// <summary>
     /// Checks if the current instance is empty.

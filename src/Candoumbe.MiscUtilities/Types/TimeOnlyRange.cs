@@ -76,6 +76,9 @@ public record TimeOnlyRange : Range<TimeOnly>
         });
 
     ///<inheritdoc/>
+    public override bool Overlaps(TimeOnly other) => other.IsBetween(Start, End);
+
+    ///<inheritdoc/>
     public override sealed string ToString() => $"{Start} - {End}";
 
     /// <summary>
@@ -194,7 +197,16 @@ public record TimeOnlyRange : Range<TimeOnly>
         }
     }
 
+#if !NET7_0_OR_GREATER
+    /// <summary>
+    /// Adds the two <see cref="TimeOnlyRange"/>s
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+#else
     ///<inheritdoc/>
+#endif
     public static TimeOnlyRange operator +(TimeOnlyRange left, TimeOnlyRange right) => left?.Merge(right);
 
     /// <summary>
