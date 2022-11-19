@@ -4,6 +4,9 @@
 #if NET6_0_OR_GREATER
 using System;
 using System.Diagnostics;
+#if NET7_0_OR_GREATER
+using System.Numerics;
+#endif
 using System.Text;
 
 namespace Candoumbe.MiscUtilities.Types;
@@ -22,12 +25,16 @@ namespace Candoumbe.MiscUtilities.Types;
 /// <para>
 /// <see cref="TimeOnlyRange"/> behaves mostly like a set so that you can :
 /// <list type="bullet">
-///     <item>get the complement, of a given <see cref="TimeOnlyRange"/> by applying the <c>-</c> operator</item>
-///     <item>merge two <see cref="TimeOnlyRange"/>s by calling the <see cref="Merge(TimeOnlyRange)"/></item>
+///     <item>get the complement of a given <see cref="TimeOnlyRange"/> by applying the <c>-</c> operator</item>
+///     <item>merge two <see cref="TimeOnlyRange"/>s by calling the <c>+</c> operator</item>
 /// </list>
 /// </para>
 /// </remarks>
 public record TimeOnlyRange : Range<TimeOnly>
+#if NET7_0_OR_GREATER
+    , IAdditionOperators<TimeOnlyRange, TimeOnlyRange, TimeOnlyRange>
+    , IUnaryNegationOperators<TimeOnlyRange, TimeOnlyRange>
+#endif
 {
     private TimeSpan Span => Start <= End ? End - Start : Start - End;
 
@@ -67,6 +74,9 @@ public record TimeOnlyRange : Range<TimeOnly>
                                || (other.End.IsBetween(Start, End) && End != other.Start && End != other.End)
                                || (other.Start <= End && Start <= other.End)
         });
+
+    ///<inheritdoc/>
+    public override bool Overlaps(TimeOnly other) => other.IsBetween(Start, End);
 
     ///<inheritdoc/>
     public override sealed string ToString() => $"{Start} - {End}";
@@ -187,6 +197,18 @@ public record TimeOnlyRange : Range<TimeOnly>
         }
     }
 
+#if !NET7_0_OR_GREATER
+    /// <summary>
+    /// Adds the two <see cref="TimeOnlyRange"/>s
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+#else
+    ///<inheritdoc/>
+#endif
+    public static TimeOnlyRange operator +(TimeOnlyRange left, TimeOnlyRange right) => left?.Merge(right);
+
     /// <summary>
     /// A <see cref="TimeOnlyRange"/> that span accros every other <see cref="TimeOnlyRange"/>.
     /// </summary>
@@ -274,22 +296,16 @@ public record TimeOnlyRange : Range<TimeOnly>
     private TimeOnlyRange ShiftTo(TimeOnly offset)
         => this with { Start = offset, End = offset.Add(Span) };
 
+#if !NET7_0_OR_GREATER
     /// <summary>
     /// Gets the <see cref="TimeOnlyRange"/> that complements <paramref name="source"/>
     /// </summary>
     /// <param name="source"></param>
-    /// <returns>A <see cref="TimeOnlyRange"/> does not overlaps the source and </returns>
-    public static TimeOnlyRange operator -(TimeOnlyRange source) => Complement(source);
-
+    /// <returns>A <see cref="TimeOnlyRange"/> does not overlaps the source and </returns>  
+#else
     ///<inheritdoc/>
-    public override ContainsResult Contains(TimeOnly value) => (IsEmpty(), IsAllDay()) switch
-    {
-        (true, _) => ContainsResult.No,
-        (_, true) => ContainsResult.Yes,
-        _ => value.IsBetween(Start, End)
-            ? ContainsResult.Yes
-            : ContainsResult.No,
-    };
+#endif
+    public static TimeOnlyRange operator -(TimeOnlyRange source) => Complement(source);
 
     /// <summary>
     /// Checks if the current instance covers all other <see cref="TimeOnlyRange"/>s

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 
 namespace Candoumbe.MiscUtilities.Types;
@@ -16,6 +17,11 @@ namespace Candoumbe.MiscUtilities.Types;
 /// A type that optimize the storage of several <see cref="DateOnlyRange"/>.
 /// </summary>
 public class MultiDateOnlyRange : IEquatable<MultiDateOnlyRange>
+#if NET7_0_OR_GREATER
+    , IAdditionOperators<MultiDateOnlyRange, MultiDateOnlyRange, MultiDateOnlyRange>
+    , IAdditionOperators<MultiDateOnlyRange, DateOnlyRange, MultiDateOnlyRange>
+    , IUnaryNegationOperators<MultiDateOnlyRange, MultiDateOnlyRange>
+#endif
 {
     /// <summary>
     /// Ranges holded by the current instance.
@@ -93,21 +99,33 @@ public class MultiDateOnlyRange : IEquatable<MultiDateOnlyRange>
         }
     }
 
+    ///<inheritdoc/>
+    public static MultiDateOnlyRange operator +(MultiDateOnlyRange left, DateOnlyRange range)
+    {
+        left.Add(range);
+
+        return left;
+    }
+
     /// <summary>
     /// Builds a <see cref="MultiDateOnlyRange"/> instance that represents the union of the current instance with <paramref name="other"/>.
     /// </summary>
     /// <param name="other">The other instance to add</param>
     /// <exception cref="ArgumentNullException">if <paramref name="other"/> is <see langword="null"/></exception>
     /// <returns>a <see cref="MultiDateOnlyRange"/> that represents the union of the current instance with <paramref name="other"/>.</returns>
-    public MultiDateOnlyRange Union(MultiDateOnlyRange other) => new(_ranges.Union(other.Ranges).ToArray());
+    public MultiDateOnlyRange Merge(MultiDateOnlyRange other) => new(_ranges.Union(other.Ranges).ToArray());
 
+#if !NET7_0_OR_GREATER
     /// <summary>
     /// Performs a "union" operation between <paramref name="left"/> and <paramref name="right"/> elements.
     /// </summary>
     /// <param name="left">The left element of the operator</param>
     /// <param name="right">The right element of the operator</param>
     /// <returns>a <see cref="MultiDateOnlyRange"/> that represents <paramref name="left"/> and <paramref name="right"/> values.</returns>
-    public static MultiDateOnlyRange operator +(MultiDateOnlyRange left, MultiDateOnlyRange right) => left.Union(right);
+#else
+    ///<inheritdoc/>
+#endif
+    public static MultiDateOnlyRange operator +(MultiDateOnlyRange left, MultiDateOnlyRange right) => left.Merge(right);
 
     /// <summary>
     /// Tests if the current instance contains one or more <see cref="DateOnlyRange"/> which, combined together, overlap the specified <paramref name="range"/>.
@@ -221,6 +239,9 @@ public class MultiDateOnlyRange : IEquatable<MultiDateOnlyRange>
 
         return complement;
     }
+
+    ///<inheritdoc/>
+    public static MultiDateOnlyRange operator -(MultiDateOnlyRange range) => range.Complement();
 
     /// <summary>
     /// Checks if the current instance is empty.

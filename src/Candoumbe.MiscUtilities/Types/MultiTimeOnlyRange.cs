@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+#if NET7_0_OR_GREATER
+using System.Numerics;
+#endif
 using System.Text;
 
 namespace Candoumbe.MiscUtilities.Types;
@@ -16,6 +19,12 @@ namespace Candoumbe.MiscUtilities.Types;
 /// A type that optimize the storage of several <see cref="TimeOnlyRange"/>.
 /// </summary>
 public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
+#if NET7_0_OR_GREATER
+    , IAdditionOperators<MultiTimeOnlyRange, MultiTimeOnlyRange, MultiTimeOnlyRange>
+    , IAdditionOperators<MultiTimeOnlyRange, TimeOnlyRange, MultiTimeOnlyRange>
+    , IUnaryNegationOperators<MultiTimeOnlyRange, MultiTimeOnlyRange>
+#endif
+
 {
     /// <summary>
     /// Ranges holded by the current instance.
@@ -82,6 +91,14 @@ public class MultiTimeOnlyRange : IEquatable<MultiTimeOnlyRange>
                 }
             }
         }
+    }
+
+    ///<inheritdoc/>
+    public static MultiTimeOnlyRange operator +(MultiTimeOnlyRange left, TimeOnlyRange right)
+    {
+        left?.Add(right);
+
+        return left;
     }
 
     /// <summary>

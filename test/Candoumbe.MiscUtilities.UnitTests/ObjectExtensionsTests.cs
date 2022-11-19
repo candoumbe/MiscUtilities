@@ -1,4 +1,7 @@
-﻿using Candoumbe.MiscUtilities.UnitTests.Generators;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+using Candoumbe.MiscUtilities.UnitTests.Generators;
 using Candoumbe.MiscUtilities.UnitTests.Models;
 
 using FluentAssertions;
@@ -344,33 +347,43 @@ namespace Utilities.UnitTests
                  .BeEquivalentTo(source);
         }
 
-        [Property(Arbitrary = new[] {typeof(ValueGenerators)})]
+        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
         public void Given_non_null_input_and_no_serializerOptions_Jsonify_should_behave_as_expected(Appointment source)
         {
             // Act
             string json = source.Jsonify();
-            JToken jtoken = JToken.Parse(json);
+            _outputHelper.WriteLine(json);
 
             // Assert
+            JToken jtoken = JToken.Parse(json);
             jtoken[nameof(Appointment.Name)].Should().HaveValue(source.Name);
             jtoken[nameof(Appointment.Date)].Should().HaveValue(source.Date.ToString("yyyy-MM-dd"));
-            jtoken[nameof(Appointment.Time)].Should().HaveValue(source.Time.ToString(source.Time.Millisecond  > 0 ? "HH:mm:ss.FFFFFFF" : "HH:mm:ss"));
+#if NET6_0
+            jtoken[nameof(Appointment.Time)].Should().HaveValue(source.Time.ToString(source.Time.Millisecond > 0 ? "HH:mm:ss.FFFFFFF" : "HH:mm:ss"));
+#else
+            jtoken[nameof(Appointment.Time)].Should().HaveValue(source.Time.ToString(source.Time.Millisecond > 0 || source.Time.Nanosecond > 0 || source.Time.Microsecond > 0 ? "HH:mm:ss.fffffff" : "HH:mm:ss"));
+#endif
         }
 
         [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
         public void Given_non_null_input_and_serializerOptions_with_no_custom_converters_for_TimeOnly_or_DateOnly_types_Jsonify_should_behave_as_expected(Appointment source)
         {
             // Arrange
-            JsonSerializerOptions settings = new ();
+            JsonSerializerOptions settings = new();
 
             // Act
             string json = source.Jsonify(settings);
+            _outputHelper.WriteLine(json);
 
             // Assert
             JToken jtoken = JToken.Parse(json);
             jtoken[nameof(Appointment.Name)].Should().HaveValue(source.Name);
             jtoken[nameof(Appointment.Date)].Should().HaveValue(source.Date.ToString("yyyy-MM-dd"));
+#if NET6_0
             jtoken[nameof(Appointment.Time)].Should().HaveValue(source.Time.ToString(source.Time.Millisecond > 0 ? "HH:mm:ss.FFFFFFF" : "HH:mm:ss"));
+#else
+            jtoken[nameof(Appointment.Time)].Should().HaveValue(source.Time.ToString(source.Time.Millisecond > 0 || source.Time.Nanosecond > 0 || source.Time.Microsecond > 0 ? "HH:mm:ss.fffffff" : "HH:mm:ss"));
+#endif
         }
 #endif
     }

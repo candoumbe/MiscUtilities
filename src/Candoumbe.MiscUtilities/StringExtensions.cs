@@ -1,21 +1,26 @@
-﻿
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
 namespace System
 {
     using Globalization;
 
-    #if STRING_SEGMENT
+#if STRING_SEGMENT
     using Microsoft.Extensions.Primitives;
-    #endif
+
+#endif
     using Collections.Generic;
+
     using Linq;
     using Linq.Expressions;
+
     using Text;
     using Text.RegularExpressions;
 
     using static Linq.Expressions.Expression;
 
     /// <summary>
-    /// Extension methods for <see cref="string"/> type
+    /// Extension methods for <see langword="string"/> type
     /// </summary>
     public static class StringExtensions
     {
@@ -164,7 +169,7 @@ namespace System
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
         public static LambdaExpression ToLambda<TSource>(this string source)
         {
-            if (source == null)
+            if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
@@ -179,7 +184,7 @@ namespace System
 
             foreach (string field in fields)
             {
-                property = property == null
+                property = property is null
                     ? Property(pe, field)
                     : Property(property, field);
             }
@@ -217,7 +222,7 @@ namespace System
         /// </example>
         public static string Slugify(this string input)
         {
-            if (input == null)
+            if (input is null)
             {
                 throw new ArgumentNullException(nameof(input), $"{nameof(input)} cannot be null");
             }
@@ -271,7 +276,7 @@ namespace System
         /// </example>
         public static string ToSnakeCase(this string input)
         {
-            if (input == null)
+            if (input is null)
             {
                 throw new ArgumentNullException(nameof(input), $"{nameof(input)} cannot be null");
             }
@@ -430,12 +435,12 @@ namespace System
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int FirstOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
-            if (source == null)
+            if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
 
-            if (search == null)
+            if (search is null)
             {
                 throw new ArgumentNullException(nameof(search));
             }
@@ -463,12 +468,12 @@ namespace System
         /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="search"/> is <c>nuull</c></exception>
         public static int LastOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
-            if (source == null)
+            if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
 
-            if (search == null)
+            if (search is null)
             {
                 throw new ArgumentNullException(nameof(search));
             }

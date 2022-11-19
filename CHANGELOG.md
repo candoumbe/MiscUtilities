@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### New features
-- Added `Range.Contains`
+- Added `Range<T>.Overlaps(T element)`
 
 ### Breaking changes
 - Renamed `MultiTimeOnlyRange.Union` method to `MultiTimeOnlyRange.Merge`

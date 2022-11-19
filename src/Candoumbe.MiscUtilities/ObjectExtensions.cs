@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -216,6 +219,9 @@ namespace System
         public static string Jsonify(this object obj, JsonSerializerOptions settings = null)
         {
             string json = null;
+#if NET7_0_OR_GREATER
+            settings ??= JsonSerializerOptions.Default;
+#endif
             if (obj is not null)
             {
 #if REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND
@@ -244,5 +250,5 @@ namespace System
             return json;
         }
 #endif
-            }
+    }
 }

@@ -460,23 +460,26 @@ public class DateOnlyRangeTests
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-    public void Given_DateOnlyRange_is_empty_When_value_is_anything_Contains_should_returns_Inconclusive(DateOnly date)
+    public void Given_DateOnlyRange_is_empty_When_value_is_empty_and_matches_Overlaps_should_returns_true(DateOnly date)
     {
+        // Arrange
+        DateOnlyRange empty = DateOnlyRange.Empty;
+
         // Act
-        ContainsResult result = DateOnlyRange.Empty.Contains(date);
+        bool actual = empty.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.No, $"The {nameof(DateOnlyRange)} is empty");
+        actual.Should().Be(empty.Start == date);
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
-    public void Given_DateOnlyRange_is_infinite_When_value_anything_Contains_should_returns_Yes(DateOnly date)
+    public void Given_DateOnlyRange_is_infinite_When_value_anything_Overlaps_should_returns_Yes(DateOnly date)
     {
         // Act
-        ContainsResult result = DateOnlyRange.Infinite.Contains(date);
+        bool actual = DateOnlyRange.Infinite.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.Yes, $"The {nameof(DateOnlyRange.Infinite)} 7678333contains all {nameof(DateOnly)} values");
+        actual.Should().BeTrue($"The {nameof(DateOnlyRange.Infinite)} 7678333contains all {nameof(DateOnly)} values");
     }
 
     [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
@@ -496,10 +499,10 @@ public class DateOnlyRangeTests
         };
 
         // Act
-        ContainsResult result = dateRange.Contains(date);
+        bool actual = dateRange.Overlaps(date);
 
         // Assert
-        result.Should().Be(ContainsResult.Yes, $"{dateRange} contains {date} value");
+        actual.Should().BeTrue($"{dateRange} contains {date} value");
     }
 
     [Fact]
@@ -517,10 +520,10 @@ public class DateOnlyRangeTests
                                           faker.Date.FutureDateOnly(refDate: end.AddDays(1)));
 
         // Act
-        ContainsResult result = dateRange.Contains(value);
+        bool actual = dateRange.Overlaps(value);
 
         // Assert
-        result.Should().Be(ContainsResult.No, $"{dateRange} does not contains {value} value");
+        actual.Should().BeFalse($"{dateRange} does not contains {value} value");
     }
 }
 #endif
