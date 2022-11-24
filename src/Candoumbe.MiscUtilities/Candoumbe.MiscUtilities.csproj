@@ -19,7 +19,7 @@
         <DefineConstants>$(DefineConstants);NEWTONSOFT_JSON</DefineConstants>
       </PropertyGroup>
       <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
       </ItemGroup>
     </When>
     <When Condition="'$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0'">
