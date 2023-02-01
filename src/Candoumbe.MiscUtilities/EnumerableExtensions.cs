@@ -241,6 +241,9 @@ namespace System.Collections.Generic
 
             return count == default
                 ? !items.Any()
+#if NET6_0_OR_GREATER
+                : items.TryGetNonEnumeratedCount(out int currentCount) ? currentCount == count
+#endif
                 : items.Count() == count;
         }
 
