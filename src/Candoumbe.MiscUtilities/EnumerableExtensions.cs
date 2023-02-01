@@ -1,5 +1,9 @@
-﻿using System.Linq;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+using System.Linq;
 using System.Linq.Expressions;
+
 using static System.Linq.Expressions.ExpressionExtensions;
 
 #if !NETSTANDARD1_0
@@ -21,7 +25,7 @@ namespace System.Collections.Generic
         /// <typeparam name="TElement">type of the element groupêd</typeparam>
         /// <param name="groups"></param>
         /// <returns>a dictionary</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="groups"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="groups"/> is <see langword="null"/>.</exception>
         public static IDictionary<TKey, IEnumerable<TElement>> ToDictionary<TKey, TElement>(this IEnumerable<IGrouping<TKey, TElement>> groups)
         {
             if (groups is null)
@@ -124,7 +128,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <returns><see langword="true"/> if <paramref name="items"/> contains one or more element.s</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <see langword="null"/></exception>
         public static bool AtLeastOnce<T>(this IEnumerable<T> items) => AtLeast(items, True<T>(), 1);
 
         /// <summary>
@@ -134,7 +138,7 @@ namespace System.Collections.Generic
         /// <param name="items">Collection to test</param>
         /// <param name="count"></param>
         /// <returns><see langword="true"/> if <paramref name="items"/> contains <paramref name="count"/> or more one elements.</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <see langword="null"/></exception>
         public static bool AtLeast<T>(this IEnumerable<T> items, int count) => AtLeast(items, True<T>(), count);
 
         /// <summary>
@@ -221,7 +225,7 @@ namespace System.Collections.Generic
         /// <param name="items">collection under test</param>
         /// <param name="count">number of elements in <paramref name="items"/> </param>
         /// <returns><see langword="true"/> if <paramref name="items"/> contains <strong>exactly</strong> <paramref name="count"/> elements and <see langword="false"/> otherwise</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="items"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="items"/> is <see langword="null"/></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, int count)
         {
@@ -237,6 +241,9 @@ namespace System.Collections.Generic
 
             return count == default
                 ? !items.Any()
+#if NET6_0_OR_GREATER
+                : items.TryGetNonEnumeratedCount(out int currentCount) ? currentCount == count
+#endif
                 : items.Count() == count;
         }
 
@@ -248,7 +255,7 @@ namespace System.Collections.Generic
         /// <param name="predicate">Filter that <paramref name="count"/> elements should match.</param>
         /// <param name="count">Number of elements that match <paramref name="predicate"/></param>
         /// <returns><see langword="true"/> if there are 0 to <paramref name="count"/> elements that matches <paramref name="predicate"/> and <see langword="false"/> otherwise.</returns>
-        /// <exception cref="ArgumentNullException">if either <paramref name="items"/> or <paramref name="predicate"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if either <paramref name="items"/> or <paramref name="predicate"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtMost<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
         {
@@ -277,7 +284,7 @@ namespace System.Collections.Generic
         /// <param name="items"></param>
         /// <param name="count">Number of elements that the current contains at most</param>
         /// <returns><see langword="true"/> if there are 0 to <paramref name="count"/> elements and <see langword="false"/> otherwise.</returns>
-        /// <exception cref="ArgumentNullException">if either <paramref name="items"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if either <paramref name="items"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtMost<T>(this IEnumerable<T> items, int count) => AtMost(items, True<T>(), count);
 
@@ -445,7 +452,7 @@ namespace System.Collections.Generic
         /// <item><c>Falsy</c> : that contains all items from <paramref name="source"/> that do not satifies <paramref name="predicate"/>.</item>
         /// </list>
         /// </returns>
-        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is 
+        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is
         /// <see langword="null"/>.</exception>
         public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
             => (source.Where(predicate), source.Where(val => !predicate(val)));
@@ -455,20 +462,21 @@ namespace System.Collections.Generic
         /// Asynchronously iterates over each element of <paramref name="source"/> and applies the specified <paramref name="body"/> function.
         /// </summary>
         /// <remarks>
-        /// The implementation will define the 
+        /// If <paramref name="degreeOfParallelism"/> is not provided, this method will relies on the value returned by <see cref="Environment.ProcessorCount"/>
+        /// in order to run <paramref name="body"/> in a concurrent manner.
         /// </remarks>
         /// <typeparam name="T">The type of elements <paramref name="source"/> contains</typeparam>
         /// <param name="source">The collection to iterate over</param>
         /// <param name="body">A function that will be called asynchronously</param>
-        /// <param name="dop">Defines the degre of parallelism</param>
+        /// <param name="degreeOfParallelism">Defines the degree of parallelism to use when running</param>
         /// <returns>A <see cref="Task"/> that will be completed as soon as <paramref name="source"/> was fully iterated</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="dop"/> is negative or <c>0</c></exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="degreeOfParallelism"/> is negative or <c>0</c></exception>
         /// <exception cref="ArgumentNullException">either <paramref name="source"/> or <paramref name="body"/> is <see langword="null"/></exception>
-        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body, int? dop = null)
+        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body, int? degreeOfParallelism = null)
         {
             return Task.WhenAll(
                 from partition in Partitioner.Create(source)
-                        .GetPartitions(dop ?? Environment.ProcessorCount)
+                        .GetPartitions(degreeOfParallelism ?? Environment.ProcessorCount / 2)
                 select Task.Run(async delegate
                 {
                     using (partition)
@@ -499,7 +507,7 @@ namespace System.Collections.Generic
         /// <returns>
         /// <see cref="IAsyncEnumerable{T}"/>
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="millisecondsDelay"/> is less than <c>0</c>.</exception>
         public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IEnumerable<T> source, int millisecondsDelay = 1)
         {

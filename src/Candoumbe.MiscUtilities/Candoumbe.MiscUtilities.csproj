@@ -2,7 +2,7 @@
 
   <Import Project="..\..\core.props" />
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard2.0;netstandard2.1;net5.0;net6.0;</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
     <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
     <PackageTags>collections; string; utilities</PackageTags>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Candoumbe.MiscUtilities.xml</DocumentationFile>
@@ -12,27 +12,34 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  
+
   <Choose>
     <When Condition="'$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'netstandard1.1'">
       <PropertyGroup>
         <DefineConstants>$(DefineConstants);NEWTONSOFT_JSON</DefineConstants>
       </PropertyGroup>
       <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'net6.0'">
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);SYSTEM_TEXT;REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND</DefineConstants>
+      </PropertyGroup>
+      <ItemGroup>
+        <PackageReference Include="System.Text.Json" Version="7.0.1" />
       </ItemGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
         <DefineConstants>$(DefineConstants);SYSTEM_TEXT</DefineConstants>
-        <DefineConstants Condition="'$(TargetFramework)' == 'net6.0'">$(DefineConstants);REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND</DefineConstants>
       </PropertyGroup>
       <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="6.0.6" />
+        <PackageReference Include="System.Text.Json" Version="7.0.1" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-  
+
   <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.*" />
     <PackageReference Include="System.Linq" Version="4.*" />
@@ -54,7 +61,7 @@
         <DefineConstants>$(DefineConstants);STRING_SEGMENT</DefineConstants>
       </PropertyGroup>
       <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Primitives" Version="7.0.0" />
       </ItemGroup>
     </When>
   </Choose>

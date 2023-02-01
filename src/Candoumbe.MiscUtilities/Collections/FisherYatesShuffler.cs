@@ -16,9 +16,8 @@ namespace Candoumbe.MiscUtilities.Collections
     /// <typeparam name="T"></typeparam>
     public class FisherYatesShuffler<T> : IShuffler<T>
     {
-
 #if !NET5_0_OR_GREATER
-        private readonly Random _random = new(); 
+        private readonly Random _random = new();
 #endif
 
         ///<inheritdoc/>
@@ -42,7 +41,7 @@ namespace Candoumbe.MiscUtilities.Collections
                     shuffled = original;
                     break;
                 case 2:
-                    shuffled =  new[] { original.Last(), original.First() };
+                    shuffled = new[] { original.Last(), original.First() };
                     break;
 
                 default:
@@ -61,9 +60,7 @@ namespace Candoumbe.MiscUtilities.Collections
 #endif
 
                         //Step 3: Swap the selected item with the last "unstruck" letter in the collection
-                        T temp = unshuffled[i];
-                        unshuffled[i] = unshuffled[k];
-                        unshuffled[k] = temp;
+                        (unshuffled[k], unshuffled[i]) = (unshuffled[i], unshuffled[k]);
                     }
                     shuffled = unshuffled;
 

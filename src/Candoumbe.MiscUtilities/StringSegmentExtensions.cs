@@ -1,4 +1,7 @@
-﻿#if STRING_SEGMENT
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+#if STRING_SEGMENT
 
 namespace Microsoft.Extensions.Primitives
 {
@@ -48,7 +51,7 @@ namespace Microsoft.Extensions.Primitives
         /// the index where <paramref name="search"/>
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <see langword="null"/></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = default)
         {
@@ -142,7 +145,7 @@ namespace Microsoft.Extensions.Primitives
         /// <returns><see langword="true"/> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <see langword="false"/>
         /// otherwise.
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         public static bool Like(this StringSegment input, string pattern, bool ignoreCase) => input.Value.Like(pattern, ignoreCase);
 
         /// <summary>
@@ -151,7 +154,7 @@ namespace Microsoft.Extensions.Primitives
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
         /// <returns><see langword="true"/> if input is like <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
 
         /// <summary>
@@ -160,9 +163,8 @@ namespace Microsoft.Extensions.Primitives
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
         /// <returns><see cref="LambdaExpression"/></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
         public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
-
 
         /// <summary>
         /// Converts the <paramref name="input"/> to its Title Case equivalent
