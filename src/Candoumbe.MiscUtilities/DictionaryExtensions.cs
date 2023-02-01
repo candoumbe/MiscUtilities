@@ -74,9 +74,8 @@ namespace System.Collections.Generic
                     Type valueType = value.GetType();
                     TypeInfo valueTypeInfo = valueType.GetTypeInfo();
                     //The type of the value is a "simple" object
-                    if (valueTypeInfo.IsPrimitive
-                        || valueTypeInfo.IsEnum
-                        || PrimitiveTypes.Any(x => x == valueType))
+                    if (valueTypeInfo.IsPrimitive || valueTypeInfo.IsEnum
+                                                  || PrimitiveTypes.Any(x => x == valueType))
                     {
                         if (sb.Length > 0)
                         {
@@ -109,7 +108,7 @@ namespace System.Collections.Generic
 
                         foreach (object item in enumerable)
                         {
-                            if (item != null)
+                            if (item is not null)
                             {
                                 elementType = item.GetType();
                                 elementTypeInfo = elementType.GetTypeInfo();
