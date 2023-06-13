@@ -27,7 +27,7 @@
         <DefineConstants>$(DefineConstants);SYSTEM_TEXT;REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND</DefineConstants>
       </PropertyGroup>
       <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="7.0.2" />
+        <PackageReference Include="System.Text.Json" Version="7.0.3" />
       </ItemGroup>
     </When>
     <Otherwise>
@@ -35,7 +35,7 @@
         <DefineConstants>$(DefineConstants);SYSTEM_TEXT</DefineConstants>
       </PropertyGroup>
       <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="7.0.2" />
+        <PackageReference Include="System.Text.Json" Version="7.0.3" />
       </ItemGroup>
     </Otherwise>
   </Choose>
