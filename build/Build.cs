@@ -3,9 +3,9 @@
 
 namespace Utilities.ContinuousIntegration;
 
-using Candoumbe.Pipelines;
 using Candoumbe.Pipelines.Components;
 using Candoumbe.Pipelines.Components.GitHub;
+using Candoumbe.Pipelines.Components.NuGet;
 using Candoumbe.Pipelines.Components.Workflows;
 
 using Nuke.Common;
@@ -19,8 +19,6 @@ using Nuke.Common.Tools.DotNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using static Nuke.Common.IO.PathConstruction;
 
 [GitHubActions(
     "integration",
@@ -48,7 +46,7 @@ using static Nuke.Common.IO.PathConstruction;
     "delivery",
     GitHubActionsImage.UbuntuLatest,
     OnPushBranches = new[] { IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*" },
-    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPublish.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
+    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
     EnableGitHubToken = true,
     FetchDepth = 0,
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
@@ -69,7 +67,6 @@ using static Nuke.Common.IO.PathConstruction;
 
 [UnsetVisualStudioEnvironmentVariables]
 [DotNetVerbosityMapping]
-[HandleVisualStudioDebugging]
 public class Build : NukeBuild,
     IHaveArtifacts,
     IHaveConfiguration,
@@ -87,7 +84,7 @@ public class Build : NukeBuild,
     IMutationTest,
     IReportCoverage,
     IPack,
-    IPublish,
+    IPushNugetPackages,
     IGitFlowWithPullRequest,
     ICreateGithubRelease
 {
@@ -125,26 +122,27 @@ public class Build : NukeBuild,
     };
 
     ///<inheritdoc/>
-    IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetProjects("*.UnitTests"));
+    IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
 
     ///<inheritdoc/>
-    IEnumerable<Project> IMutationTest.MutationTestsProjects => Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects);
+    IEnumerable<(Project SourceProject, IEnumerable<Project> TestProjects)> IMutationTest.MutationTestsProjects
+        => new[] { (Solution.GetProject("Candoumbe.MiscUtilities"), Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects)) };
 
     ///<inheritdoc/>
-    IEnumerable<Project> IBenchmark.BenchmarkProjects => this.Get<IHaveSolution>().Solution.GetProjects("*.PerformanceTests");
+    IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
 
     ///<inheritdoc/>
     IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
     ///<inheritdoc/>
-    IEnumerable<PublishConfiguration> IPublish.PublishConfigurations => new PublishConfiguration[]
+    IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations => new PushNugetPackageConfiguration[]
     {
-        new NugetPublishConfiguration(
+        new NugetPushConfiguration(
             apiKey: NugetApiKey,
             source: new Uri("https://api.nuget.org/v3/index.json"),
             canBeUsed: () => NugetApiKey is not null
         ),
-        new GitHubPublishConfiguration(
+        new GitHubPushNugetConfiguration(
             githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
             source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
             canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null
