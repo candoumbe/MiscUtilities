@@ -6,11 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
 #if NEWTONSOFT_JSON
 using Newtonsoft.Json;
+
 using static Newtonsoft.Json.JsonConvert;
 using static Newtonsoft.Json.Formatting;
 using static Newtonsoft.Json.NullValueHandling;
+
 using Newtonsoft.Json.Converters;
 #else
 using System.Text.Json;
@@ -193,7 +196,11 @@ namespace System
             {
                 Type sourceType = obj.GetType();
 
-                if (targetType == sourceType || sourceType.GetTypeInfo().IsAssignableFrom(targetType.GetTypeInfo()))
+                if (targetType == sourceType)
+                {
+                    safeCastResult = obj;
+                }
+                else
                 {
                     ParameterExpression param = Expression.Parameter(obj.GetType());
                     Expression asExpression = Expression.TypeAs(param, targetType);
