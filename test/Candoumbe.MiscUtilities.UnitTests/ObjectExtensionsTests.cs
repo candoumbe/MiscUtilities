@@ -4,6 +4,8 @@
 using Candoumbe.MiscUtilities.UnitTests.Generators;
 using Candoumbe.MiscUtilities.UnitTests.Models;
 
+using FakeItEasy;
+
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using FluentAssertions.Json;
@@ -304,6 +306,17 @@ namespace Utilities.UnitTests
                     (Expression<Func<object, bool>>)(result => result == null),
                     $"{nameof(ObjectExtensions.As)} is null safe"
                 };
+
+                {
+                    Foo obj = A.Fake<Foo>(options => options.Implements<IFoo>());
+                    yield return new object[]
+                    {
+                        obj,
+                        typeof(IFoo),
+                        (Expression<Func<object, bool>>)(result => result is IFoo),
+                        $"{nameof(ObjectExtensions.As)} because Foo implements IFoo"
+                    };
+                }
             }
         }
 
@@ -387,4 +400,20 @@ namespace Utilities.UnitTests
         }
 #endif
     }
+
+
+    public class Foo
+    {
+        public Foo()
+        { }
+    }
+
+    public interface IFoo
+    {
+    }
+
+    public interface IBar
+    {
+    }
+
 }
