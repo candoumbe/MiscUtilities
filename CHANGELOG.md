@@ -6,12 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### 🚀 New features
+- Added net8.0 support
+
 ### 🔧 Fixes
 - Fixed `object.As<T>()` extension method to work the same way `as` keyword does.
 
 ### 🧹 Housekeeping
 - Add Codium PR agent
 - Bumped `Candoumbe.Pipelines` to 0.9.0
+- Replaced constructors with primary constructor wherever applicable
 
 ## [0.11.0] / 2023-02-01
 ### ⚠️ Breaking changes
