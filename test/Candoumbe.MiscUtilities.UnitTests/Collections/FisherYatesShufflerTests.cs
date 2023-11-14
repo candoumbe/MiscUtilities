@@ -22,17 +22,10 @@ using Xunit.Categories;
 namespace Candoumbe.MiscUtilities.UnitTests.Collections
 {
     [UnitTest]
-    public class FisherYatesShufflerTests
+    public class FisherYatesShufflerTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-        private readonly FisherYatesShuffler<int> _sut;
+        private readonly FisherYatesShuffler<int> _sut = new();
         private static readonly Faker _faker = new();
-
-        public FisherYatesShufflerTests(ITestOutputHelper outputHelper)
-        {
-            _outputHelper = outputHelper;
-            _sut = new();
-        }
 
         [Property]
         public async Task Given_a_collection_of_items_Shuffle_should_shuffle_the_collection(NonEmptySet<int> original)
@@ -41,7 +34,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Collections
             List<int> input = new(original.Item.Count);
             original.Item.ForEach(val => input.Add(val));
 
-            _outputHelper.WriteLine($"Input : {input.Jsonify()}");
+            outputHelper.WriteLine($"Input : {input.Jsonify()}");
 
             int runCount = _faker.Random.Int(10, 100);
 

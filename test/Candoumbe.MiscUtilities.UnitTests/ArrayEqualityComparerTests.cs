@@ -10,15 +10,8 @@ using Xunit.Categories;
 namespace Utilities.UnitTests
 {
     [UnitTest]
-    public class ArrayEqualityComparerTests
+    public class ArrayEqualityComparerTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        public ArrayEqualityComparerTests(ITestOutputHelper outputHelper)
-        {
-            _outputHelper = outputHelper;
-        }
-
         public static IEnumerable<object[]> ArrayOfByteEqualCases
         {
             get
@@ -80,8 +73,8 @@ namespace Utilities.UnitTests
 
         private void TestEqual<T>(T[] first, T[] second, bool expected, string reason)
         {
-            _outputHelper.WriteLine($"First : '{first.Jsonify()}'");
-            _outputHelper.WriteLine($"Second : '{second.Jsonify()}'");
+            outputHelper.WriteLine($"First : '{first.Jsonify()}'");
+            outputHelper.WriteLine($"Second : '{second.Jsonify()}'");
 
             ArrayEqualityComparer<T> comparer = new();
 

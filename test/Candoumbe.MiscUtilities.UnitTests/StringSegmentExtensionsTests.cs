@@ -12,15 +12,8 @@ using Bogus;
 namespace Utilities.UnitTests
 {
     [UnitTest]
-    public class StringSegmentExtensionsTests
+    public class StringSegmentExtensionsTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        public StringSegmentExtensionsTests(ITestOutputHelper outputHelper)
-        {
-            _outputHelper = outputHelper;
-        }
-
         public static IEnumerable<object[]> OccurrencesCases
         {
             get
@@ -72,13 +65,13 @@ namespace Utilities.UnitTests
         [MemberData(nameof(OccurrencesCases))]
         public void Occurrences(StringSegment source, StringSegment search, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
         {
-            _outputHelper.WriteLine($"Source : '{source.Value}'");
-            _outputHelper.WriteLine($"Search : '{search}'");
+            outputHelper.WriteLine($"Source : '{source.Value}'");
+            outputHelper.WriteLine($"Search : '{search}'");
 
             // Act
             IEnumerable<int> occurrences = source.Occurrences(search);
 
-            _outputHelper.WriteLine($"Result : {occurrences.Jsonify()}");
+            outputHelper.WriteLine($"Result : {occurrences.Jsonify()}");
 
             // Assert
             occurrences.Should()
@@ -136,13 +129,13 @@ namespace Utilities.UnitTests
         [MemberData(nameof(OccurrencesWithCharCases))]
         public void Occurrences_of_char(StringSegment source, char search, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
         {
-            _outputHelper.WriteLine($"Source : '{source.Value}'");
-            _outputHelper.WriteLine($"Search : '{search}'");
+            outputHelper.WriteLine($"Source : '{source.Value}'");
+            outputHelper.WriteLine($"Search : '{search}'");
 
             // Act
             IEnumerable<int> occurrences = source.Occurrences(search);
 
-            _outputHelper.WriteLine($"Result : {occurrences.Jsonify()}");
+            outputHelper.WriteLine($"Result : {occurrences.Jsonify()}");
 
             // Assert
             occurrences.Should()

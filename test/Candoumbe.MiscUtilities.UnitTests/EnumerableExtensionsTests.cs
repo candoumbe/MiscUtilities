@@ -27,15 +27,9 @@ namespace Utilities.UnitTests
 {
     [UnitTest]
     [Feature("Enumerable")]
-    public class EnumerableExtensionsTests
+    public class EnumerableExtensionsTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
         private readonly static Faker _faker = new();
-
-        public EnumerableExtensionsTests(ITestOutputHelper outputHelper)
-        {
-            _outputHelper = outputHelper;
-        }
 
         /// <summary>
         /// <see cref="Once(IEnumerable{int}, Expression{Func{int, bool}}, bool)"/> tests cases
@@ -113,8 +107,8 @@ namespace Utilities.UnitTests
         [MemberData(nameof(OnceCases))]
         public void Once(IEnumerable<int> source, Expression<Func<int, bool>> predicate, bool expectedResult, string reason)
         {
-            _outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
-            _outputHelper.WriteLine($"{nameof(predicate)} : {predicate}");
+            outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
+            outputHelper.WriteLine($"{nameof(predicate)} : {predicate}");
 
             // Act
             bool actualResult = source.Once(predicate);
@@ -198,8 +192,8 @@ namespace Utilities.UnitTests
         [MemberData(nameof(AtLeastOnceWithPredicateThrowsArgumentNullExceptionCases))]
         public void AtLeastOnce_With_Predicate_Should_Throws_ArgumentNullException(IEnumerable<int> source, Expression<Func<int, bool>> predicate)
         {
-            _outputHelper.WriteLine($"source is null : {source is null}");
-            _outputHelper.WriteLine($"predicate is null : {predicate is null}");
+            outputHelper.WriteLine($"source is null : {source is null}");
+            outputHelper.WriteLine($"predicate is null : {predicate is null}");
 
             // Act
             Action action = () => source.AtLeastOnce(predicate);
@@ -264,8 +258,8 @@ namespace Utilities.UnitTests
         [MemberData(nameof(AtLeastOnceWithPredicateCases))]
         public void AtLeastOnceWithPredicate(IEnumerable<int> source, Expression<Func<int, bool>> predicate, bool expectedResult)
         {
-            _outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
-            _outputHelper.WriteLine($"{nameof(predicate)} : {predicate}");
+            outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
+            outputHelper.WriteLine($"{nameof(predicate)} : {predicate}");
 
             // Act
             bool actualResult = source.AtLeastOnce(predicate);
@@ -310,7 +304,7 @@ namespace Utilities.UnitTests
         [MemberData(nameof(AtLeastOnceCases))]
         public void AtLeastOnce(IEnumerable<int> source, bool expectedResult)
         {
-            _outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
+            outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
 
             // Act
             bool actualResult = source.AtLeastOnce();
@@ -535,8 +529,8 @@ namespace Utilities.UnitTests
         [MemberData(nameof(CrossJoinTwoCollectionCases))]
         public void CrossJoinTwoCollections(IEnumerable<int> first, IEnumerable<int> second, Expression<Func<IEnumerable<(int, int)>, bool>> crossJoinResultExpectation)
         {
-            _outputHelper.WriteLine($"{nameof(first)} : {SerializeObject(first)}");
-            _outputHelper.WriteLine($"{nameof(second)} : {SerializeObject(second)}");
+            outputHelper.WriteLine($"{nameof(first)} : {SerializeObject(first)}");
+            outputHelper.WriteLine($"{nameof(second)} : {SerializeObject(second)}");
 
             // Act
             IEnumerable<(int, int)> result = first.CrossJoin(second);
@@ -614,9 +608,9 @@ namespace Utilities.UnitTests
         [MemberData(nameof(CrossJoinThreeCollectionCases))]
         public void CrossJoinThreeCollections(IEnumerable<int> first, IEnumerable<int> second, IEnumerable<string> third, Expression<Func<IEnumerable<(int, int, string)>, bool>> crossJoinResultExpectation)
         {
-            _outputHelper.WriteLine($"{nameof(first)} : {SerializeObject(first)}");
-            _outputHelper.WriteLine($"{nameof(second)} : {SerializeObject(second)}");
-            _outputHelper.WriteLine($"{nameof(third)} : {SerializeObject(third)}");
+            outputHelper.WriteLine($"{nameof(first)} : {SerializeObject(first)}");
+            outputHelper.WriteLine($"{nameof(second)} : {SerializeObject(second)}");
+            outputHelper.WriteLine($"{nameof(third)} : {SerializeObject(third)}");
 
             // Act
             IEnumerable<(int, int, string)> result = first.CrossJoin(second, third);
@@ -666,8 +660,8 @@ namespace Utilities.UnitTests
         [MemberData(nameof(NoneCases))]
         public void None(IEnumerable<int> source, Expression<Func<int, bool>> predicate, bool expectedResult)
         {
-            _outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
-            _outputHelper.WriteLine($"{nameof(predicate)} : {predicate}");
+            outputHelper.WriteLine($"{nameof(source)} : {SerializeObject(source)}");
+            outputHelper.WriteLine($"{nameof(predicate)} : {predicate}");
 
             // Act and assert
             source.None(predicate).Should().Be(expectedResult);
@@ -710,7 +704,7 @@ namespace Utilities.UnitTests
             Faker faker = new();
             int[] source = faker.Random.Digits(count: 10);
 
-            _outputHelper.WriteLine($"Collection : {source.Jsonify()}");
+            outputHelper.WriteLine($"Collection : {source.Jsonify()}");
 
             // Act
             Action asAsyncEnumerableWithInvalidDelay = () => source.AsAsyncEnumerable(millisecondsDelay);
@@ -872,7 +866,7 @@ namespace Utilities.UnitTests
         [Property]
         public void Given_Source_and_strictly_Positive_bucketSize_Partition_should_create_buckets(NonEmptyArray<int> source, PositiveInt bucketSize)
         {
-            _outputHelper.WriteLine($"Bucket size : {bucketSize.Item}");
+            outputHelper.WriteLine($"Bucket size : {bucketSize.Item}");
 
             // Act
             IEnumerable<IEnumerable<int>> buckets = source.Item.Partition(bucketSize.Item);

@@ -28,12 +28,8 @@ namespace Utilities.UnitTests;
 /// </summary>
 [UnitTest]
 [Feature("IDictionary")]
-public class DictionaryExtensionsTests
+public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
 {
-    private readonly ITestOutputHelper _outputHelper;
-
-    public DictionaryExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
-
     public static IEnumerable<object[]> ToQueryStringCases
     {
         get
@@ -232,13 +228,13 @@ public class DictionaryExtensionsTests
     [MemberData(nameof(ToQueryStringCases))]
     public void ToQueryString(IEnumerable<KeyValuePair<string, object>> keyValues, Expression<Func<string, bool>> expectedString)
     {
-        _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
+        outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
 
         // Act
         string queryString = keyValues.ToQueryString();
 
         // Arrange
-        _outputHelper.WriteLine($"Result is '{queryString}'");
+        outputHelper.WriteLine($"Result is '{queryString}'");
         queryString?.Should()
                     .Match(expectedString);
     }
@@ -362,13 +358,13 @@ public class DictionaryExtensionsTests
                                                 Func<string, object, object> transformation,
                                                 Expression<Func<string, bool>> expectedString)
     {
-        _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
+        outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
 
         // Act
         string queryString = keyValues?.ToQueryString(transformation);
 
         // Arrange
-        _outputHelper.WriteLine($"Result is '{queryString}'");
+        outputHelper.WriteLine($"Result is '{queryString}'");
         queryString?.Should()
                     .Match(expectedString);
     }

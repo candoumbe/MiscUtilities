@@ -15,6 +15,10 @@
           "description": "The API key used to push code coverage to CodeCov",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
+        "ConfigName": {
+          "type": "string",
+          "description": "Defines the name of the configuration to use to publish packages"
+        },
         "Configuration": {
           "type": "string",
           "description": "Defines the configuratoin to use when building the application",
@@ -106,11 +110,8 @@
           "description": "Shows the execution plan (HTML)"
         },
         "Profile": {
-          "type": "array",
-          "description": "Defines the profiles to load",
-          "items": {
-            "type": "string"
-          }
+          "type": "string",
+          "description": "Name of the profile where the current set of secrets"
         },
         "Root": {
           "type": "string",
@@ -147,7 +148,9 @@
           "description": "Path to a solution file that is automatically loaded"
         },
         "StrykerDashboardApiKey": {
-          "type": "string"
+          "type": "string",
+          "description": "API KEY used to submit mutation report to a stryker dashboard",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Target": {
           "type": "array",
@@ -178,11 +181,6 @@
         "Title": {
           "type": "string",
           "description": "Title that will be used when creating a PR"
-        },
-        "Token": {
-          "type": "string",
-          "description": "Token used to create a pull request",
-          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Verbosity": {
           "type": "string",

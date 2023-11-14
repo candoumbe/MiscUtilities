@@ -30,18 +30,14 @@ namespace Utilities.UnitTests
     /// <summary>
     /// Extensions methods for <see cref="object"/> type.
     /// </summary>
+    /// <remarks>
+    /// Builds a new <see cref="ObjectExtensionsTests"/> instance.
+    /// </remarks
+    /// <param name="outputHelper"></param>
     [UnitTest]
     [Feature(nameof(ObjectExtensions))]
-    public class ObjectExtensionsTests
+    public class ObjectExtensionsTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        /// <summary>
-        /// Builds a new <see cref="ObjectExtensionsTests"/> instance.
-        /// </summary
-        /// <param name="outputHelper"></param>
-        public ObjectExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
-
         public static IEnumerable<object[]> ToQueryStringCases
         {
             get
@@ -141,7 +137,7 @@ namespace Utilities.UnitTests
         [MemberData(nameof(ToQueryStringCases))]
         public void ToQueryString(object input, string expectedString)
         {
-            _outputHelper.WriteLine($"input : {input}");
+            outputHelper.WriteLine($"input : {input}");
 
             // Act
             string actual = input.ToQueryString();
@@ -174,7 +170,7 @@ namespace Utilities.UnitTests
         [MemberData(nameof(ToQueryStringWithTransformCases))]
         public void ToQueryStringWithTransform(object input, Func<string, object, object> transform, string expectedString)
         {
-            _outputHelper.WriteLine($"input : {input}");
+            outputHelper.WriteLine($"input : {input}");
 
             // Act
             string actual = input.ToQueryString(transform);
@@ -285,13 +281,13 @@ namespace Utilities.UnitTests
         [MemberData(nameof(ParseAnonymousObjectCases))]
         public void ParseAnonymousObject(object input, Expression<Func<IDictionary<string, object>, bool>> resultExpectation)
         {
-            _outputHelper.WriteLine($"input : {input}");
+            outputHelper.WriteLine($"input : {input}");
 
             //Act
             IDictionary<string, object> result = input?.ParseAnonymousObject();
 
             // Assert
-            _outputHelper.WriteLine($"output : {SerializeObject(result)}");
+            outputHelper.WriteLine($"output : {SerializeObject(result)}");
             result.Should().Match(resultExpectation);
         }
 
@@ -365,7 +361,7 @@ namespace Utilities.UnitTests
         {
             // Act
             string json = source.Jsonify();
-            _outputHelper.WriteLine(json);
+            outputHelper.WriteLine(json);
 
             // Assert
             JToken jtoken = JToken.Parse(json);
@@ -386,7 +382,7 @@ namespace Utilities.UnitTests
 
             // Act
             string json = source.Jsonify(settings);
-            _outputHelper.WriteLine(json);
+            outputHelper.WriteLine(json);
 
             // Assert
             JToken jtoken = JToken.Parse(json);

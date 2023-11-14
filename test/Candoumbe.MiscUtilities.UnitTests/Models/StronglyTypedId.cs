@@ -71,7 +71,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     }
 
     [ExcludeFromCodeCoverage]
-    public class StronglyTypedIdConverter<TValue> : TypeConverter where TValue : notnull
+    public class StronglyTypedIdConverter<TValue>(Type type) : TypeConverter where TValue : notnull
     {
         private static readonly TypeConverter IdValueConverter = GetIdValueConverter();
 
@@ -84,12 +84,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
             }
 
             return converter;
-        }
-
-        private readonly Type _type;
-        public StronglyTypedIdConverter(Type type)
-        {
-            _type = type;
         }
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
@@ -117,7 +111,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
 
             if (value is TValue idValue)
             {
-                Func<TValue, object> factory = StronglyTypedIdHelper.GetFactory<TValue>(_type);
+                Func<TValue, object> factory = StronglyTypedIdHelper.GetFactory<TValue>(type);
                 result = factory(idValue);
             }
             else
@@ -158,16 +152,11 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     }
 
     [ExcludeFromCodeCoverage]
-    public class StronglyTypedIdConverter : TypeConverter
+    public class StronglyTypedIdConverter(Type stronglyTypedIdType) : TypeConverter
     {
         private static readonly ConcurrentDictionary<Type, TypeConverter> ActualConverters = new();
 
-        private readonly TypeConverter _innerConverter;
-
-        public StronglyTypedIdConverter(Type stronglyTypedIdType)
-        {
-            _innerConverter = ActualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
-        }
+        private readonly TypeConverter _innerConverter = ActualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
             _innerConverter.CanConvertFrom(context, sourceType);

@@ -20,10 +20,8 @@ namespace Utilities.UnitTests
 {
     [UnitTest]
     [Feature(nameof(StringExtensions))]
-    public class StringExtensionsTests
+    public class StringExtensionsTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-
         internal class SuperHero
         {
             public string Firstname { get; set; }
@@ -32,8 +30,6 @@ namespace Utilities.UnitTests
 
             public SuperHero Acolyte { get; set; }
         }
-
-        public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
 
         public static IEnumerable<object[]> ToTitleCases
         {
@@ -62,16 +58,16 @@ namespace Utilities.UnitTests
         public void ToTitleCase(string cultureName, string input, string expectedString)
         {
             // Arrange
-            _outputHelper.WriteLine($"Current culture : {CultureInfo.CurrentCulture}");
-            _outputHelper.WriteLine($"Culture to test : {cultureName}");
-            _outputHelper.WriteLine($"Input : {input}");
-            _outputHelper.WriteLine($"expected : {expectedString}");
+            outputHelper.WriteLine($"Current culture : {CultureInfo.CurrentCulture}");
+            outputHelper.WriteLine($"Culture to test : {cultureName}");
+            outputHelper.WriteLine($"Input : {input}");
+            outputHelper.WriteLine($"expected : {expectedString}");
 
             using CultureSwitcher cultureSwitcher = new();
 
             cultureSwitcher.Run(cultureName, () =>
             {
-                _outputHelper.WriteLine($"Culture while testing : {CultureInfo.CurrentCulture}");
+                outputHelper.WriteLine($"Culture while testing : {CultureInfo.CurrentCulture}");
                 // Assert
                 string actual = input?.ToTitleCase();
 
@@ -150,9 +146,9 @@ namespace Utilities.UnitTests
         [InlineData("a@b.c", "?*@?*.?*", false, true)]
         public void StringLike(string input, string pattern, bool ignoreCase, bool expectedResult)
         {
-            _outputHelper.WriteLine($"input : '{input}'");
-            _outputHelper.WriteLine($"pattern : '{pattern}'");
-            _outputHelper.WriteLine($"Ignore case : '{ignoreCase}'");
+            outputHelper.WriteLine($"input : '{input}'");
+            outputHelper.WriteLine($"pattern : '{pattern}'");
+            outputHelper.WriteLine($"Ignore case : '{ignoreCase}'");
 
             // Act
             bool result = input.Like(pattern, ignoreCase);
@@ -224,9 +220,9 @@ namespace Utilities.UnitTests
         [MemberData(nameof(StringSegmentLikeCases))]
         public void StringSegmentLike((StringSegment input, string pattern, bool ignoreCase, bool expectedResult) data)
         {
-            _outputHelper.WriteLine($"input : '{data.input}'");
-            _outputHelper.WriteLine($"pattern : '{data.pattern}'");
-            _outputHelper.WriteLine($"Ignore case : '{data.ignoreCase}'");
+            outputHelper.WriteLine($"input : '{data.input}'");
+            outputHelper.WriteLine($"pattern : '{data.pattern}'");
+            outputHelper.WriteLine($"Ignore case : '{data.ignoreCase}'");
 
             // Act
             bool result = data.input.Like(data.pattern, data.ignoreCase);
@@ -278,7 +274,7 @@ namespace Utilities.UnitTests
         //#endif
         public void Slugify(string culture, string input, string expectedOutput)
         {
-            _outputHelper.WriteLine($"input : '{input}'");
+            outputHelper.WriteLine($"input : '{input}'");
             using CultureSwitcher cultureSwitcher = new();
             cultureSwitcher.Run(culture, () =>
             {
@@ -303,7 +299,7 @@ namespace Utilities.UnitTests
         //#endif
         public void ToSnakeCase(string input, string expectedOutput)
         {
-            _outputHelper.WriteLine($"input : '{input}'");
+            outputHelper.WriteLine($"input : '{input}'");
             input.ToSnakeCase().Should().Be(expectedOutput);
         }
 
@@ -412,14 +408,14 @@ namespace Utilities.UnitTests
         [MemberData(nameof(OccurrencesCases))]
         public void Occurrences(string source, string search, StringComparison stringComparison, Expression<Func<IEnumerable<int>, bool>> expectation, string reason)
         {
-            _outputHelper.WriteLine($"Source : '{source}'");
-            _outputHelper.WriteLine($"Search : '{search}'");
-            _outputHelper.WriteLine($"StringComparison : '{stringComparison}'");
+            outputHelper.WriteLine($"Source : '{source}'");
+            outputHelper.WriteLine($"Search : '{search}'");
+            outputHelper.WriteLine($"StringComparison : '{stringComparison}'");
 
             // Act
             IEnumerable<int> occurrences = source.Occurrences(search, stringComparison);
 
-            _outputHelper.WriteLine($"Result : {occurrences.Jsonify()}");
+            outputHelper.WriteLine($"Result : {occurrences.Jsonify()}");
 
             // Assert
             occurrences.Should()
@@ -431,9 +427,9 @@ namespace Utilities.UnitTests
         [InlineData("zsasz", "z", StringComparison.InvariantCulture, 0)]
         public void FirstOccurrence(string source, string search, StringComparison stringComparison, int expected)
         {
-            _outputHelper.WriteLine($"Source : '{source}'");
-            _outputHelper.WriteLine($"Search : '{search}'");
-            _outputHelper.WriteLine($"StringComparison : '{stringComparison}'");
+            outputHelper.WriteLine($"Source : '{source}'");
+            outputHelper.WriteLine($"Search : '{search}'");
+            outputHelper.WriteLine($"StringComparison : '{stringComparison}'");
 
             // Act
             int occurrence = source.FirstOccurrence(search, stringComparison);
