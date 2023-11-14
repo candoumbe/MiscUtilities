@@ -94,7 +94,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
                 || base.CanConvertTo(context, destinationType);
         }
 
-        [SuppressMessage("Simplification", "RCS1179:Unnecessary assignment.")]
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string s)

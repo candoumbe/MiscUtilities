@@ -16,6 +16,7 @@ using Xunit.Abstractions;
 using Xunit.Categories;
 using static System.Linq.Expressions.ExpressionExtensions;
 using static Newtonsoft.Json.JsonConvert;
+using static System.Linq.Expressions.ExpressionExtensions;
 
 namespace Utilities.UnitTests
 {

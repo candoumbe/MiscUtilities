@@ -17,32 +17,11 @@ using Xunit.Categories;
 namespace Candoumbe.MiscUtilities.UnitTests.Collections
 {
     [UnitTest]
-
-    /* Modification non fusionnée à partir du projet 'Candoumbe.MiscUtilities.UnitTests(net7.0)'
-    Avant :
-        public class FisherYatesShufflerTests
-        {
-            private readonly ITestOutputHelper _outputHelper;
-            private readonly FisherYatesShuffler<int> _sut;
-            private static readonly Faker _faker = new();
-
-            public FisherYatesShufflerTests(ITestOutputHelper outputHelper)
-            {
-                _outputHelper = outputHelper;
-                _sut = new();
-            }
-    Après :
-        public class FisherYatesShufflerTests(ITestOutputHelper outputHelper)
-        {
-            private readonly ITestOutputHelper _outputHelper = outputHelper;
-            private readonly FisherYatesShuffler<int> _sut = new();
-            private static readonly Faker _faker = new();
-    */
     public class FisherYatesShufflerTests(ITestOutputHelper outputHelper)
     {
         private readonly ITestOutputHelper _outputHelper = outputHelper;
         private readonly FisherYatesShuffler<int> _sut = new();
-        private static readonly Faker _faker = new();
+        private static readonly Faker Faker = new();
 
         [Property]
         public async Task Given_a_collection_of_items_Shuffle_should_shuffle_the_collection(NonEmptySet<int> original)
@@ -53,7 +32,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Collections
 
             _outputHelper.WriteLine($"Input : {input.Jsonify()}");
 
-            int runCount = _faker.Random.Int(10, 100);
+            int runCount = Faker.Random.Int(10, 100);
 
             // Act
             IEnumerable<Task<IEnumerable<int>>> tasks = Enumerable.Range(0, runCount)
