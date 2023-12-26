@@ -370,7 +370,7 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
     }
 
 #if NET6_0_OR_GREATER
-    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    [Property(Arbitrary = [typeof(ValueGenerators)])]
     public void Given_dictionary_that_contains_a_DateOnly_instance_ToQueryString_should_returns_expected_result(DateOnly date)
     {
         // Arrange
@@ -387,7 +387,7 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
                    .Be($"date-only={date:yyyy-MM-dd}");
     }
 
-    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    [Property(Arbitrary = [typeof(ValueGenerators)])]
     public void Given_dictionary_that_contains_a_TimeOnly_instance_ToQueryString_should_returns_expected_result(TimeOnly time)
     {
         // Arrange

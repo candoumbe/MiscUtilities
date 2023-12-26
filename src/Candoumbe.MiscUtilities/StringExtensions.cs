@@ -178,7 +178,7 @@ namespace System
 
             IEnumerable<string> fields = source.Replace(@"[""", ".")
                                                .Replace(@"""]", string.Empty)
-                                               .Split(new[] { '.' })
+                                               .Split(['.'])
                                                .Select(item => item.Trim());
             MemberExpression property = null;
 

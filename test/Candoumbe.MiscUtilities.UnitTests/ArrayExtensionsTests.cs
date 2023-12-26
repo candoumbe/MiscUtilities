@@ -18,7 +18,7 @@ namespace Candoumbe.MiscUtilities.UnitTests;
 [UnitTest]
 public class ArrayExtensionsTests
 {
-    [Property(Arbitrary = new[] {typeof(ValueGenerators)})]
+    [Property(Arbitrary = [typeof(ValueGenerators)])]
     public void Given_any_non_empty_array_ToArray_should_produce_an_array_of_the_same_length(NonNull<Array> source)
     {
         // Arrange

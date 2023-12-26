@@ -31,6 +31,6 @@ public static class ArrayExtensions
             values.Add(value);
         }
 
-        return values.ToArray();
+        return [.. values];
     }
 }

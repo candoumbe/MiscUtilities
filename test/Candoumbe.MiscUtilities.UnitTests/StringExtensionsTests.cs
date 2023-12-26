@@ -35,7 +35,7 @@ namespace Utilities.UnitTests
         {
             get
             {
-                string[] cultures = { "en-US", "fr-FR", "en-GB" };
+                string[] cultures = ["en-US", "fr-FR", "en-GB"];
 
                 foreach (string culture in cultures)
                 {

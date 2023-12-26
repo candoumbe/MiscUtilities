@@ -23,46 +23,46 @@ using System.Linq;
 [GitHubActions(
     "integration",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranchesIgnore = new[] { IHaveMainBranch.MainBranchName },
+    OnPushBranchesIgnore = [IHaveMainBranch.MainBranchName],
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPack.Pack) },
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
-    ImportSecrets = new[]
-    {
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPack.Pack)],
+    CacheKeyFiles = ["global.json", "src/**/*.csproj"],
+    ImportSecrets =
+    [
             nameof(NugetApiKey),
             nameof(IReportCoverage.CodecovToken)
-    },
-    OnPullRequestExcludePaths = new[]
-    {
+    ],
+    OnPullRequestExcludePaths =
+    [
             "docs/*",
             "README.md",
             "CHANGELOG.md",
             "LICENSE"
-    }
+    ]
 )]
 [GitHubActions(
     "delivery",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranches = new[] { IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*" },
-    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
+    OnPushBranches = [IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*"],
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease)],
     EnableGitHubToken = true,
     FetchDepth = 0,
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
+    CacheKeyFiles = ["global.json", "src/**/*.csproj"],
     PublishArtifacts = true,
-    ImportSecrets = new[]
-    {
+    ImportSecrets =
+    [
             nameof(NugetApiKey),
             nameof(IReportCoverage.CodecovToken)
-    },
-    OnPullRequestExcludePaths = new[]
-    {
+    ],
+    OnPullRequestExcludePaths =
+    [
             "docs/*",
             "README.md",
             "CHANGELOG.md",
             "LICENSE"
-    }
+    ]
 )]
 
 [UnsetVisualStudioEnvironmentVariables]
