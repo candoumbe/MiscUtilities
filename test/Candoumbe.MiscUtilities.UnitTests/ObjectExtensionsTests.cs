@@ -351,7 +351,7 @@ namespace Utilities.UnitTests
                  .BeEquivalentTo(source);
         }
 
-        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+        [Property(Arbitrary = [typeof(ValueGenerators)])]
         public void Given_non_null_input_and_no_serializerOptions_Jsonify_should_behave_as_expected(Appointment source)
         {
             // Act
@@ -369,7 +369,7 @@ namespace Utilities.UnitTests
 #endif
         }
 
-        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+        [Property(Arbitrary = [typeof(ValueGenerators)])]
         public void Given_non_null_input_and_serializerOptions_with_no_custom_converters_for_TimeOnly_or_DateOnly_types_Jsonify_should_behave_as_expected(Appointment source)
         {
             // Arrange
