@@ -58,7 +58,7 @@ namespace System.Collections.Generic
             StringBuilder sb = new();
 
             IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues is null
-                ? Enumerable.Empty<KeyValuePair<string, object>>()
+                ? []
                 : keyValues.Where(kv => kv.Value != null)
                            .OrderBy(kv => kv.Key)
                            .ThenBy(kv => kv.Value);
