@@ -14,55 +14,58 @@ using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
+using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using static Nuke.Common.Tools.Git.GitTasks;
+
 [GitHubActions(
     "integration",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranchesIgnore = new[] { IHaveMainBranch.MainBranchName },
+    OnPushBranchesIgnore = [IHaveMainBranch.MainBranchName],
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPack.Pack) },
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
-    ImportSecrets = new[]
-    {
-            nameof(NugetApiKey),
-            nameof(IReportCoverage.CodecovToken)
-    },
-    OnPullRequestExcludePaths = new[]
-    {
-            "docs/*",
-            "README.md",
-            "CHANGELOG.md",
-            "LICENSE"
-    }
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPack.Pack)],
+    CacheKeyFiles = ["global.json", "src/**/*.csproj"],
+    ImportSecrets =
+    [
+        nameof(NugetApiKey),
+        nameof(IReportCoverage.CodecovToken)
+    ],
+    OnPullRequestExcludePaths =
+    [
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ]
 )]
 [GitHubActions(
     "delivery",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranches = new[] { IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*" },
-    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
+    OnPushBranches = [IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*"],
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease)],
     EnableGitHubToken = true,
     FetchDepth = 0,
     CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
     PublishArtifacts = true,
-    ImportSecrets = new[]
-    {
-            nameof(NugetApiKey),
-            nameof(IReportCoverage.CodecovToken)
-    },
-    OnPullRequestExcludePaths = new[]
-    {
-            "docs/*",
-            "README.md",
-            "CHANGELOG.md",
-            "LICENSE"
-    }
+    ImportSecrets =
+    [
+        nameof(NugetApiKey),
+        nameof(IReportCoverage.CodecovToken)
+    ],
+    OnPullRequestExcludePaths =
+    [
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ]
 )]
 
 [UnsetVisualStudioEnvironmentVariables]
@@ -78,6 +81,7 @@ public class Build : NukeBuild,
     IHaveGitVersion,
     IClean,
     IRestore,
+    IDotnetFormat,
     ICompile,
     IBenchmark,
     IUnitTest,
@@ -132,6 +136,9 @@ public class Build : NukeBuild,
     IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
 
     ///<inheritdoc/>
+    Configure<DotNetRunSettings> IBenchmark.BenchmarksSettings => settings => settings.SetConfiguration(Configuration.Release);
+
+    ///<inheritdoc/>
     IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
     ///<inheritdoc/>
@@ -154,6 +161,25 @@ public class Build : NukeBuild,
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
+
+    ///<inheritdoc/>
+    bool IDotnetFormat.VerifyNoChanges => IsServerBuild;
+
+    ///<inheritdoc/>
+    (IReadOnlyCollection<AbsolutePath> IncludedFiles, IReadOnlyCollection<AbsolutePath> ExcludedFiles) IDotnetFormat.Files
+    {
+        get
+        {
+            IReadOnlyCollection<AbsolutePath> includedFiles = Git("diff --name-status", workingDirectory: Solution.Directory)
+                        .Where(output => output.Text.AsSpan().StartsWith("M") || output.Text.AsSpan().StartsWith("A"))
+                        .Select(output => AbsolutePath.Create(output.Text.AsSpan()[1..].TrimStart().ToString()))
+                        .ToArray();
+
+            IReadOnlyCollection<AbsolutePath> excludedFiles = [];
+
+            return (includedFiles, excludedFiles);
+        }
+    }
 
     ///<inheritdoc/>
     protected override void OnBuildCreated()
