@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🧹 Housekeeping
 - Add Codium PR agent
+- Bumped `Candoumbe.Pipelines` to 0.9.0
 
 ## [0.11.0] / 2023-02-01
 ### ⚠️ Breaking changes
