@@ -1,21 +1,27 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using AutoFixture.Xunit2;
+
+using Bogus;
+
+using FluentAssertions;
+
+using FsCheck;
+using FsCheck.Xunit;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AutoFixture.Xunit2;
-using Bogus;
-using FluentAssertions;
-using FsCheck;
-using FsCheck.Xunit;
+
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
-using static System.Linq.Expressions.ExpressionExtensions;
+
 using static Newtonsoft.Json.JsonConvert;
+using static System.Linq.Expressions.ExpressionExtensions;
 
 namespace Utilities.UnitTests
 {
@@ -851,7 +857,7 @@ namespace Utilities.UnitTests
         public void Given_Source_is_not_null_Partition_should_throw_ArgumentOutOfRangeException_when_bucketSize_is_negative(NonEmptyArray<int> source, NegativeInt bucketSize)
         {
             // Act
-            Action callingPartitionWithNegativeBucketSize = () => source.Item.Partition(bucketSize.Item).ToArray();
+            Action callingPartitionWithNegativeBucketSize = () => source.Item.Partition(bucketSize.Item);
 
             // Assert
             callingPartitionWithNegativeBucketSize.Should()
