@@ -152,7 +152,7 @@ namespace System.Collections.Generic
             {
                 DateTime dateTime when dateTime.Kind == DateTimeKind.Utc => dateTime.ToString("u").Replace(' ', 'T'),
                 DateTime dateTime => dateTime.ToString("s").Replace(' ', 'T'),
-                DateTimeOffset dateTimeOffset => $"{ dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-" : "+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
+                DateTimeOffset dateTimeOffset => $"{dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-" : "+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
 #if NET6_0_OR_GREATER
                 TimeOnly time => (time.Hour, time.Minute, time.Second, time.Millisecond) switch
                 {

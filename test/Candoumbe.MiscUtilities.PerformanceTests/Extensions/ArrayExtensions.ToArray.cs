@@ -35,7 +35,7 @@ namespace Candoumbe.MiscUtilities.PerformanceTests.Extensions
                 _genericArray[i] = _numbers[i];
             }
 
-            return _genericArray.ToArray();
+            return [.. _genericArray];
         }
     }
 }

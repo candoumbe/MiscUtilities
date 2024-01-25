@@ -3,11 +3,14 @@
 
 namespace Utilities.ContinuousIntegration;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Candoumbe.Pipelines.Components;
+using Candoumbe.Pipelines.Components.Formatting;
 using Candoumbe.Pipelines.Components.GitHub;
 using Candoumbe.Pipelines.Components.NuGet;
 using Candoumbe.Pipelines.Components.Workflows;
-
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
@@ -16,11 +19,6 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using static Nuke.Common.Tools.Git.GitTasks;
 
 [GitHubActions(
@@ -52,7 +50,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
     InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease)],
     EnableGitHubToken = true,
     FetchDepth = 0,
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
+    CacheKeyFiles = ["global.json", "src/**/*.csproj"],
     PublishArtifacts = true,
     ImportSecrets =
     [
@@ -166,20 +164,24 @@ public class Build : NukeBuild,
     bool IDotnetFormat.VerifyNoChanges => IsServerBuild;
 
     ///<inheritdoc/>
-    (IReadOnlyCollection<AbsolutePath> IncludedFiles, IReadOnlyCollection<AbsolutePath> ExcludedFiles) IDotnetFormat.Files
-    {
-        get
-        {
-            IReadOnlyCollection<AbsolutePath> includedFiles = Git("diff --name-status", workingDirectory: Solution.Directory)
-                        .Where(output => output.Text.AsSpan().StartsWith("M") || output.Text.AsSpan().StartsWith("A"))
-                        .Select(output => AbsolutePath.Create(output.Text.AsSpan()[1..].TrimStart().ToString()))
-                        .ToArray();
+    Configure<DotNetFormatSettings> IDotnetFormat.FormatSettings => settings => settings
+        .SetInclude(Git(arguments: "status --porcelain",
+                        workingDirectory: Solution.Directory,
+                        logOutput: IsLocalBuild || Verbosity is not Verbosity.Normal)
+                      .Where(output => output.Text.AsSpan().TrimStart()[..2] switch
+                      {
+                          ['M' or 'A', _] or [_, 'M' or 'A'] => true,
+                          _ => false,
+                      })
+                        .Select(output => output.Text.AsSpan()[2..].TrimStart().ToString())
+                        .ToArray())
+        .SetVerbosity(IsLocalBuild ? DotNetVerbosity.diagnostic : DotNetVerbosity.minimal)
+        .SetSeverity(DotNetFormatSeverity.info);
 
-            IReadOnlyCollection<AbsolutePath> excludedFiles = [];
-
-            return (includedFiles, excludedFiles);
-        }
-    }
+    ///<inheritdoc/>
+    DotNetFormatter[] IDotnetFormat.Formatters => IsLocalBuild
+                ? [DotNetFormatter.Analyzers, DotNetFormatter.Style, DotNetFormatter.Whitespace]
+                : [DotNetFormatter.Analyzers, DotNetFormatter.Style];
 
     ///<inheritdoc/>
     protected override void OnBuildCreated()

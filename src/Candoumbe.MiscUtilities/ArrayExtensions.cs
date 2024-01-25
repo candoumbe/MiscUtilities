@@ -3,8 +3,8 @@
 
 namespace System;
 
-using Linq;
 using Collections.Generic;
+using Linq;
 
 /// <summary>
 /// Sets of extension methods for <see cref="Array"/> type.
@@ -31,6 +31,6 @@ public static class ArrayExtensions
             values.Add(value);
         }
 
-        return values.ToArray();
+        return [.. values];
     }
 }

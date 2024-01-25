@@ -355,7 +355,7 @@ namespace System.Collections.Generic
         /// </param>
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> body)
         {
-            Action<T, int> bodyWithIndex = (item, _) => body(item);
+            void bodyWithIndex(T item, int _) => body(item);
             source.ForEach(bodyWithIndex);
         }
 

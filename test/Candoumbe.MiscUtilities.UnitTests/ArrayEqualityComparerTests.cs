@@ -1,8 +1,9 @@
-﻿using FluentAssertions;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
 
 using System;
 using System.Collections.Generic;
-
+using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -10,15 +11,9 @@ using Xunit.Categories;
 namespace Utilities.UnitTests
 {
     [UnitTest]
-    public class ArrayEqualityComparerTests
+    public class ArrayEqualityComparerTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        public ArrayEqualityComparerTests(ITestOutputHelper outputHelper)
-        {
-            _outputHelper = outputHelper;
-        }
-
+        private readonly ITestOutputHelper _outputHelper = outputHelper;
         public static IEnumerable<object[]> ArrayOfByteEqualCases
         {
             get

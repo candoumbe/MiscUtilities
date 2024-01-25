@@ -1,8 +1,6 @@
-using FluentAssertions;
-
 using System;
 using System.Collections.Generic;
-
+using FluentAssertions;
 using Xunit;
 using Xunit.Categories;
 
