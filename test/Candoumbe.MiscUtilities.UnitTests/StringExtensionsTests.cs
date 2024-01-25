@@ -1,17 +1,13 @@
-﻿using FluentAssertions;
-
-using FsCheck;
-using FsCheck.Fluent;
-using FsCheck.Xunit;
-
-using Microsoft.Extensions.Primitives;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-
+using FluentAssertions;
+using FsCheck;
+using FsCheck.Fluent;
+using FsCheck.Xunit;
+using Microsoft.Extensions.Primitives;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -20,9 +16,31 @@ namespace Utilities.UnitTests
 {
     [UnitTest]
     [Feature(nameof(StringExtensions))]
-    public class StringExtensionsTests
+
+    /* Modification non fusionnée à partir du projet 'Candoumbe.MiscUtilities.UnitTests(net7.0)'
+    Avant :
+        public class StringExtensionsTests
+        {
+            private readonly ITestOutputHelper _outputHelper;
+
+            internal class SuperHero
+            {
+                public string Firstname { get; set; }
+
+                public string Lastname { get; set; }
+
+                public SuperHero Acolyte { get; set; }
+            }
+
+            public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
+    Après :
+        public class StringExtensionsTests(ITestOutputHelper outputHelper)
+        {
+            private readonly ITestOutputHelper _outputHelper = outputHelper;
+    */
+    public class StringExtensionsTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
+        private readonly ITestOutputHelper _outputHelper = outputHelper;
 
         internal class SuperHero
         {
@@ -33,17 +51,31 @@ namespace Utilities.UnitTests
             public SuperHero Acolyte { get; set; }
         }
 
-        public StringExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
+        public
+/* Modification non fusionnée à partir du projet 'Candoumbe.MiscUtilities.UnitTests(net7.0)'
+Avant :
+        public static IEnumerable<object[]> ToTitleCases
+Après :
+        internal class SuperHero
+        {
+            public string Firstname { get; set; }
+
+            public string Lastname { get; set; }
+
+            public SuperHero Acolyte { get; set; }
+        }
 
         public static IEnumerable<object[]> ToTitleCases
+*/
+static IEnumerable<object[]> ToTitleCases
         {
             get
             {
-                string[] cultures = { "en-US", "fr-FR", "en-GB" };
+                string[] cultures = ["en-US", "fr-FR", "en-GB"];
 
                 foreach (string culture in cultures)
                 {
-                    CultureInfo cultureInfo = new (culture);
+                    CultureInfo cultureInfo = new(culture);
                     TextInfo textInfo = cultureInfo.TextInfo;
                     yield return new object[] { culture, "bruce", "Bruce" };
                     yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
