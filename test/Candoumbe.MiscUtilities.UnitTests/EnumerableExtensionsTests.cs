@@ -1,27 +1,21 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-using AutoFixture.Xunit2;
-
-using Bogus;
-
-using FluentAssertions;
-
-using FsCheck;
-using FsCheck.Xunit;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
+using AutoFixture.Xunit2;
+using Bogus;
+using FluentAssertions;
+using FsCheck;
+using FsCheck.Xunit;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
-
-using static Newtonsoft.Json.JsonConvert;
 using static System.Linq.Expressions.ExpressionExtensions;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Utilities.UnitTests
 {
