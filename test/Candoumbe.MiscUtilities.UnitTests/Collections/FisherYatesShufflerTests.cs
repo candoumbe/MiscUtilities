@@ -1,20 +1,15 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-using Bogus;
-
-using Candoumbe.MiscUtilities.Collections;
-
-using FluentAssertions;
-
-using FsCheck;
-using FsCheck.Xunit;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Bogus;
+using Candoumbe.MiscUtilities.Collections;
+using FluentAssertions;
+using FsCheck;
+using FsCheck.Xunit;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -22,17 +17,32 @@ using Xunit.Categories;
 namespace Candoumbe.MiscUtilities.UnitTests.Collections
 {
     [UnitTest]
-    public class FisherYatesShufflerTests
-    {
-        private readonly ITestOutputHelper _outputHelper;
-        private readonly FisherYatesShuffler<int> _sut;
-        private static readonly Faker _faker = new();
 
-        public FisherYatesShufflerTests(ITestOutputHelper outputHelper)
+    /* Modification non fusionnée à partir du projet 'Candoumbe.MiscUtilities.UnitTests(net7.0)'
+    Avant :
+        public class FisherYatesShufflerTests
         {
-            _outputHelper = outputHelper;
-            _sut = new();
-        }
+            private readonly ITestOutputHelper _outputHelper;
+            private readonly FisherYatesShuffler<int> _sut;
+            private static readonly Faker _faker = new();
+
+            public FisherYatesShufflerTests(ITestOutputHelper outputHelper)
+            {
+                _outputHelper = outputHelper;
+                _sut = new();
+            }
+    Après :
+        public class FisherYatesShufflerTests(ITestOutputHelper outputHelper)
+        {
+            private readonly ITestOutputHelper _outputHelper = outputHelper;
+            private readonly FisherYatesShuffler<int> _sut = new();
+            private static readonly Faker _faker = new();
+    */
+    public class FisherYatesShufflerTests(ITestOutputHelper outputHelper)
+    {
+        private readonly ITestOutputHelper _outputHelper = outputHelper;
+        private readonly FisherYatesShuffler<int> _sut = new();
+        private static readonly Faker _faker = new();
 
         [Property]
         public async Task Given_a_collection_of_items_Shuffle_should_shuffle_the_collection(NonEmptySet<int> original)

@@ -1,4 +1,7 @@
-﻿using System;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -51,23 +54,7 @@ namespace Utilities.UnitTests
             public SuperHero Acolyte { get; set; }
         }
 
-        public
-/* Modification non fusionnée à partir du projet 'Candoumbe.MiscUtilities.UnitTests(net7.0)'
-Avant :
         public static IEnumerable<object[]> ToTitleCases
-Après :
-        internal class SuperHero
-        {
-            public string Firstname { get; set; }
-
-            public string Lastname { get; set; }
-
-            public SuperHero Acolyte { get; set; }
-        }
-
-        public static IEnumerable<object[]> ToTitleCases
-*/
-static IEnumerable<object[]> ToTitleCases
         {
             get
             {
@@ -312,6 +299,7 @@ static IEnumerable<object[]> ToTitleCases
         {
             _outputHelper.WriteLine($"input : '{input}'");
             using CultureSwitcher cultureSwitcher = new();
+
             cultureSwitcher.Run(culture, () =>
             {
                 // Act
