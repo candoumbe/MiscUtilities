@@ -19,5 +19,4 @@
     <PackageDownload Include="Codecov.Tool" Version="[1.12.3]" />
     <PackageDownload Include="dotnet-stryker" Version="[3.0.1]" />
   </ItemGroup>
-
 </Project>
