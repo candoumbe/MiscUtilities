@@ -25,6 +25,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
     "integration",
     GitHubActionsImage.UbuntuLatest,
     OnPushBranchesIgnore = [IHaveMainBranch.MainBranchName],
+    AutoGenerate = false,
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
@@ -46,6 +47,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
 [GitHubActions(
     "delivery",
     GitHubActionsImage.UbuntuLatest,
+    AutoGenerate = false,
     OnPushBranches = [IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*"],
     InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease)],
     EnableGitHubToken = true,
@@ -150,7 +152,7 @@ public class Build : NukeBuild,
         new GitHubPushNugetConfiguration(
             githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
             source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
-            canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null
+            canBeUsed: () => this is ICreateGithubRelease { GitHubToken: not null } createRelease
     )};
 
     public Target Tests => _ => _
