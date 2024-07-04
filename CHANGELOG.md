@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### 🚨 Breaking changes
+- Dropped `net7.0` support
+
 ### 🚀 New features
 - Added net8.0 support
 
@@ -18,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced constructors with primary constructor wherever applicable
 
 ## [0.11.0] / 2023-02-01
-### ⚠️ Breaking changes
+### 🚨 Breaking changes
 - Removed `DateOnlyRange` type
 - Removed `TimeOnlyRange` type
 - Removed `DateTimeRange` type
@@ -31,19 +34,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] / 2022-10-16
 ### 🚀 New features
-- Added [`DateOnlyRange`](/src/Candoumbe.MiscUtilities/Types/DateOnlyRange.cs) type
-- Added [`TimeOnlyRange`](/src/Candoumbe.MiscUtilities/Types/TimeOnlyRange.cs) type
-- Added [`DateTimeRange`](/src/Candoumbe.MiscUtilities/Types/DateTimeRange.cs) type
-- Added generic [`Range<T>`](/src/Candoumbe.MiscUtilities/Types/Range.cs) type
-- Added [`MultiTimeOnlyRange<T>`](/src/Candoumbe.MiscUtilities/Types/MultiTimeOnlyTimeRange.cs) type
-- Added [`MultiDateOnlyRange<T>`](/src/Candoumbe.MiscUtilities/Types/MultiDateOnlyTimeRange.cs) type
+- Added [`DateOnlyRange`](./src/Candoumbe.MiscUtilities/Types/DateOnlyRange.cs) type
+- Added [`TimeOnlyRange`](./src/Candoumbe.MiscUtilities/Types/TimeOnlyRange.cs) type
+- Added [`DateTimeRange`](./src/Candoumbe.MiscUtilities/Types/DateTimeRange.cs) type
+- Added generic [`Range<T>`](./src/Candoumbe.MiscUtilities/Types/Range.cs) type
+- Added [`MultiTimeOnlyRange<T>`](./src/Candoumbe.MiscUtilities/Types/MultiTimeOnlyTimeRange.cs) type
+- Added [`MultiDateOnlyRange<T>`](./src/Candoumbe.MiscUtilities/Types/MultiDateOnlyTimeRange.cs) type
 - Added `StringExtensions.ToTitleCase` string extension overload to use `CultureInfo`  when runtime is not `netstandard1.0` or `netstandard1.1`.
 
 ## [0.8.2] / 2022-07-17
 - Updated `Newtonsoft.Json` to 13.0.1 to avoid potential DoS attack ([more details](https://github.com/candoumbe/MiscUtilities/security/dependabot/1))
 
 ## [0.8.1] / 2022-07-16
-- Fixed validating a email pattern using `Like` extension method. 
+- Fixed validating an email pattern using `Like` extension method. 
 
 ## [0.8.0] / 2022-01-26
 - Added `SortBy` extension method for `IEnumerable<T>` type
@@ -96,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added new overload for `ToQueryString`
 
 ## [0.2.0] / 2021-01-29
-- Changed syntax to target subproperties from `prop.subproperty` to `prop["subproperty"]`
+- Changed syntax to target sub-properties from `prop.subproperty` to `prop["subproperty"]`
 - Added `Partition(int bucketSize)` extension method
 
 ## [0.1.0] / 2020-12-10
