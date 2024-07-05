@@ -40,7 +40,7 @@ namespace Utilities.UnitTests
 
                 foreach (string culture in cultures)
                 {
-                    CultureInfo cultureInfo = new (culture);
+                    CultureInfo cultureInfo = new(culture);
                     TextInfo textInfo = cultureInfo.TextInfo;
                     yield return new object[] { culture, "bruce", "Bruce" };
                     yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };

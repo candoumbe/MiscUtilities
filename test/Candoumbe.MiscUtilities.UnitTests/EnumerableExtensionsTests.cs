@@ -15,8 +15,8 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 using static System.Linq.Expressions.ExpressionExtensions;
-using static Newtonsoft.Json.JsonConvert;
 using static System.Linq.Expressions.ExpressionExtensions;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Utilities.UnitTests
 {
@@ -455,7 +455,7 @@ namespace Utilities.UnitTests
         public void ExactlyShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int count)
         {
             // Act
-            Action action = () => new[] { 1, 3, 5 }.Exactly(x => x == 2, count);
+            Action action = () => items.Exactly(x => x == 2, count);
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>($"{count} is not a valid value").Which
@@ -795,7 +795,7 @@ namespace Utilities.UnitTests
                     (Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>>)(dictionary => dictionary.Exactly(2)
                                                                                                 && dictionary.Once(kv => kv.Key)
                                                                                                 && dictionary.Once(kv => !kv.Key)
-                                                                                                && dictionary[true].SequenceEqual(new []{2, 4, 6, 8, 10 })
+                                                                                                && dictionary[true].SequenceEqual(second)
                                                                                                 && dictionary[false].SequenceEqual(new []{1, 3, 5, 7, 9 })
                     )
                 };
@@ -821,6 +821,9 @@ namespace Utilities.UnitTests
                 };
             }
         }
+
+        private static readonly int[] items = [1, 3, 5];
+        private static readonly int[] second = [2, 4, 6, 8, 10];
 
         [Theory]
         [MemberData(nameof(ToDictionaryCases))]

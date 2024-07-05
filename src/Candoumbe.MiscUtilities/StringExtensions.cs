@@ -126,6 +126,11 @@ namespace System
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         public static bool Like(this string input, string pattern, bool ignoreCase)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(input);
+
+            ArgumentNullException.ThrowIfNull(pattern);
+#else
             if (input is null)
             {
                 throw new ArgumentNullException(nameof(input));
@@ -135,7 +140,7 @@ namespace System
             {
                 throw new ArgumentNullException(nameof(pattern));
             }
-
+#endif
             StringBuilder sbPattern = new(pattern.Length * 2);
             RegexOptions regexOptions = RegexOptions.Singleline;
 
@@ -169,10 +174,14 @@ namespace System
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
         public static LambdaExpression ToLambda<TSource>(this string source)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(source);
+#else
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
+#endif
 
             ParameterExpression pe = Parameter(typeof(TSource), "x");
 
@@ -435,6 +444,11 @@ namespace System
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
         public static int FirstOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(source);
+
+            ArgumentNullException.ThrowIfNull(search);
+#else
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -444,6 +458,7 @@ namespace System
             {
                 throw new ArgumentNullException(nameof(search));
             }
+#endif
 
             if (search.Length == 0)
             {
@@ -465,9 +480,14 @@ namespace System
         /// <param name="stringComparison"></param>
         /// <returns>the index where <paramref name="search"/> was found in <paramref name="source"/> or <c>-1</c> if no occurrence found</returns>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <see cref="string.Empty"/></exception>
-        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="search"/> is <c>nuull</c></exception>
+        /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="search"/> is <see langword="null"/></exception>
         public static int LastOccurrence(this string source, string search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(source);
+
+            ArgumentNullException.ThrowIfNull(search);
+#else
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -477,6 +497,7 @@ namespace System
             {
                 throw new ArgumentNullException(nameof(search));
             }
+#endif
 
             if (search.Length == 0)
             {

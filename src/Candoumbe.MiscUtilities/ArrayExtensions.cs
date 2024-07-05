@@ -20,10 +20,14 @@ public static class ArrayExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static T[] ToArray<T>(this Array array)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(array);
+#else
         if (array is null)
         {
             throw new ArgumentNullException(nameof(array));
         }
+#endif
 
         IList<T> values = new List<T>(array.Length);
         foreach (T value in array)

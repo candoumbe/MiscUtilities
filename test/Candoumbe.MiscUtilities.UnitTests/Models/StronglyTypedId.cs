@@ -28,10 +28,14 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
         {
             if (!IsStronglyTypedId(stronglyTypedIdType))
             {
-                throw new ArgumentException($"Type '{stronglyTypedIdType}' is not a strongly-typed id type", nameof(stronglyTypedIdType));
+                throw new ArgumentException($"Type '{stronglyTypedIdType}' is not a strongly-typed id type",
+                    nameof(stronglyTypedIdType));
             }
 
-            System.Reflection.ConstructorInfo ctor = stronglyTypedIdType.GetConstructor(new[] { typeof(TValue) }) ?? throw new ArgumentException($"Type '{stronglyTypedIdType}' doesn't have a constructor with one parameter of type '{typeof(TValue)}'", nameof(stronglyTypedIdType));
+            System.Reflection.ConstructorInfo ctor = stronglyTypedIdType.GetConstructor(new[] { typeof(TValue) }) ??
+                                                     throw new ArgumentException(
+                                                         $"Type '{stronglyTypedIdType}' doesn't have a constructor with one parameter of type '{typeof(TValue)}'",
+                                                         nameof(stronglyTypedIdType));
             ParameterExpression param = Expression.Parameter(typeof(TValue), "value");
             NewExpression body = Expression.New(ctor, param);
             Expression<Func<TValue, object>> lambda = Expression.Lambda<Func<TValue, object>>(body, param);
@@ -43,15 +47,11 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
 
         public static bool IsStronglyTypedId(Type type, [NotNullWhen(true)] out Type idType)
         {
-            if (type is null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
+            ArgumentNullException.ThrowIfNull(type);
 
             bool isStronglyType = false;
-            if (type.BaseType is Type baseType &&
-                baseType.IsGenericType &&
-                baseType.GetGenericTypeDefinition() == typeof(StronglyTypedId<>))
+            if (type.BaseType is { IsGenericType: true } baseType
+                && baseType.GetGenericTypeDefinition() == typeof(StronglyTypedId<>))
             {
                 idType = baseType.GetGenericArguments()[0];
                 isStronglyType = true;
@@ -74,7 +74,8 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
         {
             TypeConverter converter = TypeDescriptor.GetConverter(typeof(TValue));
             return !converter.CanConvertFrom(typeof(string))
-                ? throw new InvalidOperationException($"Type '{typeof(TValue)}' doesn't have a converter that can convert from string")
+                ? throw new InvalidOperationException(
+                    $"Type '{typeof(TValue)}' doesn't have a converter that can convert from string")
                 : converter;
         }
 
@@ -83,55 +84,51 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
             return sourceType == typeof(string)
-                || sourceType == typeof(TValue)
-                || base.CanConvertFrom(context, sourceType);
+                   || sourceType == typeof(TValue)
+                   || base.CanConvertFrom(context, sourceType);
         }
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return destinationType == typeof(string)
-                || destinationType == typeof(TValue)
-                || base.CanConvertTo(context, destinationType);
+                   || destinationType == typeof(TValue)
+                   || base.CanConvertTo(context, destinationType);
         }
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
+            object result;
             if (value is string s)
             {
                 value = IdValueConverter.ConvertFrom(s);
             }
 
-            object result;
             switch (value)
             {
                 case TValue idValue:
                     {
                         Func<TValue, object> factory = StronglyTypedIdHelper.GetFactory<TValue>(_type);
-                        result = factory(idValue);
-                        break;
+                        return factory(idValue);
                     }
 
                 default:
-                    result = base.ConvertFrom(context, culture, value);
-                    break;
+                    return base.ConvertFrom(context, culture, value);
             }
-
-            return result;
         }
 
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
+            Type destinationType)
         {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ArgumentNullException.ThrowIfNull(value);
 
             StronglyTypedId<TValue> stronglyTypedId = (StronglyTypedId<TValue>)value;
             TValue idValue = stronglyTypedId.Value;
 
             object result = destinationType == typeof(string)
                 ? idValue.ToString()
-                : destinationType == typeof(TValue) ? idValue : base.ConvertTo(context, culture, value, destinationType);
+                : destinationType == typeof(TValue)
+                    ? idValue
+                    : base.ConvertTo(context, culture, value, destinationType);
             return result;
         }
     }
@@ -141,15 +138,20 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     {
         private static readonly ConcurrentDictionary<Type, TypeConverter> ActualConverters = new();
 
-        private readonly TypeConverter _innerConverter = ActualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
+        private readonly TypeConverter _innerConverter =
+            ActualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
             _innerConverter.CanConvertFrom(context, sourceType);
+
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) =>
             _innerConverter.CanConvertTo(context, destinationType);
+
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) =>
             _innerConverter.ConvertFrom(context, culture, value);
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) =>
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
+            Type destinationType) =>
             _innerConverter.ConvertTo(context, culture, value, destinationType);
 
         private static TypeConverter CreateActualConverter(Type stronglyTypedIdType)
@@ -167,7 +169,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     [ExcludeFromCodeCoverage]
     [TypeConverter(typeof(StronglyTypedIdConverter))]
     public abstract record StronglyTypedId<TValue>
-            where TValue : notnull
+        where TValue : notnull
     {
         public TValue Value { get; }
 
