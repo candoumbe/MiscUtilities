@@ -81,7 +81,6 @@ public class Build : NukeBuild,
     IHaveGitVersion,
     IClean,
     IRestore,
-    IDotnetFormat,
     ICompile,
     IBenchmark,
     IUnitTest,
@@ -161,30 +160,6 @@ public class Build : NukeBuild,
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
-
-    ///<inheritdoc/>
-    bool IDotnetFormat.VerifyNoChanges => IsServerBuild;
-
-    ///<inheritdoc/>
-    Configure<DotNetFormatSettings> IDotnetFormat.FormatSettings => settings => settings
-        .SetInclude(Git(arguments: "status --porcelain",
-                        workingDirectory: Solution.Directory,
-                        logOutput: IsLocalBuild || Verbosity is not Verbosity.Normal)
-                      .Where(output => output.Text.AsSpan().TrimStart()[..2] switch
-                      {
-                          ['M' or 'A', _] or [_, 'M' or 'A'] => true,
-                          _ => false,
-                      })
-                        .Select(output => output.Text.AsSpan()[2..].TrimStart().ToString())
-                        .ToArray())
-        .SetVerbosity(IsLocalBuild ? DotNetVerbosity.diagnostic : DotNetVerbosity.minimal)
-        .SetSeverity(DotNetFormatSeverity.info)
-        .WhenNotNull(this.As<IRestore>(), (settings, _) => settings.EnableNoRestore());
-
-    ///<inheritdoc/>
-    DotNetFormatter[] IDotnetFormat.Formatters => IsLocalBuild
-                ? [DotNetFormatter.Analyzers, DotNetFormatter.Style, DotNetFormatter.Whitespace]
-                : [DotNetFormatter.Analyzers, DotNetFormatter.Style];
 
     ///<inheritdoc/>
     protected override void OnBuildCreated()
