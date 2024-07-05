@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.13.0] / 2024-07-06
 ### 🚨 Breaking changes
 - Dropped `net7.0` support
 
@@ -108,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.13.0...HEAD
+[0.13.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.13.0
 [0.11.0]: https://github.com/candoumbe/MiscUtilities/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/candoumbe/MiscUtilities/compare/0.8.2...0.10.0
 [0.8.2]: https://github.com/candoumbe/MiscUtilities/compare/0.8.1...0.8.2
