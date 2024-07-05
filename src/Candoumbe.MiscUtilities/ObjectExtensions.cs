@@ -9,12 +9,12 @@ using System.Reflection;
 
 #if NEWTONSOFT_JSON
 using Newtonsoft.Json;
-
+using Newtonsoft.Json.Converters;
 using static Newtonsoft.Json.JsonConvert;
+#if NET6_0
 using static Newtonsoft.Json.Formatting;
 using static Newtonsoft.Json.NullValueHandling;
-
-using Newtonsoft.Json.Converters;
+#endif
 #else
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -22,6 +22,7 @@ using System.Text.Json.Serialization;
 using static System.Text.Json.JsonSerializer;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace System
 {
     /// <summary>
@@ -75,6 +76,7 @@ namespace System
                 {
                     dictionary = new Dictionary<string, object>();
                     IEnumerator enumerator = enumerable.GetEnumerator();
+                    using IDisposable disposable = enumerator as IDisposable;
                     int count = 0;
                     while (enumerator.MoveNext())
                     {
@@ -95,17 +97,17 @@ namespace System
                 {
                     IEnumerable<PropertyInfo> properties = obj.GetType()
                             .GetRuntimeProperties()
-                            .Where(pi => pi.CanRead && !pi.GetMethod.IsStatic && pi.GetValue(obj) != null);
+                            .Where(pi => pi is { CanRead: true, GetMethod.IsStatic: false } && pi.GetValue(obj) != null);
 
                     dictionary = properties.ToDictionary(
                         pi => pi.Name,
                         pi =>
                         {
                             object value = pi.GetValue(obj);
-                            Type valueType = value.GetType();
-                            TypeInfo valueTypeInfo = valueType.GetTypeInfo();
+                            Type valueType = value?.GetType();
+                            TypeInfo valueTypeInfo = valueType?.GetTypeInfo();
 
-                            if (!(valueTypeInfo.IsEnum || valueTypeInfo.IsPrimitive || valueType == typeof(string) || DictionaryExtensions.PrimitiveTypes.Contains(valueType)))
+                            if (valueTypeInfo is not null && !(valueTypeInfo.IsEnum || valueTypeInfo.IsPrimitive || valueType == typeof(string) || DictionaryExtensions.PrimitiveTypes.Contains(valueType)))
                             {
                                 value = ParseAnonymousObject(value);
                             }
@@ -121,14 +123,14 @@ namespace System
         }
 
         /// <summary>
-        /// Converts an object to its string representation suitable for appending as query string in a url
+        /// Converts an object to its string representation suitable for appending as query string in an url
         /// </summary>
         /// <param name="obj">The object to convert</param>
-        /// <returns>the query string representation preceeded with the "?" or an empty string</returns>
+        /// <returns>the query string representation preceded with the "?" or an empty string</returns>
         public static string ToQueryString(this object obj) => ToQueryString(obj, null);
 
         /// <summary>
-        /// Converts an object to its string representation suitable for appending as query string in a url
+        /// Converts an object to its string representation suitable for appending as query string in an url
         /// </summary>
         /// <param name="obj">The object to convert</param>
         /// <param name="transform">A delegate to apply to each property of <paramref name="obj"/>
@@ -222,7 +224,7 @@ namespace System
         /// <param name="obj">The object to "jsonify"</param>
         /// <param name="settings">settings to use when serializing <paramref name="obj"/> to Json.</param>
         /// <returns>Json representation</returns>
-#if NEWTONSOFT_JSON // TODO remove the right hand of the expression once https://github.com/JamesNK/Newtonsoft.Json/issues/2521 is fixed.
+#if NEWTONSOFT_JSON
         public static string Jsonify(this object obj, JsonSerializerSettings settings = null) => settings is null
                 ? SerializeObject(obj)
                 : SerializeObject(obj, settings);
