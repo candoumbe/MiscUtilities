@@ -332,8 +332,8 @@ namespace Utilities.UnitTests
                 {
                     new Appointment
                     {
-                        Date = DateOnly.FromDateTime(DateTime.Now),
-                        Time = TimeOnly.FromDateTime(DateTime.Now)
+                        Date = DateOnly.FromDateTime(7.May(2024)),
+                        Time = TimeOnly.FromTimeSpan(23.Hours().And(10.Minutes()).And(45.Seconds()))
                     }
                 };
             }
