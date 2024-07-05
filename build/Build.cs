@@ -3,73 +3,73 @@
 
 namespace Utilities.ContinuousIntegration;
 
-using Candoumbe.Pipelines;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Candoumbe.Pipelines.Components;
+using Candoumbe.Pipelines.Components.Formatting;
 using Candoumbe.Pipelines.Components.GitHub;
+using Candoumbe.Pipelines.Components.NuGet;
 using Candoumbe.Pipelines.Components.Workflows;
-
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
+using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using static Nuke.Common.IO.PathConstruction;
+using static Nuke.Common.Tools.Git.GitTasks;
 
 [GitHubActions(
     "integration",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranchesIgnore = new[] { IHaveMainBranch.MainBranchName },
+    OnPushBranchesIgnore = [IHaveMainBranch.MainBranchName],
+    AutoGenerate = false,
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPack.Pack) },
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
-    ImportSecrets = new[]
-    {
-            nameof(NugetApiKey),
-            nameof(IReportCoverage.CodecovToken)
-    },
-    OnPullRequestExcludePaths = new[]
-    {
-            "docs/*",
-            "README.md",
-            "CHANGELOG.md",
-            "LICENSE"
-    }
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPack.Pack)],
+    CacheKeyFiles = ["global.json", "src/**/*.csproj"],
+    ImportSecrets =
+    [
+        nameof(NugetApiKey),
+        nameof(IReportCoverage.CodecovToken)
+    ],
+    OnPullRequestExcludePaths =
+    [
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ]
 )]
 [GitHubActions(
     "delivery",
     GitHubActionsImage.UbuntuLatest,
-    OnPushBranches = new[] { IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*" },
-    InvokedTargets = new[] { nameof(IUnitTest.UnitTests), nameof(IPublish.Publish), nameof(ICreateGithubRelease.AddGithubRelease) },
+    AutoGenerate = false,
+    OnPushBranches = [IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*"],
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease)],
     EnableGitHubToken = true,
     FetchDepth = 0,
-    CacheKeyFiles = new[] { "global.json", "src/**/*.csproj" },
+    CacheKeyFiles = ["global.json", "src/**/*.csproj"],
     PublishArtifacts = true,
-    ImportSecrets = new[]
-    {
-            nameof(NugetApiKey),
-            nameof(IReportCoverage.CodecovToken)
-    },
-    OnPullRequestExcludePaths = new[]
-    {
-            "docs/*",
-            "README.md",
-            "CHANGELOG.md",
-            "LICENSE"
-    }
+    ImportSecrets =
+    [
+        nameof(NugetApiKey),
+        nameof(IReportCoverage.CodecovToken)
+    ],
+    OnPullRequestExcludePaths =
+    [
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ]
 )]
 
 [UnsetVisualStudioEnvironmentVariables]
 [DotNetVerbosityMapping]
-[HandleVisualStudioDebugging]
 public class Build : NukeBuild,
     IHaveArtifacts,
     IHaveConfiguration,
@@ -81,13 +81,14 @@ public class Build : NukeBuild,
     IHaveGitVersion,
     IClean,
     IRestore,
+    IDotnetFormat,
     ICompile,
     IBenchmark,
     IUnitTest,
     IMutationTest,
     IReportCoverage,
     IPack,
-    IPublish,
+    IPushNugetPackages,
     IGitFlowWithPullRequest,
     ICreateGithubRelease
 {
@@ -125,29 +126,33 @@ public class Build : NukeBuild,
     };
 
     ///<inheritdoc/>
-    IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(this.Get<IHaveSolution>().Solution.GetProjects("*.UnitTests"));
+    IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
 
     ///<inheritdoc/>
-    IEnumerable<Project> IMutationTest.MutationTestsProjects => Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects);
+    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
+        => new[] { new MutationProjectConfiguration (Solution.GetProject("Candoumbe.MiscUtilities"), Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects)) };
 
     ///<inheritdoc/>
-    IEnumerable<Project> IBenchmark.BenchmarkProjects => this.Get<IHaveSolution>().Solution.GetProjects("*.PerformanceTests");
+    IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
+
+    ///<inheritdoc/>
+    Configure<DotNetRunSettings> IBenchmark.BenchmarksSettings => settings => settings.SetConfiguration(Configuration.Release);
 
     ///<inheritdoc/>
     IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
     ///<inheritdoc/>
-    IEnumerable<PublishConfiguration> IPublish.PublishConfigurations => new PublishConfiguration[]
+    IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations => new PushNugetPackageConfiguration[]
     {
-        new NugetPublishConfiguration(
+        new NugetPushConfiguration(
             apiKey: NugetApiKey,
             source: new Uri("https://api.nuget.org/v3/index.json"),
             canBeUsed: () => NugetApiKey is not null
         ),
-        new GitHubPublishConfiguration(
+        new GitHubPushNugetConfiguration(
             githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
             source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
-            canBeUsed: () => this is ICreateGithubRelease createRelease && createRelease.GitHubToken is not null
+            canBeUsed: () => this is ICreateGithubRelease { GitHubToken: not null } createRelease
     )};
 
     public Target Tests => _ => _
@@ -156,6 +161,29 @@ public class Build : NukeBuild,
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
+
+    ///<inheritdoc/>
+    bool IDotnetFormat.VerifyNoChanges => IsServerBuild;
+
+    ///<inheritdoc/>
+    Configure<DotNetFormatSettings> IDotnetFormat.FormatSettings => settings => settings
+        .SetInclude(Git(arguments: "status --porcelain",
+                        workingDirectory: Solution.Directory,
+                        logOutput: IsLocalBuild || Verbosity is not Verbosity.Normal)
+                      .Where(output => output.Text.AsSpan().TrimStart()[..2] switch
+                      {
+                          ['M' or 'A', _] or [_, 'M' or 'A'] => true,
+                          _ => false,
+                      })
+                        .Select(output => output.Text.AsSpan()[2..].TrimStart().ToString())
+                        .ToArray())
+        .SetVerbosity(IsLocalBuild ? DotNetVerbosity.diagnostic : DotNetVerbosity.minimal)
+        .SetSeverity(DotNetFormatSeverity.info);
+
+    ///<inheritdoc/>
+    DotNetFormatter[] IDotnetFormat.Formatters => IsLocalBuild
+                ? [DotNetFormatter.Analyzers, DotNetFormatter.Style, DotNetFormatter.Whitespace]
+                : [DotNetFormatter.Analyzers, DotNetFormatter.Style];
 
     ///<inheritdoc/>
     protected override void OnBuildCreated()

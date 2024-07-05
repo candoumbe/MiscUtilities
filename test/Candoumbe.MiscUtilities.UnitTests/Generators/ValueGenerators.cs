@@ -1,10 +1,9 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using System;
 using FsCheck;
 using FsCheck.Fluent;
-
-using System;
 
 namespace Candoumbe.MiscUtilities.UnitTests.Generators;
 

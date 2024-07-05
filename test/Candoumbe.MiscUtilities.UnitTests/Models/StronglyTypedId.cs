@@ -31,12 +31,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
                 throw new ArgumentException($"Type '{stronglyTypedIdType}' is not a strongly-typed id type", nameof(stronglyTypedIdType));
             }
 
-            System.Reflection.ConstructorInfo ctor = stronglyTypedIdType.GetConstructor(new[] { typeof(TValue) });
-            if (ctor is null)
-            {
-                throw new ArgumentException($"Type '{stronglyTypedIdType}' doesn't have a constructor with one parameter of type '{typeof(TValue)}'", nameof(stronglyTypedIdType));
-            }
-
+            System.Reflection.ConstructorInfo ctor = stronglyTypedIdType.GetConstructor(new[] { typeof(TValue) }) ?? throw new ArgumentException($"Type '{stronglyTypedIdType}' doesn't have a constructor with one parameter of type '{typeof(TValue)}'", nameof(stronglyTypedIdType));
             ParameterExpression param = Expression.Parameter(typeof(TValue), "value");
             NewExpression body = Expression.New(ctor, param);
             Expression<Func<TValue, object>> lambda = Expression.Lambda<Func<TValue, object>>(body, param);
@@ -71,26 +66,19 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     }
 
     [ExcludeFromCodeCoverage]
-    public class StronglyTypedIdConverter<TValue> : TypeConverter where TValue : notnull
+    public class StronglyTypedIdConverter<TValue>(Type type) : TypeConverter where TValue : notnull
     {
         private static readonly TypeConverter IdValueConverter = GetIdValueConverter();
 
         private static TypeConverter GetIdValueConverter()
         {
             TypeConverter converter = TypeDescriptor.GetConverter(typeof(TValue));
-            if (!converter.CanConvertFrom(typeof(string)))
-            {
-                throw new InvalidOperationException($"Type '{typeof(TValue)}' doesn't have a converter that can convert from string");
-            }
-
-            return converter;
+            return !converter.CanConvertFrom(typeof(string))
+                ? throw new InvalidOperationException($"Type '{typeof(TValue)}' doesn't have a converter that can convert from string")
+                : converter;
         }
 
-        private readonly Type _type;
-        public StronglyTypedIdConverter(Type type)
-        {
-            _type = type;
-        }
+        private readonly Type _type = type;
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -114,15 +102,18 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
             }
 
             object result;
+            switch (value)
+            {
+                case TValue idValue:
+                    {
+                        Func<TValue, object> factory = StronglyTypedIdHelper.GetFactory<TValue>(_type);
+                        result = factory(idValue);
+                        break;
+                    }
 
-            if (value is TValue idValue)
-            {
-                Func<TValue, object> factory = StronglyTypedIdHelper.GetFactory<TValue>(_type);
-                result = factory(idValue);
-            }
-            else
-            {
-                result = base.ConvertFrom(context, culture, value);
+                default:
+                    result = base.ConvertFrom(context, culture, value);
+                    break;
             }
 
             return result;
@@ -138,36 +129,19 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
             StronglyTypedId<TValue> stronglyTypedId = (StronglyTypedId<TValue>)value;
             TValue idValue = stronglyTypedId.Value;
 
-            object result;
-
-            if (destinationType == typeof(string))
-            {
-                result = idValue.ToString()!;
-            }
-            else if (destinationType == typeof(TValue))
-            {
-                result = idValue;
-            }
-            else
-            {
-                result = base.ConvertTo(context, culture, value, destinationType);
-            }
-
+            object result = destinationType == typeof(string)
+                ? idValue.ToString()
+                : destinationType == typeof(TValue) ? idValue : base.ConvertTo(context, culture, value, destinationType);
             return result;
         }
     }
 
     [ExcludeFromCodeCoverage]
-    public class StronglyTypedIdConverter : TypeConverter
+    public class StronglyTypedIdConverter(Type stronglyTypedIdType) : TypeConverter
     {
         private static readonly ConcurrentDictionary<Type, TypeConverter> ActualConverters = new();
 
-        private readonly TypeConverter _innerConverter;
-
-        public StronglyTypedIdConverter(Type stronglyTypedIdType)
-        {
-            _innerConverter = ActualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
-        }
+        private readonly TypeConverter _innerConverter = ActualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
             _innerConverter.CanConvertFrom(context, sourceType);

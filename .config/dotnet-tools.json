@@ -3,15 +3,21 @@
   "isRoot": true,
   "tools": {
     "nuke.globaltool": {
-      "version": "6.3.0",
+      "version": "8.0.0",
       "commands": [
         "nuke"
       ]
     },
     "dotnet-stryker": {
-      "version": "3.4.0",
+      "version": "4.0.6",
       "commands": [
         "dotnet-stryker"
+      ]
+    },
+    "dotnet-format": {
+      "version": "5.1.250801",
+      "commands": [
+        "dotnet-format"
       ]
     }
   }

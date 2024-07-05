@@ -1,8 +1,8 @@
 ﻿using System;
-using Xunit.Categories;
 using FsCheck;
-using FsCheck.Xunit;
 using FsCheck.Fluent;
+using FsCheck.Xunit;
+using Xunit.Categories;
 
 namespace Utilities.UnitTests
 {

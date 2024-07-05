@@ -1,24 +1,21 @@
-﻿using Candoumbe.MiscUtilities.UnitTests.Generators;
-using Candoumbe.MiscUtilities.UnitTests.Models;
-
-using FluentAssertions;
-using FluentAssertions.Extensions;
-
-using FsCheck;
-using FsCheck.Fluent;
-using FsCheck.Xunit;
-
-using Microsoft.AspNetCore.Routing;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-
+using Candoumbe.MiscUtilities.UnitTests.Generators;
+using Candoumbe.MiscUtilities.UnitTests.Models;
+using FluentAssertions;
+using FluentAssertions.Extensions;
+using FsCheck;
+using FsCheck.Fluent;
+using FsCheck.Xunit;
+using Microsoft.AspNetCore.Routing;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
-
 using static System.StringSplitOptions;
 
 namespace Utilities.UnitTests;
@@ -28,11 +25,9 @@ namespace Utilities.UnitTests;
 /// </summary>
 [UnitTest]
 [Feature("IDictionary")]
-public class DictionaryExtensionsTests
+public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
 {
-    private readonly ITestOutputHelper _outputHelper;
-
-    public DictionaryExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
+    private readonly ITestOutputHelper _outputHelper = outputHelper;
 
     public static IEnumerable<object[]> ToQueryStringCases
     {
@@ -374,7 +369,7 @@ public class DictionaryExtensionsTests
     }
 
 #if NET6_0_OR_GREATER
-    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    [Property(Arbitrary = [typeof(ValueGenerators)])]
     public void Given_dictionary_that_contains_a_DateOnly_instance_ToQueryString_should_returns_expected_result(DateOnly date)
     {
         // Arrange
@@ -391,7 +386,7 @@ public class DictionaryExtensionsTests
                    .Be($"date-only={date:yyyy-MM-dd}");
     }
 
-    [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+    [Property(Arbitrary = [typeof(ValueGenerators)])]
     public void Given_dictionary_that_contains_a_TimeOnly_instance_ToQueryString_should_returns_expected_result(TimeOnly time)
     {
         // Arrange

@@ -1,25 +1,23 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿// "Copyright (c) Cyrille NDOUMBE.
+// Licenced under GNU General Public Licence, version 3.0"
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Bogus;
+using FluentAssertions;
+using Microsoft.Extensions.Primitives;
 using Xunit;
 using Xunit.Abstractions;
-using FluentAssertions;
 using Xunit.Categories;
-using Bogus;
 
 namespace Utilities.UnitTests
 {
     [UnitTest]
-    public class StringSegmentExtensionsTests
+    public class StringSegmentExtensionsTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        public StringSegmentExtensionsTests(ITestOutputHelper outputHelper)
-        {
-            _outputHelper = outputHelper;
-        }
+        private readonly ITestOutputHelper _outputHelper = outputHelper;
 
         public static IEnumerable<object[]> OccurrencesCases
         {

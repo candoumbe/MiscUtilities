@@ -42,7 +42,7 @@ namespace System
 
 #else
             StringBuilder sbResult = null;
-            if ((input?.Length ?? 0 ) > 0)
+            if ((input?.Length ?? 0) > 0)
             {
                 sbResult = new StringBuilder(input);
                 if (char.IsLetter(sbResult[0]))
@@ -178,7 +178,7 @@ namespace System
 
             IEnumerable<string> fields = source.Replace(@"[""", ".")
                                                .Replace(@"""]", string.Empty)
-                                               .Split(new[] { '.' })
+                                               .Split(['.'])
                                                .Select(item => item.Trim());
             MemberExpression property = null;
 
@@ -315,7 +315,7 @@ namespace System
                 }
             }
 #else
-            Rune[] runes = input.EnumerateRunes().ToArray();
+            Rune[] runes = [.. input.EnumerateRunes()];
             StringBuilder sb = new(runes.Length * 2);
             input = input.Trim()
                          .Replace("  ", " ");

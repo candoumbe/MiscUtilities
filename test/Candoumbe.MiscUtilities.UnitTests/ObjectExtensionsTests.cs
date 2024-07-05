@@ -1,28 +1,21 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-using Candoumbe.MiscUtilities.UnitTests.Generators;
-using Candoumbe.MiscUtilities.UnitTests.Models;
-
-using FakeItEasy;
-
-using FluentAssertions;
-using FluentAssertions.Extensions;
-using FluentAssertions.Json;
-
-using FsCheck.Xunit;
-
-using Newtonsoft.Json.Linq;
-
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text.Json;
-
+using Candoumbe.MiscUtilities.UnitTests.Generators;
+using Candoumbe.MiscUtilities.UnitTests.Models;
+using FakeItEasy;
+using FluentAssertions;
+using FluentAssertions.Extensions;
+using FluentAssertions.Json;
+using FsCheck.Xunit;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
-
 using static Newtonsoft.Json.JsonConvert;
 
 namespace Utilities.UnitTests
@@ -30,17 +23,15 @@ namespace Utilities.UnitTests
     /// <summary>
     /// Extensions methods for <see cref="object"/> type.
     /// </summary>
+    /// <remarks>
+    /// Builds a new <see cref="ObjectExtensionsTests"/> instance.
+    /// </remarks
+    /// <param name="outputHelper"></param>
     [UnitTest]
     [Feature(nameof(ObjectExtensions))]
-    public class ObjectExtensionsTests
+    public class ObjectExtensionsTests(ITestOutputHelper outputHelper)
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        /// <summary>
-        /// Builds a new <see cref="ObjectExtensionsTests"/> instance.
-        /// </summary
-        /// <param name="outputHelper"></param>
-        public ObjectExtensionsTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
+        private readonly ITestOutputHelper _outputHelper = outputHelper;
 
         public static IEnumerable<object[]> ToQueryStringCases
         {
@@ -360,7 +351,7 @@ namespace Utilities.UnitTests
                  .BeEquivalentTo(source);
         }
 
-        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+        [Property(Arbitrary = [typeof(ValueGenerators)])]
         public void Given_non_null_input_and_no_serializerOptions_Jsonify_should_behave_as_expected(Appointment source)
         {
             // Act
@@ -378,7 +369,7 @@ namespace Utilities.UnitTests
 #endif
         }
 
-        [Property(Arbitrary = new[] { typeof(ValueGenerators) })]
+        [Property(Arbitrary = [typeof(ValueGenerators)])]
         public void Given_non_null_input_and_serializerOptions_with_no_custom_converters_for_TimeOnly_or_DateOnly_types_Jsonify_should_behave_as_expected(Appointment source)
         {
             // Arrange

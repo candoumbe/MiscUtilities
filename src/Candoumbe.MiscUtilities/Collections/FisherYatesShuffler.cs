@@ -21,6 +21,7 @@ namespace Candoumbe.MiscUtilities.Collections
 #endif
 
         ///<inheritdoc/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Simplification", "RCS1179:Unnecessary assignment.")]
         public IEnumerable<T> Shuffle(IEnumerable<T> original)
         {
             IEnumerable<T> shuffled = null;
@@ -63,7 +64,6 @@ namespace Candoumbe.MiscUtilities.Collections
                         (unshuffled[k], unshuffled[i]) = (unshuffled[i], unshuffled[k]);
                     }
                     shuffled = unshuffled;
-
                     break;
             }
 
