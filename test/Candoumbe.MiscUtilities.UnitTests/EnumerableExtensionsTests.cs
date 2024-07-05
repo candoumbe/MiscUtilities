@@ -15,8 +15,8 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 using static System.Linq.Expressions.ExpressionExtensions;
-using static Newtonsoft.Json.JsonConvert;
 using static System.Linq.Expressions.ExpressionExtensions;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Utilities.UnitTests
 {
@@ -25,10 +25,10 @@ namespace Utilities.UnitTests
     public class EnumerableExtensionsTests(ITestOutputHelper outputHelper)
     {
         private readonly ITestOutputHelper _outputHelper = outputHelper;
-        private readonly static Faker _faker = new();
+        private static readonly Faker Faker = new();
 
         /// <summary>
-        /// <see cref="Once(IEnumerable{int}, Expression{Func{int, bool}}, bool)"/> tests cases
+        /// <see cref="Once(IEnumerable{int},System.Linq.Expressions.Expression{System.Func{int,bool}},bool,string)"/> tests cases
         /// </summary>
         public static IEnumerable<object[]> OnceCases
         {
@@ -350,7 +350,7 @@ namespace Utilities.UnitTests
         public void AtLeastShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int min, int max, IEnumerable<int> items)
         {
             // Arrange
-            int count = _faker.Random.Int(min, max);
+            int count = Faker.Random.Int(min, max);
 
             // Act
             Action action = () => items.AtLeast(count);
@@ -388,7 +388,7 @@ namespace Utilities.UnitTests
         public void AtMost_Should_Throw_ArgumentOutOfRangeException_When_Count_Is_Negative(int min, int max, IEnumerable<int> items)
         {
             // Arrange
-            int count = _faker.Random.Int(min, max);
+            int count = Faker.Random.Int(min, max);
 
             // Act
             Action action = () => items.AtMost(count);
@@ -455,7 +455,7 @@ namespace Utilities.UnitTests
         public void ExactlyShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int count)
         {
             // Act
-            Action action = () => new[] { 1, 3, 5 }.Exactly(x => x == 2, count);
+            Action action = () => items.Exactly(x => x == 2, count);
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>($"{count} is not a valid value").Which
@@ -795,8 +795,8 @@ namespace Utilities.UnitTests
                     (Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>>)(dictionary => dictionary.Exactly(2)
                                                                                                 && dictionary.Once(kv => kv.Key)
                                                                                                 && dictionary.Once(kv => !kv.Key)
-                                                                                                && dictionary[true].SequenceEqual(new []{2, 4, 6, 8, 10 })
-                                                                                                && dictionary[false].SequenceEqual(new []{1, 3, 5, 7, 9 })
+                                                                                                && dictionary[true].SequenceEqual(second)
+                                                                                                && dictionary[false].SequenceEqual(secondArray)
                     )
                 };
 
@@ -821,6 +821,10 @@ namespace Utilities.UnitTests
                 };
             }
         }
+
+        private static readonly int[] items = [1, 3, 5];
+        private static readonly int[] second = [2, 4, 6, 8, 10];
+        private static readonly int[] secondArray = [1, 3, 5, 7, 9];
 
         [Theory]
         [MemberData(nameof(ToDictionaryCases))]

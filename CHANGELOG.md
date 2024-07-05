@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.12.0] / 2024-07-05
+## [0.13.0] / 2024-07-06
 ### 🚨 Breaking changes
 - Dropped `net7.0` support
 
@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add Codium PR agent
 - Bumped `Candoumbe.Pipelines` to 0.9.0
 - Replaced constructors with primary constructor wherever applicable
+- Removed `Format` step from build pipeline
 
 ## [0.11.0] / 2023-02-01
 ### 🚨 Breaking changes
@@ -109,8 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.12.0...HEAD
-[0.12.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.12.0
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.13.0...HEAD
+[0.13.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.13.0
 [0.11.0]: https://github.com/candoumbe/MiscUtilities/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/candoumbe/MiscUtilities/compare/0.8.2...0.10.0
 [0.8.2]: https://github.com/candoumbe/MiscUtilities/compare/0.8.1...0.8.2
