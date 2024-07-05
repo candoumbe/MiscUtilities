@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.12.0] / 2024-07-05
 ### 🚨 Breaking changes
 - Dropped `net7.0` support
 
 ### 🚀 New features
-- Added net8.0 support
+- Added `net8.0` support
 
 ### 🔧 Fixes
 - Fixed `object.As<T>()` extension method to work the same way `as` keyword does.
@@ -107,7 +109,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.12.0...HEAD
+[0.12.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/candoumbe/MiscUtilities/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/candoumbe/MiscUtilities/compare/0.8.2...0.10.0
 [0.8.2]: https://github.com/candoumbe/MiscUtilities/compare/0.8.1...0.8.2
@@ -128,4 +131,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.0]: https://github.com/candoumbe/MiscUtilities/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/candoumbe/MiscUtilities/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/candoumbe/MiscUtilities/tree/0.1.0
-
