@@ -178,7 +178,8 @@ public class Build : NukeBuild,
                         .Select(output => output.Text.AsSpan()[2..].TrimStart().ToString())
                         .ToArray())
         .SetVerbosity(IsLocalBuild ? DotNetVerbosity.diagnostic : DotNetVerbosity.minimal)
-        .SetSeverity(DotNetFormatSeverity.info);
+        .SetSeverity(DotNetFormatSeverity.info)
+        .WhenNotNull(this.As<IRestore>(), (settings, _) => settings.EnableNoRestore());
 
     ///<inheritdoc/>
     DotNetFormatter[] IDotnetFormat.Formatters => IsLocalBuild
