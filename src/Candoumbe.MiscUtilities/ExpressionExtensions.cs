@@ -32,15 +32,21 @@ namespace System.Linq.Expressions
         /// <exception cref="ArgumentNullException">if either <paramref name="first"/> or <paramref name="second"/> is <see langword="null"/>.</exception>
         public static Expression<Func<T1, T3>> Compose<T1, T2, T3>(this Expression<Func<T1, T2>> first, Expression<Func<T2, T3>> second)
         {
-            if (first == null)
+#if NET
+            ArgumentNullException.ThrowIfNull(first);
+
+            ArgumentNullException.ThrowIfNull(second);
+#else
+            if (first is null)
             {
                 throw new ArgumentNullException(nameof(first));
             }
 
-            if (second == null)
+            if (second is null)
             {
                 throw new ArgumentNullException(nameof(second));
             }
+#endif
 
             ParameterExpression param = Expression.Parameter(typeof(T1), "param");
 
@@ -61,15 +67,21 @@ namespace System.Linq.Expressions
         /// <exception cref="ArgumentNullException">either<paramref name="first"/> or <paramref name="second"/> is <see langword="null"/>.</exception>
         public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
         {
-            if (first == null)
+#if NET
+            ArgumentNullException.ThrowIfNull(first);
+
+            ArgumentNullException.ThrowIfNull(second);
+#else
+            if (first is null)
             {
                 throw new ArgumentNullException(nameof(first));
             }
 
-            if (second == null)
+            if (second is null)
             {
                 throw new ArgumentNullException(nameof(second));
             }
+#endif
 
             ParameterExpression parameter = Expression.Parameter(typeof(T));
 

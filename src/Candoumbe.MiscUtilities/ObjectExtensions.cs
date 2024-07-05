@@ -185,10 +185,14 @@ namespace System
         /// <exception cref="ArgumentNullException"><paramref name="targetType"/> is <see langword="null"/></exception>
         public static object As(this object obj, Type targetType)
         {
-            if (targetType == null)
+#if NET
+            ArgumentNullException.ThrowIfNull(targetType);
+#else
+            if (targetType is null)
             {
                 throw new ArgumentNullException(nameof(targetType));
             }
+#endif
 
             object safeCastResult = null;
 

@@ -135,10 +135,10 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
                     },
                     (Expression<Func<string, bool>>)( queryString =>
                         queryString != null
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 5
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[page]")}=1")
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[pageSize]")}=3")
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][field]")}=firstname")
+                        && queryString.Split(separator, RemoveEmptyEntries).Length == 5
+                        && queryString.Split(separator, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[page]")}=1")
+                        && queryString.Split(separatorArray, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[pageSize]")}=3")
+                        && queryString.Split(separatorArray, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][field]")}=firstname")
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][op]")}=eq")
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("search[filter][value]")}=Bruce")
                 )
@@ -345,6 +345,9 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
             };
         }
     }
+
+    private static readonly string[] separator = ["&"];
+    private static readonly string[] separatorArray = ["&"];
 
     /// <summary>
     /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString(IEnumerable{KeyValuePair{string, object}})"/>

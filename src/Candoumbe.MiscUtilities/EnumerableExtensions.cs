@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace System.Collections.Generic
 {
     /// <summary>
@@ -28,10 +29,14 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentNullException">if <paramref name="groups"/> is <see langword="null"/>.</exception>
         public static IDictionary<TKey, IEnumerable<TElement>> ToDictionary<TKey, TElement>(this IEnumerable<IGrouping<TKey, TElement>> groups)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(groups);
+#else
             if (groups is null)
             {
                 throw new ArgumentNullException(nameof(groups));
             }
+#endif
             return groups.ToDictionary(g => g.Key, g => g.AsEnumerable());
         }
 
@@ -53,6 +58,11 @@ namespace System.Collections.Generic
         /// <returns><see langword="true"/> if <paramref name="items"/> does not contain any element that fullfills <paramref name="predicate"/> and <see langword="false"/> otherwise.</returns>
         public static bool None<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(items);
+
+            ArgumentNullException.ThrowIfNull(predicate);
+#else
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
@@ -62,6 +72,7 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
+#endif
 
             return !AtLeastOnce(items, predicate);
         }
@@ -83,6 +94,11 @@ namespace System.Collections.Generic
         /// <returns><see langword="true"/> if <paramref name="items"/> contains exactly one element that fullfills <paramref name="predicate"/></returns>
         public static bool Once<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(items);
+
+            ArgumentNullException.ThrowIfNull(predicate);
+#else
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
@@ -92,6 +108,7 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
+#endif
 
             return Exactly(items, predicate, 1);
         }
@@ -105,6 +122,11 @@ namespace System.Collections.Generic
         /// <returns><see langword="true"/> if <paramref name="items"/> contains one or more one element that fullfills <paramref name="predicate"/></returns>
         public static bool AtLeastOnce<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(items);
+
+            ArgumentNullException.ThrowIfNull(predicate);
+#else
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
@@ -114,6 +136,7 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
+#endif
 
             return items
 #if NETSTANDARD1_1_OR_GREATER || NET
@@ -156,6 +179,11 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtLeast<T>(this IEnumerable<T> source, Expression<Func<T, bool>> predicate, int count)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(source);
+
+            ArgumentNullException.ThrowIfNull(predicate);
+#else
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -165,14 +193,19 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
+#endif
 
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+#else
             if (count < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value");
             }
+#endif
 
             return count == 0
-                ? source is not null
+                ? !source.Any()
                 : source
 #if NETSTANDARD1_1_OR_GREATER || NET
                     .AsParallel()
@@ -192,6 +225,11 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(items);
+
+            ArgumentNullException.ThrowIfNull(predicate);
+#else
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
@@ -201,12 +239,16 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
+#endif
 
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+#else
             if (count < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value");
             }
-
+#endif
 #if NETSTANDARD1_1_OR_GREATER || NET
             return count == default
                 ? !items.AsParallel().Any(predicate.Compile())
@@ -229,15 +271,23 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="count"/> is negative.</exception>
         public static bool Exactly<T>(this IEnumerable<T> items, int count)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(items);
+#else
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
+#endif
 
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+#else
             if (count < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value");
             }
+#endif
 
             return count == default
                 ? !items.Any()
@@ -259,6 +309,12 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative </exception>
         public static bool AtMost<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(items);
+
+            ArgumentNullException.ThrowIfNull(predicate);
+
+#else
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
@@ -268,13 +324,16 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
-
+#endif
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+#else
             if (count < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value.");
             }
-
-            return (count == 0 && items == Enumerable.Empty<T>()) || items.Count(predicate.Compile()) <= count;
+#endif
+            return (count == 0 && !items.Any()) || items.Count(predicate.Compile()) <= count;
         }
 
         /// <summary>
@@ -311,7 +370,7 @@ namespace System.Collections.Generic
         /// <returns></returns>
         public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> selector)
 #pragma warning disable RCS1163 // Unused parameter.
-            => first?.SelectMany(t1 => second, (t1, t2) => selector(t1, t2));
+            => first?.SelectMany(t1 => second, selector);
 #pragma warning restore RCS1163 // Unused parameter.
 
         /// <summary>
@@ -328,7 +387,7 @@ namespace System.Collections.Generic
             => CrossJoin(first, second, third, (x, y, z) => (x, y, z));
 
         /// <summary>
-        /// Performs a cartesian product beetwen <paramref name="first"/> and <paramref name="second"/>.
+        /// Performs a cartesian product between <paramref name="first"/> and <paramref name="second"/>.
         /// </summary>
         /// <typeparam name="TFirst">Type of element in <paramref name="first"/> collection.</typeparam>
         /// <typeparam name="TSecond">Type of element in <paramref name="second"/> collection.</typeparam>
@@ -355,8 +414,11 @@ namespace System.Collections.Generic
         /// </param>
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> body)
         {
-            void bodyWithIndex(T item, int _) => body(item);
-            source.ForEach(bodyWithIndex);
+            source.ForEach(BodyWithIndex);
+
+            return;
+
+            void BodyWithIndex(T item, int _) => body(item);
         }
 
         /// <summary>
@@ -405,16 +467,22 @@ namespace System.Collections.Generic
         /// <returns>Collection of "buckets" where each bucket are</returns>
         public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> source, int bucketSize)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(source);
+#endif
+
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfLessThan(bucketSize, 0);
+#else
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
-
             if (bucketSize < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(bucketSize), bucketSize, "Bucket size must be greater than 0");
             }
-
+#endif
             return PartitionInternal();
 
             IEnumerable<IEnumerable<T>> PartitionInternal()
@@ -511,15 +579,22 @@ namespace System.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="millisecondsDelay"/> is less than <c>0</c>.</exception>
         public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IEnumerable<T> source, int millisecondsDelay = 1)
         {
+#if NET
+            ArgumentNullException.ThrowIfNull(source);
+#else
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
             }
-
+#endif
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfLessThan(millisecondsDelay, 0);
+#else
             if (millisecondsDelay < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(millisecondsDelay), millisecondsDelay, "cannot be negative");
             }
+#endif
 
             async IAsyncEnumerable<T> AsAsyncEnumerableIterator()
             {

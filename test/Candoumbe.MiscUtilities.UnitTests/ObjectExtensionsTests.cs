@@ -392,7 +392,6 @@ namespace Utilities.UnitTests
 #endif
     }
 
-
     public class Foo
     {
         public Foo()
@@ -406,5 +405,4 @@ namespace Utilities.UnitTests
     public interface IBar
     {
     }
-
 }
