@@ -23,21 +23,26 @@ namespace Microsoft.Extensions.Primitives
         /// <returns>
         /// A collection of all indexes in <paramref name="input"/> where <paramref name="search"/> is present.
         /// </returns>
+        /// <remarks>
+        ///     The returned collection should not be expected to be in any particular order.
+        /// </remarks>
         public static IEnumerable<int> Occurrences(this StringSegment input, char search)
         {
             int i = 0;
 
-            if (!StringSegment.IsNullOrEmpty(input))
+            if (StringSegment.IsNullOrEmpty(input))
             {
-                while (i < input.Length)
-                {
-                    if (input[i] == search)
-                    {
-                        yield return i;
-                    }
+                yield break;
+            }
 
-                    i++;
+            while (i < input.Length)
+            {
+                if (input[i] == search)
+                {
+                    yield return i;
                 }
+
+                i++;
             }
         }
 
@@ -51,16 +56,35 @@ namespace Microsoft.Extensions.Primitives
         /// the index where <paramref name="search"/>
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <see langword="null"/></exception>
-        /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
+        /// <exception cref="ArgumentOutOfRangeException">if either <paramref name="source"/> or <paramref name="search"/> does not have an inner value.</exception>
         public static int FirstOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = default)
         {
-            using IEnumerator<int> enumerator = source.Occurrences(search, stringComparison)
-                                                      .GetEnumerator();
+            if (!source.HasValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(source));
+            }
 
-            return enumerator.MoveNext()
-                ? enumerator.Current
-                : -1;
+            if (!search.HasValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(search));
+            }
+
+            int index;
+            if (search == StringSegment.Empty)
+            {
+                index = 0;
+            }
+            else
+            {
+                using IEnumerator<int> enumerator = source.Occurrences(search, stringComparison)
+                    .GetEnumerator();
+
+                index =  enumerator.MoveNext()
+                    ? enumerator.Current
+                    : -1;
+            }
+
+            return index;
         }
 
         /// <summary>
@@ -73,30 +97,51 @@ namespace Microsoft.Extensions.Primitives
         /// the index where <paramref name="search"/>
         /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
         /// </returns>
-        /// <exception cref="ArgumentException">if <paramref name="search"/> is <c>empty</c></exception>
+        /// <exception cref="ArgumentOutOfRangeException">if either <paramref name="source"/> or <paramref name="search"/> inner value is <see langword="null"/>.</exception>
         public static int LastOccurrence(this StringSegment source, StringSegment search, StringComparison stringComparison = default)
         {
-            if (StringSegment.IsNullOrEmpty(search))
+            bool found = false;
+            int index = -1,
+                offset = 0;
+
+            if (!source.HasValue)
             {
-                throw new ArgumentException($"{nameof(search)} cannot be null or empty", nameof(search));
+                throw new ArgumentOutOfRangeException(nameof(source), "The source string must have a value.");
             }
 
-            int index = -1,
-                offset = 0,
-                currentPos = source.LastIndexOf(search[0]);
-
-            bool found = false;
-
-            while (!found && currentPos >= 0)
+            if (!search.HasValue)
             {
-                StringSegment subSegment = source.Subsegment(currentPos, search.Length);
-                found = subSegment.Equals(search, stringComparison);
-                if (found)
+                throw new ArgumentOutOfRangeException(nameof(search), "The search StringSegment must have a value.");
+            }
+
+            if (search == StringSegment.Empty)
+            {
+                index = source switch
                 {
-                    index = currentPos;
+                    { Length: var length and > 0 } => length - 1,
+                    _ => 0
+                };
+            }
+            else if (source.Length >= search.Length)
+            {
+                int currentPos = source.LastIndexOf(search[0]);
+                int remainingCharactersInSource = source.Length - currentPos;
+
+                if(remainingCharactersInSource >= search.Length)
+                {
+                    while (!found && currentPos >= 0)
+                    {
+                        StringSegment subSegment = source.Subsegment(currentPos, search.Length);
+                        found = subSegment.Equals(search, stringComparison);
+                        if (found)
+                        {
+                            index = currentPos;
+                        }
+
+                        offset++;
+                        currentPos = source.Length - (search.Length + offset);
+                    }
                 }
-                offset++;
-                currentPos = source.Length - (search.Length + offset);
             }
 
             return index;
@@ -113,27 +158,32 @@ namespace Microsoft.Extensions.Primitives
         /// </returns>
         public static IEnumerable<int> Occurrences(this StringSegment input, StringSegment search, StringComparison stringComparison = StringComparison.CurrentCulture)
         {
-            int index,
-                newPos,
-                currentPos = 0;
+            int currentPos = 0;
 
-            if (!StringSegment.IsNullOrEmpty(input))
+            if (search == StringSegment.Empty && input is { Value: not null })
             {
-                int inputLength = input.Length;
-                do
-                {
-                    index = input.IndexOf(search[0], currentPos);
-
-                    if (index != -1 && input.Subsegment(index, search.Length).Equals(search, stringComparison))
-                    {
-                        yield return index;
-                    }
-
-                    newPos = index + search.Length;
-                    currentPos = newPos + 1;
-                }
-                while (currentPos <= inputLength && index != -1);
+                yield return 0;
             }
+
+            if (StringSegment.IsNullOrEmpty(input))
+            {
+                yield break;
+            }
+
+            int inputLength = input.Length;
+            int index;
+            do
+            {
+                index = input.IndexOf(search[0], currentPos);
+
+                if (index != -1 && input.Subsegment(index, search.Length).Equals(search, stringComparison))
+                {
+                    yield return index;
+                }
+
+                int newPos = index + search.Length;
+                currentPos = newPos + 1;
+            } while (currentPos <= inputLength && index != -1);
         }
 
         /// <summary>
