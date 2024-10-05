@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace Utilities.UnitTests
+namespace Candoumbe.MiscUtilities.UnitTests
 {
     [ExcludeFromCodeCoverage]
     public sealed class CultureSwitcher : IDisposable

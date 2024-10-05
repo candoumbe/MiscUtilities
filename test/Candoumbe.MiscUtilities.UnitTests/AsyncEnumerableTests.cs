@@ -1,11 +1,10 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using Xunit.Categories;
 
-namespace Utilities.UnitTests
+namespace Candoumbe.MiscUtilities.UnitTests
 {
     [UnitTest]
     public class AsyncEnumerableTests

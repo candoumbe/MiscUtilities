@@ -18,7 +18,7 @@ using Xunit.Abstractions;
 using Xunit.Categories;
 using static Newtonsoft.Json.JsonConvert;
 
-namespace Utilities.UnitTests
+namespace Candoumbe.MiscUtilities.UnitTests
 {
     /// <summary>
     /// Extensions methods for <see cref="object"/> type.

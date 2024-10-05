@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.1] / 2024-10-05
+### 🔧 Fixes
+- `StringExtensions.FirstOccurrence(string source, string search)` now returns `0` instead of throwing `ArgumentOutOfRangeException` when `source`
+is not null and  ̀search` is empty.
+- `StringExtensions.LastOccurrence(string source, string search)` now returns `0` when both `source` and  `search` are empty.
+- `StringSegmentExtensions.FirstOccurrence(StringSegment source, StringSegment search)` now returns `0` 
+instead of throwing `ArgumentOutOfRangeException` when both `source` and  `search` are equal to `StringSegment.Empty`
+- `StringSegmentExtensions.LastOccurrence(StringSegment source, StringSegment search)` now returns `0`
+instead of throwing `ArgumentOutOfRangeException` when both `source` and  `search` are equal to `StringSegment.Empty`
+
+
 ## [0.13.0] / 2024-07-06
 ### 🚨 Breaking changes
 - Dropped `net7.0` support
@@ -110,7 +121,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.13.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.13.1...HEAD
+[0.13.1]: https://github.com/candoumbe/MiscUtilities/compare/0.13.0...0.13.1
 [0.13.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.13.0
 [0.11.0]: https://github.com/candoumbe/MiscUtilities/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/candoumbe/MiscUtilities/compare/0.8.2...0.10.0

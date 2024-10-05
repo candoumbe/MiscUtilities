@@ -15,10 +15,9 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 using static System.Linq.Expressions.ExpressionExtensions;
-using static System.Linq.Expressions.ExpressionExtensions;
 using static Newtonsoft.Json.JsonConvert;
 
-namespace Utilities.UnitTests
+namespace Candoumbe.MiscUtilities.UnitTests
 {
     [UnitTest]
     [Feature("Enumerable")]

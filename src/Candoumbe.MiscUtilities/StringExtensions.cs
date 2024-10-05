@@ -7,16 +7,12 @@ namespace System
 
 #if STRING_SEGMENT
     using Microsoft.Extensions.Primitives;
-
 #endif
     using Collections.Generic;
-
     using Linq;
     using Linq.Expressions;
-
     using Text;
     using Text.RegularExpressions;
-
     using static Linq.Expressions.Expression;
 
     /// <summary>
@@ -75,11 +71,11 @@ namespace System
             input ??= string.Empty;
             string sanitizedInput
 #if !(NETSTANDARD1_0 || NETSTANDARD1_1)
-             = new(input
+                = new(input
 #else
             = new(input.ToCharArray()
 #endif
-                .Where(character => char.IsLetterOrDigit(character) || character == '-' || char.IsWhiteSpace(character))
+                    .Where(character => char.IsLetterOrDigit(character) || character == '-' || char.IsWhiteSpace(character))
                     .ToArray());
 
             if (sanitizedInput != string.Empty)
@@ -148,6 +144,7 @@ namespace System
             {
                 regexOptions |= RegexOptions.IgnoreCase;
             }
+
             foreach (char chr in pattern)
             {
                 sbPattern.Append(chr switch
@@ -186,9 +183,9 @@ namespace System
             ParameterExpression pe = Parameter(typeof(TSource), "x");
 
             IEnumerable<string> fields = source.Replace(@"[""", ".")
-                                               .Replace(@"""]", string.Empty)
-                                               .Split(['.'])
-                                               .Select(item => item.Trim());
+                .Replace(@"""]", string.Empty)
+                .Split(['.'])
+                .Select(item => item.Trim());
             MemberExpression property = null;
 
             foreach (string field in fields)
@@ -238,7 +235,7 @@ namespace System
 
             StringBuilder sb = new(input.Length * 2);
             input = input.Trim()
-                         .Replace("  ", " ");
+                .Replace("  ", " ");
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -251,6 +248,7 @@ namespace System
                         {
                             sb.Append('-');
                         }
+
                         break;
                     case char c when char.IsUpper(c):
                         if (i == 0)
@@ -262,6 +260,7 @@ namespace System
                             sb.Append('-');
                             sb.Append(char.ToLowerInvariant(c));
                         }
+
                         break;
                     default:
                         sb.Append(char.ToLowerInvariant(character));
@@ -293,7 +292,7 @@ namespace System
 #if !NET5_0_OR_GREATER
             StringBuilder sb = new(input.Length * 2);
             input = input.Trim()
-                         .Replace("  ", " ");
+                .Replace("  ", " ");
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -306,6 +305,7 @@ namespace System
                         {
                             sb.Append('_');
                         }
+
                         break;
                     case char c when char.IsUpper(c):
                         if (i == 0)
@@ -317,6 +317,7 @@ namespace System
                             sb.Append('_');
                             sb.Append(char.ToLowerInvariant(c));
                         }
+
                         break;
                     default:
                         sb.Append(char.ToLowerInvariant(character));
@@ -425,20 +426,19 @@ namespace System
                         yield return index;
                         currentPos = newPos + 1;
                     }
-                }
-                while (currentPos <= inputLength && index != -1);
+                } while (currentPos <= inputLength && index != -1);
             }
         }
 
         /// <summary>
         /// Report a zero-based index of the first occurrence of <paramref name="search"/> in <paramref name="source"/>
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="search"></param>
+        /// <param name="source">The <see langword="string"/> into which perform the lookup</param>
+        /// <param name="search">The value to search for</param>
         /// <param name="stringComparison"></param>
         /// <returns>
-        /// the index where <paramref name="search"/>
-        /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found
+        /// the index where <paramref name="search"/> was found in <paramref name="source"/>
+        /// or <c>-1</c> if no occurrence found
         /// </returns>
         /// <exception cref="ArgumentNullException">if <paramref name="source"/> or <paramref name="search"/> is <see langword="null"/></exception>
         /// <exception cref="ArgumentOutOfRangeException">if <paramref name="search"/> is <c>empty</c></exception>
@@ -460,16 +460,21 @@ namespace System
             }
 #endif
 
+            int index;
             if (search.Length == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(search), "Search cannot be empty");
+                index = 0;
+            }
+            else
+            {
+                using IEnumerator<int> enumerator = Occurrences(source, search, stringComparison).GetEnumerator();
+
+                index = enumerator.MoveNext()
+                    ? enumerator.Current
+                    : -1;
             }
 
-            using IEnumerator<int> enumerator = Occurrences(source, search, stringComparison).GetEnumerator();
-
-            return enumerator.MoveNext()
-                ? enumerator.Current
-                : -1;
+            return index;
         }
 
         /// <summary>
@@ -499,20 +504,7 @@ namespace System
             }
 #endif
 
-            if (search.Length == 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(search), "Search cannot be empty");
-            }
-
-            using IEnumerator<int> enumerator = Occurrences(source, search, stringComparison).GetEnumerator();
-
-            int index = -1;
-            while (enumerator.MoveNext())
-            {
-                index = enumerator.Current;
-            }
-
-            return index;
+            return source.LastIndexOf(search, stringComparison);
         }
 
         /// <summary>
@@ -548,9 +540,9 @@ namespace System
             }
 
             return (sbResult?.ToString() ?? string.Empty)
-                        .Replace(" ", string.Empty)
-                        .Replace("-", string.Empty)
-                        .Replace("_", string.Empty);
+                .Replace(" ", string.Empty)
+                .Replace("-", string.Empty)
+                .Replace("_", string.Empty);
         }
     }
 }
