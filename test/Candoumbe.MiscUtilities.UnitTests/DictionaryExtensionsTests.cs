@@ -3,14 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using Candoumbe.MiscUtilities.UnitTests.Generators;
 using Candoumbe.MiscUtilities.UnitTests.Models;
 using FluentAssertions;
 using FluentAssertions.Extensions;
-using FsCheck;
-using FsCheck.Fluent;
 using FsCheck.Xunit;
 using Microsoft.AspNetCore.Routing;
 using Xunit;
@@ -18,7 +15,7 @@ using Xunit.Abstractions;
 using Xunit.Categories;
 using static System.StringSplitOptions;
 
-namespace Utilities.UnitTests;
+namespace Candoumbe.MiscUtilities.UnitTests;
 
 /// <summary>
 /// unit tests for <see cref="DictionaryExtensions"/> methods.

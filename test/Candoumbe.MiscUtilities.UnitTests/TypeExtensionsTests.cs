@@ -4,7 +4,7 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Categories;
 
-namespace Utilities.UnitTests
+namespace Candoumbe.MiscUtilities.UnitTests
 {
     [UnitTest]
     [Feature("Type")]

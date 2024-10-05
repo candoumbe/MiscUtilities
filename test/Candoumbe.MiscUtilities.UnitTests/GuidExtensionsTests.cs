@@ -4,7 +4,7 @@ using FsCheck.Fluent;
 using FsCheck.Xunit;
 using Xunit.Categories;
 
-namespace Utilities.UnitTests
+namespace Candoumbe.MiscUtilities.UnitTests
 {
     [UnitTest]
     [Feature(nameof(GuidExtensions))]

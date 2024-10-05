@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using FluentAssertions;
+using Utilities;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Utilities.UnitTests
+namespace Candoumbe.MiscUtilities.UnitTests
 {
     [UnitTest]
     public class ArrayEqualityComparerTests(ITestOutputHelper outputHelper)
