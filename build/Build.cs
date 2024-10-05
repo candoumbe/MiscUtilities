@@ -1,6 +1,8 @@
 // "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using Nuke.Common.Tools.GitHub;
+
 namespace Utilities.ContinuousIntegration;
 
 using System;
@@ -150,7 +152,7 @@ public class Build : NukeBuild,
         ),
         new GitHubPushNugetConfiguration(
             githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
-            source: new Uri($"https://nuget.pkg.github.com/{GitHubActions?.RepositoryOwner}/index.json"),
+            source: new Uri($"https://nuget.pkg.github.com/{this.Get<IHaveGitHubRepository>().GitRepository.GetGitHubOwner()}/index.json"),
             canBeUsed: () => this is ICreateGithubRelease { GitHubToken: not null } createRelease
     )};
 
