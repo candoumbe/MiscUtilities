@@ -25,14 +25,8 @@ namespace System
         private static bool HasInterfaceThatMapsToGenericTypeDefinition(this Type givenType, Type genericType)
         => givenType is not null && genericType is not null && givenType
                 .GetTypeInfo()
-#if NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD1_3
-
-                .ImplementedInterfaces
-#else
-            .GetInterfaces()
-#endif
-            .Where(it => it.GetTypeInfo().IsGenericType)
-                .Any(it => it.GetGenericTypeDefinition() == genericType);
+                .GetInterfaces()
+                .Any(it => it.GetTypeInfo().IsGenericType && it.GetGenericTypeDefinition() == genericType);
 
         private static bool MapsToGenericTypeDefinition(this Type givenType, Type genericType)
             => givenType is not null

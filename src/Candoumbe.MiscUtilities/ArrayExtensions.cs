@@ -20,7 +20,7 @@ public static class ArrayExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static T[] ToArray<T>(this Array array)
     {
-#if NET6_0_OR_GREATER
+#if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
 #else
         if (array is null)

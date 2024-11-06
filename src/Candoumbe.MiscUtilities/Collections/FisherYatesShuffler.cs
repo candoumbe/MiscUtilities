@@ -4,9 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if NET5_0_OR_GREATER
-using System.Security.Cryptography;
-#endif
 
 namespace Candoumbe.MiscUtilities.Collections
 {
@@ -25,7 +22,7 @@ namespace Candoumbe.MiscUtilities.Collections
         public IEnumerable<T> Shuffle(IEnumerable<T> original)
         {
             IEnumerable<T> shuffled = null;
-#if NET6_0_OR_GREATER
+#if NET8_0_OR_GREATER
             if(!original.TryGetNonEnumeratedCount(out int count))
             {
                 count = original.Count();
@@ -54,10 +51,10 @@ namespace Candoumbe.MiscUtilities.Collections
                     for (int i = unshuffled.Length - 1; i > 0; --i)
                     {
                         //Step 2: Randomly pick an item which has not been shuffled yet
-#if !NET5_0_OR_GREATER
+#if !NET8_0_OR_GREATER
                         int k = _random.Next(i + 1);
 #else
-                        int k = RandomNumberGenerator.GetInt32(0, i + 1);
+                        int k = Random.Shared.Next(0, i + 1);
 #endif
 
                         //Step 3: Swap the selected item with the last "unstruck" letter in the collection

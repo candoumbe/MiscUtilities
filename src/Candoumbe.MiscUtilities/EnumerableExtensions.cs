@@ -3,13 +3,9 @@
 
 using System.Linq;
 using System.Linq.Expressions;
-
 using static System.Linq.Expressions.ExpressionExtensions;
-
-#if !NETSTANDARD1_0
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
-#endif
 
 // ReSharper disable once CheckNamespace
 namespace System.Collections.Generic
@@ -139,10 +135,8 @@ namespace System.Collections.Generic
 #endif
 
             return items
-#if NETSTANDARD1_1_OR_GREATER || NET
-                    .AsParallel()
-#endif
-                    .Any(predicate.Compile());
+                .AsParallel()
+                .Any(predicate.Compile());
         }
 
         /// <summary>
@@ -207,9 +201,7 @@ namespace System.Collections.Generic
             return count == 0
                 ? !source.Any()
                 : source
-#if NETSTANDARD1_1_OR_GREATER || NET
                     .AsParallel()
-#endif
                     .Where(predicate.Compile()).Skip(count - 1).Any();
         }
 
@@ -249,15 +241,9 @@ namespace System.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value");
             }
 #endif
-#if NETSTANDARD1_1_OR_GREATER || NET
             return count == default
                 ? !items.AsParallel().Any(predicate.Compile())
                 : items.AsParallel().Count(predicate.Compile()) == count;
-#else
-            return count == default
-                ? !items.Any(predicate.Compile())
-                : items.Count(predicate.Compile()) == count;
-#endif
         }
 
         /// <summary>
@@ -400,7 +386,7 @@ namespace System.Collections.Generic
         /// <returns></returns>
         public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TThird, TResult>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third, Func<TFirst, TSecond, TThird, TResult> selector) =>
 #pragma warning disable RCS1163 // Unused parameter.
-            first.SelectMany(x => second.SelectMany(y => third, (y, z) => selector(x, y, z)));
+            first.SelectMany(x => second.SelectMany(_ => third, (y, z) => selector(x, y, z)));
 #pragma warning restore RCS1163 // Unused parameter.
 
         /// <summary>
@@ -478,6 +464,7 @@ namespace System.Collections.Generic
             {
                 throw new ArgumentNullException(nameof(source));
             }
+
             if (bucketSize < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(bucketSize), bucketSize, "Bucket size must be greater than 0");
@@ -525,7 +512,6 @@ namespace System.Collections.Generic
         public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
             => (source.Where(predicate), source.Where(val => !predicate(val)));
 
-#if !NETSTANDARD1_0
         /// <summary>
         /// Asynchronously iterates over each element of <paramref name="source"/> and applies the specified <paramref name="body"/> function.
         /// </summary>
@@ -544,7 +530,7 @@ namespace System.Collections.Generic
         {
             return Task.WhenAll(
                 from partition in Partitioner.Create(source)
-                        .GetPartitions(degreeOfParallelism ?? Environment.ProcessorCount / 2)
+                    .GetPartitions(degreeOfParallelism ?? Environment.ProcessorCount / 2)
                 select Task.Run(async delegate
                 {
                     using (partition)
@@ -557,7 +543,6 @@ namespace System.Collections.Generic
                     }
                 }));
         }
-#endif
 
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
         /// <summary>

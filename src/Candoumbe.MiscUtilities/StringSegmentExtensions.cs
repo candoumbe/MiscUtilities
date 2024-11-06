@@ -1,8 +1,6 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-#if STRING_SEGMENT
-
 namespace Microsoft.Extensions.Primitives
 {
     using System;
@@ -232,4 +230,3 @@ namespace Microsoft.Extensions.Primitives
         }
     }
 }
-#endif

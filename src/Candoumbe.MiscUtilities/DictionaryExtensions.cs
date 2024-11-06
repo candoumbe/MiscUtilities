@@ -6,7 +6,7 @@ using System.Text;
 namespace System.Collections.Generic
 {
     /// <summary>
-    /// Exntesions for <see cref="KeyValuePair{TKey, TValue}"/> and <see cref="IDictionary{TKey, TValue}"/> types.
+    /// Extensions for <see cref="KeyValuePair{TKey, TValue}"/> and <see cref="IDictionary{TKey, TValue}"/> types.
     /// </summary>
     public static class DictionaryExtensions
     {
@@ -30,7 +30,7 @@ namespace System.Collections.Generic
 #if NET6_0_OR_GREATER
             typeof(DateOnly), typeof(DateOnly?),
             typeof(TimeOnly), typeof(TimeOnly?),
-	#endif
+#endif
             typeof(Guid), typeof(Guid?),
             typeof(bool), typeof(bool?)
         };
@@ -89,9 +89,7 @@ namespace System.Collections.Generic
                     else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
                     {
                         subDictionary = subDictionary
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3
                                     .AsParallel()
-#endif
                                     .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
 
                         if (sb.Length > 0)
@@ -104,14 +102,13 @@ namespace System.Collections.Generic
                     {
                         int itemPosition = 0;
                         Type elementType;
-                        TypeInfo elementTypeInfo;
 
                         foreach (object item in enumerable)
                         {
                             if (item is not null)
                             {
                                 elementType = item.GetType();
-                                elementTypeInfo = elementType.GetTypeInfo();
+                                TypeInfo elementTypeInfo = elementType.GetTypeInfo();
                                 if (elementTypeInfo.IsPrimitive || PrimitiveTypes.Any(x => x == elementType))
                                 {
                                     if (sb.Length > 0)
@@ -150,7 +147,7 @@ namespace System.Collections.Generic
 
             static string ConvertValueToString(in object value) => value switch
             {
-                DateTime dateTime when dateTime.Kind == DateTimeKind.Utc => dateTime.ToString("u").Replace(' ', 'T'),
+                DateTime { Kind: DateTimeKind.Utc } dateTime => dateTime.ToString("u").Replace(' ', 'T'),
                 DateTime dateTime => dateTime.ToString("s").Replace(' ', 'T'),
                 DateTimeOffset dateTimeOffset => $"{dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-" : "+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
 #if NET6_0_OR_GREATER
