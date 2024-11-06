@@ -6,21 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
-#if NEWTONSOFT_JSON
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using static Newtonsoft.Json.JsonConvert;
-#if NET6_0
-using static Newtonsoft.Json.Formatting;
-using static Newtonsoft.Json.NullValueHandling;
-#endif
-#else
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using static System.Text.Json.JsonSerializer;
-#endif
 
 // ReSharper disable once CheckNamespace
 namespace System
@@ -38,25 +26,10 @@ namespace System
         /// <returns>A deep copy of the object</returns>
         public static T DeepClone<T>(this T source)
         {
-#if REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND
-            Candoumbe.MiscUtilities.DateOnlyJsonConverter dateOnlyJsonConverter = new();
-            Candoumbe.MiscUtilities.TimeOnlyJsonConverter timeOnlyJsonConverter = new();
-
-            JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.General);
-            serializerOptions.Converters.Add(dateOnlyJsonConverter);
-            serializerOptions.Converters.Add(timeOnlyJsonConverter);
-#endif
-
             // Don't serialize a null object, simply return the default for that object
             T clone = ReferenceEquals(source, default)
                 ? default
-#if NEWTONSOFT_JSON
-        : DeserializeObject<T>(SerializeObject(source));
-#elif REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND
-        : Deserialize<T>(Serialize(source, serializerOptions), serializerOptions);
-#else
-        : Deserialize<T>(Serialize(source));
-#endif
+                : Deserialize<T>(Serialize(source));
 
             return clone;
         }
@@ -224,44 +197,18 @@ namespace System
         /// <param name="obj">The object to "jsonify"</param>
         /// <param name="settings">settings to use when serializing <paramref name="obj"/> to Json.</param>
         /// <returns>Json representation</returns>
-#if NEWTONSOFT_JSON
-        public static string Jsonify(this object obj, JsonSerializerSettings settings = null) => settings is null
-                ? SerializeObject(obj)
-                : SerializeObject(obj, settings);
-#else
         public static string Jsonify(this object obj, JsonSerializerOptions settings = null)
         {
             string json = null;
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
             settings ??= JsonSerializerOptions.Default;
 #endif
             if (obj is not null)
             {
-#if REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND
-                if (settings is null)
-                {
-                    settings = new();
-                    settings.Converters.Add(new Candoumbe.MiscUtilities.DateOnlyJsonConverter());
-                    settings.Converters.Add(new Candoumbe.MiscUtilities.TimeOnlyJsonConverter());
-                }
-                else
-                {
-                    if (settings.Converters.None(conv => conv.GetType().IsAssignableToGenericType(typeof(JsonConverter<DateOnly>))))
-                    {
-                        settings.Converters.Add(new Candoumbe.MiscUtilities.DateOnlyJsonConverter());
-                    }
-
-                    if (settings.Converters.None(conv => conv.GetType().IsAssignableToGenericType(typeof(JsonConverter<TimeOnly>))))
-                    {
-                        settings.Converters.Add(new Candoumbe.MiscUtilities.TimeOnlyJsonConverter());
-                    }
-                }
-#endif
                 json = Serialize(obj, obj.GetType(), settings);
             }
 
             return json;
         }
-#endif
     }
 }

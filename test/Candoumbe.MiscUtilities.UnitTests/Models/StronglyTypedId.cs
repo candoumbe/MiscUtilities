@@ -32,7 +32,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
                     nameof(stronglyTypedIdType));
             }
 
-            System.Reflection.ConstructorInfo ctor = stronglyTypedIdType.GetConstructor(new[] { typeof(TValue) }) ??
+            System.Reflection.ConstructorInfo ctor = stronglyTypedIdType.GetConstructor([typeof(TValue)]) ??
                                                      throw new ArgumentException(
                                                          $"Type '{stronglyTypedIdType}' doesn't have a constructor with one parameter of type '{typeof(TValue)}'",
                                                          nameof(stronglyTypedIdType));
@@ -43,7 +43,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
             return lambda.Compile();
         }
 
-        public static bool IsStronglyTypedId(Type type) => IsStronglyTypedId(type, out _);
+        private static bool IsStronglyTypedId(Type type) => IsStronglyTypedId(type, out _);
 
         public static bool IsStronglyTypedId(Type type, [NotNullWhen(true)] out Type idType)
         {
@@ -97,7 +97,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            object result;
             if (value is string s)
             {
                 value = IdValueConverter.ConvertFrom(s);

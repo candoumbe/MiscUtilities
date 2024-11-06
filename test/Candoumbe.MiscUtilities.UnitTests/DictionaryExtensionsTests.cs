@@ -368,7 +368,6 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
                     .Match(expectedString);
     }
 
-#if NET6_0_OR_GREATER
     [Property(Arbitrary = [typeof(ValueGenerators)])]
     public void Given_dictionary_that_contains_a_DateOnly_instance_ToQueryString_should_returns_expected_result(DateOnly date)
     {
@@ -411,5 +410,4 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
                 break;
         }
     }
-#endif
 }

@@ -1,68 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\core.props" />
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
-    <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
-    <PackageTags>collections; string; utilities</PackageTags>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Candoumbe.MiscUtilities.xml</DocumentationFile>
-    <RepositoryUrl>https://github.com/candoumbe/Candoumbe.MiscUtilities</RepositoryUrl>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-
-  <Choose>
-    <When Condition="'$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'netstandard1.1'">
-      <PropertyGroup>
-        <DefineConstants>$(DefineConstants);NEWTONSOFT_JSON</DefineConstants>
-      </PropertyGroup>
-      <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      </ItemGroup>
-    </When>
-    <When Condition="'$(TargetFramework)' == 'net6.0'">
-      <PropertyGroup>
-        <DefineConstants>$(DefineConstants);SYSTEM_TEXT;REQUIRES_DATE_AND_TIME_ONLY_SERIALIZATION_WORKAROUND</DefineConstants>
-      </PropertyGroup>
-      <ItemGroup>
+    <Import Project="..\..\core.props" />
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
+        <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
+        <PackageTags>collections; string; utilities</PackageTags>
+        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Candoumbe.MiscUtilities.xml</DocumentationFile>
+        <RepositoryUrl>https://github.com/candoumbe/Candoumbe.MiscUtilities</RepositoryUrl>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants);SYSTEM_TEXT;STRING_SEGMENT</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup>
         <PackageReference Include="System.Text.Json" Version="8.0.5" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <DefineConstants>$(DefineConstants);SYSTEM_TEXT</DefineConstants>
-      </PropertyGroup>
-      <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="8.0.5" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-
-  <ItemGroup>
-    <PackageReference Include="System.Collections" Version="4.*" />
-    <PackageReference Include="System.Linq" Version="4.*" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.*" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.*" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Include="System.Collections.Concurrent" Version="4.*" />
-    <PackageReference Include="System.Linq.Parallel" Version="4.*" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.*" />
-  </ItemGroup>
-
-  <!-- Support for StringSegment type -->
-
-  <Choose>
-    <When Condition="'$(TargetFramework)' != 'netstandard1.0' and '$(TargetFramework)' != 'netstandard1.1'">
-      <PropertyGroup>
-        <DefineConstants>$(DefineConstants);STRING_SEGMENT</DefineConstants>
-      </PropertyGroup>
-      <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
-      </ItemGroup>
-    </When>
-  </Choose>
+    </ItemGroup>
+
 </Project>

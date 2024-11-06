@@ -1,4 +1,4 @@
-﻿#if !(NETSTANDARD1_0 || NETSTANDARD1_1 || NETSTANDARD2_0)
+﻿#if !NETSTANDARD2_0
 using System.Threading;
 using System.Threading.Tasks;
 

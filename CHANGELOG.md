@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### 🚨 Breaking changes
-- Dropped `netstandard1.0`, `netstandard1.1` and `net6.0` support
+- Dropped `netstandard1.0`, `netstandard1.1` and `net6.0` support ([#272](https://github.com/candoumbe/MiscUtilities/issues/272))
+  - Removed `DateOnlyJsonConverter`, `TimeOnlyJsonConverter`
+  - Removed `T[] Enum.GetValues<T>()` extension method
+
+### 🧹 Housekeeping
 
 ## [0.13.1] / 2024-10-05
 ### 🔧 Fixes
