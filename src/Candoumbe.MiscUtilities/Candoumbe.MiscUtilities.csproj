@@ -2,7 +2,7 @@
 
   <Import Project="..\..\core.props" />
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
     <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
     <PackageTags>collections; string; utilities</PackageTags>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Candoumbe.MiscUtilities.xml</DocumentationFile>
