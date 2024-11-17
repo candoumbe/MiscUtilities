@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Candoumbe.MiscUtilities.UnitTests.Generators;
-using Candoumbe.MiscUtilities.UnitTests.Models;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using FsCheck.Xunit;
-using Microsoft.AspNetCore.Routing;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -180,36 +178,6 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[0]")}=1")
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[1]")}=5")
                         && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[2]")}=4")
-                    )
-            };
-
-            yield return new object[]
-            {
-                    new RouteValueDictionary
-                    {
-                        ["name"] = new []{ 1, 5, 4 }
-                    },
-                    (Expression<Func<string, bool>>)( queryString =>
-                        queryString != null
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 3
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[0]")}=1")
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[1]")}=5")
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name[2]")}=4")
-                    )
-            };
-
-            yield return new object[]
-            {
-                    new RouteValueDictionary
-                    {
-                        ["name"] = "john doe",
-                        ["id"] = new Identifier(Guid.Empty)
-                    },
-                    (Expression<Func<string, bool>>)( queryString =>
-                        queryString != null
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Length == 2
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("name")}={Uri.EscapeDataString("john doe")}")
-                        && queryString.Split(new []{ "&"}, RemoveEmptyEntries).Once(x => x == $"{Uri.EscapeDataString("id")}={Guid.Empty}")
                     )
             };
         }

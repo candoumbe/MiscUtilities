@@ -69,10 +69,9 @@ using static Nuke.Common.Tools.Git.GitTasks;
         "LICENSE"
     ]
 )]
-
 [UnsetVisualStudioEnvironmentVariables]
 [DotNetVerbosityMapping]
-public class Build : NukeBuild,
+public class Build : EnhancedNukeBuild,
     IHaveArtifacts,
     IHaveConfiguration,
     IHaveSolution,
@@ -95,9 +94,7 @@ public class Build : NukeBuild,
 {
     public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
 
-    [Required]
-    [Solution]
-    public readonly Solution Solution;
+    [Required] [Solution] public readonly Solution Solution;
 
     ///<inheritdoc/>
     Solution IHaveSolution.Solution => Solution;
@@ -105,33 +102,39 @@ public class Build : NukeBuild,
     /// <summary>
     /// Token to interact with Nuget's API
     /// </summary>
-    [Parameter("Token to interact with Nuget's API")]
-    [Secret]
+    [Parameter("Token to interact with Nuget's API")] [Secret]
     public readonly string NugetApiKey;
 
     [CI] public readonly GitHubActions GitHubActions;
 
     ///<inheritdoc/>
-    IEnumerable<AbsolutePath> IClean.DirectoriesToDelete => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj")
-                                                            .Concat(this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj"));
+    IEnumerable<AbsolutePath> IClean.DirectoriesToDelete =>
+        [ 
+            ..this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj"),
+            ..this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj")
+        ];
 
     ///<inheritdoc/>
-    IEnumerable<AbsolutePath> IClean.DirectoriesToClean => new[] { this.Get<IPack>().ArtifactsDirectory, this.Get<IReportCoverage>().CoverageReportDirectory };
+    IEnumerable<AbsolutePath> IClean.DirectoriesToClean =>
+    [
+        this.Get<IPack>().ArtifactsDirectory,
+        this.Get<IReportCoverage>().CoverageReportDirectory
+    ];
 
     ///<inheritdoc/>
-    IEnumerable<AbsolutePath> IClean.DirectoriesToEnsureExistance => new[]
-    {
-        this.Get<IReportCoverage>().CoverageReportHistoryDirectory,
-        this.Get<IMutationTest>().MutationTestResultDirectory,
-
-    };
+    IEnumerable<AbsolutePath> IClean.DirectoriesToEnsureExistence
+        =>
+        [
+            this.Get<IReportCoverage>().CoverageReportHistoryDirectory,
+            this.Get<IMutationTest>().MutationTestResultDirectory
+        ];
 
     ///<inheritdoc/>
     IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
 
     ///<inheritdoc/>
     IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
-        => new[] { new MutationProjectConfiguration(Solution.GetProject("Candoumbe.MiscUtilities"), Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects)) };
+        => [new MutationProjectConfiguration(Solution.GetProject("Candoumbe.MiscUtilities"), Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects))];
 
     ///<inheritdoc/>
     IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
@@ -143,8 +146,8 @@ public class Build : NukeBuild,
     IEnumerable<AbsolutePath> IPack.PackableProjects => this.Get<IHaveSourceDirectory>().SourceDirectory.GlobFiles("**/*.csproj");
 
     ///<inheritdoc/>
-    IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations => new PushNugetPackageConfiguration[]
-    {
+    IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations =>
+    [
         new NugetPushConfiguration(
             apiKey: NugetApiKey,
             source: new Uri("https://api.nuget.org/v3/index.json"),
@@ -154,7 +157,8 @@ public class Build : NukeBuild,
             githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
             source: new Uri($"https://nuget.pkg.github.com/{this.Get<IHaveGitHubRepository>().GitRepository.GetGitHubOwner()}/index.json"),
             canBeUsed: () => this is ICreateGithubRelease { GitHubToken: not null } createRelease
-    )};
+        )
+    ];
 
     public Target Tests => _ => _
         .Description("Run all tests")
