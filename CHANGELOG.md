@@ -6,9 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### 🚀 New features
-- Added `net9.0` support
-
 ### 🚨 Breaking changes
 - Dropped `netstandard1.0`, `netstandard1.1` and `net6.0` support ([#272](https://github.com/candoumbe/MiscUtilities/issues/272))
   - Removed `DateOnlyJsonConverter`, `TimeOnlyJsonConverter`
