@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <Import Project="..\..\core.props" />
+    <Import Project="..\..\core.props"/>
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
         <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
@@ -15,9 +15,20 @@
     <PropertyGroup>
         <DefineConstants>$(DefineConstants);SYSTEM_TEXT;STRING_SEGMENT</DefineConstants>
     </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="9.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.0" />
-    </ItemGroup>
+
+    <Choose>
+        <When Condition="'$(TargetFramework)' == 'net9.0'">
+            <ItemGroup>
+                <PackageReference Include="System.Text.Json" Version="9.0.0"/>
+                <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.0"/>
+            </ItemGroup>
+        </When>
+        <Otherwise>
+            <ItemGroup>
+                <PackageReference Include="System.Text.Json" Version="8.0.5"/>
+                <PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0"/>
+            </ItemGroup>
+        </Otherwise>
+    </Choose>
 
 </Project>
