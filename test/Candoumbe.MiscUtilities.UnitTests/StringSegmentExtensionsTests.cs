@@ -44,7 +44,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
                 },
                 {
                     new StringSegment("zsasz"),
-                    new StringSegment("z"), 
+                    new StringSegment("z"),
                     (occurrences =>
                         occurrences != null
                         && occurrences.Exactly(2)
