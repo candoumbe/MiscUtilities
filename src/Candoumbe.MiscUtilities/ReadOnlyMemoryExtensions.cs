@@ -185,7 +185,7 @@ namespace Microsoft.Extensions.Primitives
             {
                 startsWith = true;
             }
-            else if(search.Length < input.Length)
+            else if(search.Length <= input.Length)
             {
                 int i = 0;
                 bool mismatchFound;

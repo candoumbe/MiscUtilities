@@ -263,6 +263,16 @@ namespace Candoumbe.MiscUtilities.UnitTests
                     new StringSegment("zsasz"),
                     new StringSegment("z"),
                     true
+                },
+                {
+                    new StringSegment("Firstname"),
+                    new StringSegment("Firstname"),
+                    true
+                },
+                {
+                    new StringSegment("First"),
+                    new StringSegment("Firstname"),
+                    false
                 }
             };
 
