@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🧹 Housekeeping
 - Removed `Nuke.Common` dependency
 - Updated `Candoumbe.Pipelines` to `0.12.1`
+- Updated `GitVersion.tool` to `6.0.5`
 
 ## [0.13.1] / 2024-10-05
 ### 🔧 Fixes
