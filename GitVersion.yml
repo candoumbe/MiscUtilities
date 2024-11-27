@@ -17,7 +17,7 @@ branches:
   release:
     regex: "^release(s)?[/-]"
     label: "rc"
-    increment: Inherit
+    mode: ContinuousDelivery
   develop:
     label: "alpha"
 ignore:
