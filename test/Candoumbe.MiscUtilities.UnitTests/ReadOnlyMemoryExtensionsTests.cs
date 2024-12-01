@@ -172,6 +172,50 @@ namespace Candoumbe.MiscUtilities.UnitTests
             occurrences.Should()
                 .Match(expectation, reason);
         }
+        
+        public static TheoryData<ReadOnlyMemory<char>, Func<char,bool>, int, string> FirstOccurrenceWithPredicateCases
+            => new()
+            {
+                {
+                    new StringSegment("Firstname"),
+                    chr => chr == 'z',
+                    -1,
+                    "There's no occurrence of the search element in the string"
+                },
+                {
+                    StringSegment.Empty,
+                    chr => chr == 'z',
+                    -1,
+                    "There source is empty"
+                },
+                {
+                    new StringSegment("Firstname"),
+                    chr => chr == 'F',
+                    0,
+                    "There is one occurrence of the search element in the string"
+                },
+                {
+                    new StringSegment("zsasz"),
+                    chr => chr is 'z' or 'Z',
+                    0,
+                    "There is 2 occurrences of the search element in the string"
+                }
+            };
+
+        [Theory]
+        [MemberData(nameof(FirstOccurrenceWithPredicateCases))]
+        public void FirstOccurrence_with_predicate(ReadOnlyMemory<char> source, Func<char, bool> search, int expected, string reason)
+        {
+            _outputHelper.WriteLine($"Source : '{source.Span}'");
+            _outputHelper.WriteLine($"Search : '{search}'");
+
+            // Act
+            int actual = source.FirstOccurrence(search);
+
+            // Assert
+            actual.Should()
+                .Be(expected, reason);
+        }
 
         public static TheoryData<ReadOnlyMemory<char>, ReadOnlyMemory<char>, CharComparer, int, string> LastOccurrenceCases
         => new()

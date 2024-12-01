@@ -1,6 +1,10 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+#if NET8_0_OR_GREATER
+using System.Linq;
+#endif
+
 namespace Microsoft.Extensions.Primitives;
 
 using System;
@@ -134,7 +138,7 @@ public static class ReadOnlyMemoryExtensions
         return index;
     }
 
-        /// <summary>
+    /// <summary>
     /// Reports a zero-based index of the first occurrence of <paramref name="search"/> within <paramref name="source"/>.
     /// </summary>
     /// <param name="source">The source to search within</param>
@@ -187,6 +191,31 @@ public static class ReadOnlyMemoryExtensions
 
         return index;
     }
+
+    /// <summary>
+    /// Reports a zero-based index of the first occurrence of <typeparamref name="T"/> within <paramref name="source"/>
+    /// that matches the specified <paramref name="predicate"/>.
+    /// </summary>
+    /// <param name="source">The source to search within</param>
+    /// <param name="predicate">The predicate used to search for a matching <typeparamref name="T"/> element within <paramref name="source"/>.</param>
+    /// <returns>
+    /// the index of the first <typeparamref name="T"/> element which matches <paramref name="predicate"/>
+    /// was found in <paramref name="source"/> or <c>-1</c> if no occurrence found.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown when either <paramref name="source"/> or <paramref name="predicate"/> is <see langword="null"/>.</exception>
+    public static int FirstOccurrence<T>(this ReadOnlyMemory<T> source, Func<T, bool> predicate)
+#if NET8_0_OR_GREATER
+        => source.Occurrences(predicate)
+                 .FirstOrDefault(-1);
+    #else
+    {
+            using IEnumerator<int> enumerator = source.Occurrences(predicate).GetEnumerator();
+
+            return enumerator.MoveNext()
+                ? enumerator.Current
+                : -1;
+    }
+#endif
 
     /// <summary>
     /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
