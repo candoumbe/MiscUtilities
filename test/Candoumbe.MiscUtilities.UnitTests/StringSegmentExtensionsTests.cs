@@ -72,52 +72,36 @@ namespace Candoumbe.MiscUtilities.UnitTests
                        .Match(expectation, reason);
         }
 
-        public static IEnumerable<object[]> OccurrencesWithCharCases
-        {
-            get
+        public static TheoryData<StringSegment, char, Expression<Func<IEnumerable<int>, bool>>, string> OccurrencesWithCharCases
+            => new()
             {
-                yield return new object[]
                 {
-                    new StringSegment("Firstname"),
-                    'z',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && occurrences.None()),
-                     "There's no occurrence of the search element in the string"
-                };
-
-                yield return new object[]
+                    new StringSegment("Firstname"), 'z',
+                    occurrences => occurrences != null && occurrences.None(),
+                    "There's no occurrence of the search element in the string"
+                },
                 {
                     StringSegment.Empty,
                     'z',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && occurrences.None()),
-                     "There source is empty"
-                };
-
-                yield return new object[]
+                    occurrences => occurrences != null && occurrences.None(),
+                    "There source is empty"
+                },
                 {
-                    new StringSegment("Firstname"),
-                    'F',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
+                    new StringSegment("Firstname"), 'F', occurrences =>
                         occurrences != null
                         && occurrences.Exactly(1)
-                        && occurrences.Once(pos  => pos == 0)
-                    ),
+                        && occurrences.Once(pos => pos == 0),
                     "There is one occurrence of the search element in the string"
-                };
-
-                yield return new object[]
+                },
                 {
-                    new StringSegment("zsasz"),
-                    'z',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
+                    new StringSegment("zsasz"), 'z', occurrences =>
                         occurrences != null
                         && occurrences.Exactly(2)
                         && occurrences.Once(pos => pos == 0)
-                        && occurrences.Once(pos  =>pos == 4)
-                    ),
+                        && occurrences.Once(pos => pos == 4),
                     "There is 2 occurrences of the search element in the string"
-                };
-            }
-        }
+                }
+            };
 
         [Theory]
         [MemberData(nameof(OccurrencesWithCharCases))]
