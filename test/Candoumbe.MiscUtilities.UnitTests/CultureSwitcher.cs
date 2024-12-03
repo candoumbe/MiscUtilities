@@ -21,12 +21,22 @@ namespace Candoumbe.MiscUtilities.UnitTests
         /// <param name="newCultureName"></param>
         /// <param name="action"></param>
         [SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Cette méthode n'est pas utilisé de manière statique")]
-        public void Run(string newCultureName, Action action)
+        public void Run(string newCultureName, Action action) => Run(CultureInfo.CreateSpecificCulture(newCultureName), action);
+
+        /// <summary>
+        /// Performs the specified <see cref="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
+        /// to the specified <paramref name="newCultureName"/>.
+        /// </summary>
+        /// <param name="culture">Culture to use when running <paramref name="action"/>.</param>
+        /// <param name="action"></param>
+
+        public void Run(CultureInfo culture, Action action)
         {
-            CultureInfo.CurrentCulture = CultureInfo.CreateSpecificCulture(newCultureName);
+            CultureInfo.CurrentCulture = culture;
             action.Invoke();
         }
 
+        /// <inheritdoc />
         public void Dispose() => CultureInfo.CurrentCulture = _currentCulture;
     }
 }
