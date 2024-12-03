@@ -1,8 +1,6 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-#if STRING_SEGMENT
-
 namespace Microsoft.Extensions.Primitives
 {
     using System;
@@ -230,6 +228,36 @@ namespace Microsoft.Extensions.Primitives
             TextInfo textInfo = cultureInfo?.TextInfo ?? CultureInfo.CurrentCulture.TextInfo;
             return textInfo.ToTitleCase(input.Value);
         }
+
+
+        /// <summary>
+        /// Determines if <paramref name="input"/> starts with <paramref name="search"/>.
+        /// </summary>
+        /// <param name="input">The string segment to test</param>
+        /// <param name="search"></param>
+        /// <param name="stringComparison"></param>
+        /// <returns></returns>
+        public static bool StartsWith(this StringSegment input, ReadOnlySpan<char> search, StringComparison stringComparison = default)
+        {
+            bool startsWith = false;
+
+            if (search.Length == 0)
+            {
+                startsWith = true;
+            }
+            else if(search.Length < input.Length)
+            {
+                int i = 0;
+                bool mismatchFound;
+                do
+                {
+                    mismatchFound = input[i] != search[i];
+                    i++;
+                } while (!mismatchFound && i < search.Length);
+
+                startsWith = !mismatchFound;
+            }
+            return startsWith;
+        }
     }
 }
-#endif

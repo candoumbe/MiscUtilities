@@ -45,15 +45,12 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
                 yield return new object[] { culture, "bruce", "Bruce" };
                 yield return new object[] { culture, "bruce wayne", "Bruce Wayne" };
                 yield return new object[] { culture, "cyrille-alexandre", "Cyrille-Alexandre" };
-#if NET
                 yield return new object[] { culture, "𐓷𐓘𐓻𐓘𐓻𐓟 𐒻𐓟", textInfo.ToTitleCase("𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟") };
                 yield return new object[] { culture, "𐐿𐐱𐐻", textInfo.ToTitleCase("𐐗𐐱𐐻") };
-#endif
             }
         }
     }
-
-#if !STRING_SEGMENT
+    
     [Theory]
     [MemberData(nameof(ToTitleCases))]
     public void ToTitleCase(string cultureName, string input, string expectedString)
@@ -76,30 +73,6 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
             actual.Should().Be(expectedString);
         });
     }
-#else
-        [Theory]
-        [MemberData(nameof(ToTitleCases))]
-        public void ToTitleCase(string cultureName, StringSegment input, string expectedString)
-        {
-            // Arrange
-            _outputHelper.WriteLine($"Current culture : {CultureInfo.CurrentCulture}");
-            _outputHelper.WriteLine($"Culture to test : {cultureName}");
-            _outputHelper.WriteLine($"Input : {input}");
-            _outputHelper.WriteLine($"expected : {expectedString}");
-
-            using CultureSwitcher cultureSwitcher = new();
-
-            cultureSwitcher.Run(cultureName, () =>
-            {
-                _outputHelper.WriteLine($"Culture while testing : {CultureInfo.CurrentCulture}");
-                // Assert
-                string actual = input?.ToTitleCase(CultureInfo.CreateSpecificCulture(cultureName));
-
-                // Assert
-                actual.Should().Be(expectedString);
-            });
-        }
-#endif
 
     [Theory]
     [InlineData(null, null)]
@@ -216,7 +189,6 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
         }
     }
 
-#if NETCOREAPP3_1_OR_GREATER
     [Theory]
     [MemberData(nameof(StringSegmentLikeCases))]
     public void StringSegmentLike((StringSegment input, string pattern, bool ignoreCase, bool expectedResult) data)
@@ -231,7 +203,6 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
         // Assert
         result.Should().Be(data.expectedResult);
     }
-#endif
 
     [Theory]
     [InlineData(null, "test")]
@@ -269,10 +240,8 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
     [InlineData("en-US", "first name ", "first-name")]
     [InlineData("en-US", "first/name", "first-name")]
     [InlineData("en-US", "o'neal", "o-neal")]
-    //#if NET5_0_OR_GREATER
-    //        [InlineData("en-US", "𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
-    //        [InlineData("en-US", "𐐿𐐱𐐻", "𐐿𐐱𐐻")]
-    //#endif
+    [InlineData("en-US", "𐓷𐓘𐓻 𐓘𐓻𐓟", "𐓷𐓘𐓻-𐓘𐓻𐓟")]
+    [InlineData("en-US", "𐐿𐐱𐐻", "𐐿𐐱𐐻")]
     public void Slugify(string culture, string input, string expectedOutput)
     {
         _outputHelper.WriteLine($"input : '{input}'");
@@ -296,9 +265,7 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
     [InlineData("first name", "first_name")]
     [InlineData("first  name", "first_name")]
     [InlineData("first-name", "first_name")]
-    //#if NET5_0_OR_GREATER
-    //        [InlineData("𐓘𐓻𐓘𐓏𐓻𐓟", "𐓘𐓻𐓘_𐓷𐓻𐓟")]
-    //#endif
+    [InlineData("𐓘𐓻𐓘𐓏𐓻𐓟", "𐓘𐓻𐓘_𐓷𐓻𐓟")]
     public void ToSnakeCase(string input, string expectedOutput)
     {
         _outputHelper.WriteLine($"input : '{input}'");

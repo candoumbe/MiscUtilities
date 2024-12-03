@@ -12,7 +12,6 @@ namespace Candoumbe.MiscUtilities.UnitTests.Generators;
 /// </summary>
 internal static class ValueGenerators
 {
-#if NET6_0_OR_GREATER
     /// <summary>
     /// Generates Arbitrary for <see cref="DateOnly"/>
     /// </summary>
@@ -32,7 +31,6 @@ internal static class ValueGenerators
                          .Select(tuple => (dateTime: tuple.Item1, milliseconds: tuple.Item2.Get))
                          .Select((dateTimeAndMillisecobds) => TimeOnly.FromDateTime(dateTimeAndMillisecobds.dateTime).Add(TimeSpan.FromMilliseconds(dateTimeAndMillisecobds.milliseconds)))
                          .ToArbitrary();
-#endif
 
     public static Arbitrary<Array> Arrays() => ArbMap.Default.ArbFor<int>().Generator.ArrayOf<int>()
                                                   .Select(numbers =>
