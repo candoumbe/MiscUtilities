@@ -30,5 +30,18 @@ namespace Candoumbe.MiscUtilities.UnitTests.Comparers
             // Assert
             actual.Should().Be(expected);
         }
+
+        [Property]
+        public void Given_any_character_Then_GetHashcode_returns_the_hashcode_of_the_character(char value)
+        {
+            // Arrange
+            int expected = value.GetHashCode();
+
+            // Act
+            int actual = _sut.GetHashCode(value);
+
+            // Assert
+            actual.Should().Be(expected);
+        }
     }
 }
