@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### 🧹 Housekeeping
-- Reconfigure Renovate to never auto-approve update with major versions.
+- Reconfigured Renovate to never auto-approve update with major versions.
 
 ## [0.14.0] / 2024-12-03
 ### 🚀 New features
