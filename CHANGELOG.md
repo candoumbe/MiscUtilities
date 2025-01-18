@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### 🧹 Housekeeping
+- Reconfigured Renovate to never auto-approve update with major versions.
+
+## [0.14.0] / 2024-12-03
+### 🚀 New features
+- Added `ReadOnlyMemoryExtensions.Occurrences(ReadOnlyMemory<T> search)` extension method.
+- Added `ReadOnlyMemoryExtensions.FirstOccurrence(ReadOnlyMemory<T> search, IEqualityComparer<T>)` extension method.
+- Added `ReadOnlyMemoryExtensions.FirstOccurrence<T>(ReadOnlyMemory<T> search, IEqualityComparer<T>)` extension method.
+- Added `ReadOnlyMemoryExtensions.LastOccurrence<T>(ReadOnlyMemory<T> search, IEqualityComparer<T>)` extension method.
+- Added `ReadOnlyMemoryExtensions.Split(ReadOnlySpan<T> search)` extension method.
+
 ### 🚨 Breaking changes
 - Dropped `netstandard1.0`, `netstandard1.1` and `net6.0` support ([#272](https://github.com/candoumbe/MiscUtilities/issues/272))
   - Removed `DateOnlyJsonConverter`, `TimeOnlyJsonConverter`
@@ -14,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🧹 Housekeeping
 - Removed `Nuke.Common` dependency
 - Updated `Candoumbe.Pipelines` to `0.12.1`
+- Updated `GitVersion.tool` to `6.0.5`
+- Updated `Nuke.GlobalTool` to `9.0.1`
 
 ## [0.13.1] / 2024-10-05
 ### 🔧 Fixes
@@ -129,7 +142,8 @@ instead of throwing `ArgumentOutOfRangeException` when both `source` and  `searc
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.13.1...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.14.0...HEAD
+[0.14.0]: https://github.com/candoumbe/MiscUtilities/compare/0.13.1...0.14.0
 [0.13.1]: https://github.com/candoumbe/MiscUtilities/compare/0.13.0...0.13.1
 [0.13.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.13.0
 [0.11.0]: https://github.com/candoumbe/MiscUtilities/compare/0.10.0...0.11.0

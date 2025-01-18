@@ -44,7 +44,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
                 },
                 {
                     new StringSegment("zsasz"),
-                    new StringSegment("z"), 
+                    new StringSegment("z"),
                     (occurrences =>
                         occurrences != null
                         && occurrences.Exactly(2)
@@ -72,52 +72,36 @@ namespace Candoumbe.MiscUtilities.UnitTests
                        .Match(expectation, reason);
         }
 
-        public static IEnumerable<object[]> OccurrencesWithCharCases
-        {
-            get
+        public static TheoryData<StringSegment, char, Expression<Func<IEnumerable<int>, bool>>, string> OccurrencesWithCharCases
+            => new()
             {
-                yield return new object[]
                 {
-                    new StringSegment("Firstname"),
-                    'z',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && occurrences.None()),
-                     "There's no occurrence of the search element in the string"
-                };
-
-                yield return new object[]
+                    new StringSegment("Firstname"), 'z',
+                    occurrences => occurrences != null && occurrences.None(),
+                    "There's no occurrence of the search element in the string"
+                },
                 {
                     StringSegment.Empty,
                     'z',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences => occurrences != null && occurrences.None()),
-                     "There source is empty"
-                };
-
-                yield return new object[]
+                    occurrences => occurrences != null && occurrences.None(),
+                    "There source is empty"
+                },
                 {
-                    new StringSegment("Firstname"),
-                    'F',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
+                    new StringSegment("Firstname"), 'F', occurrences =>
                         occurrences != null
                         && occurrences.Exactly(1)
-                        && occurrences.Once(pos  => pos == 0)
-                    ),
+                        && occurrences.Once(pos => pos == 0),
                     "There is one occurrence of the search element in the string"
-                };
-
-                yield return new object[]
+                },
                 {
-                    new StringSegment("zsasz"),
-                    'z',
-                    (Expression<Func<IEnumerable<int>, bool>>)(occurrences =>
+                    new StringSegment("zsasz"), 'z', occurrences =>
                         occurrences != null
                         && occurrences.Exactly(2)
                         && occurrences.Once(pos => pos == 0)
-                        && occurrences.Once(pos  =>pos == 4)
-                    ),
+                        && occurrences.Once(pos => pos == 4),
                     "There is 2 occurrences of the search element in the string"
-                };
-            }
-        }
+                }
+            };
 
         [Theory]
         [MemberData(nameof(OccurrencesWithCharCases))]
@@ -136,47 +120,38 @@ namespace Candoumbe.MiscUtilities.UnitTests
                        .Match(expectation, reason);
         }
 
-        public static IEnumerable<object[]> LastOccurrenceCases
-        {
-            get
+        public static TheoryData<StringSegment, StringSegment, StringComparison, int, string> LastOccurrenceCases
+            => new()
             {
-                yield return new object[]
                 {
                     new StringSegment("Firstname"),
                     new StringSegment("z"),
                     StringComparison.OrdinalIgnoreCase,
                     -1,
                     "There's no occurrence of the search element in the string"
-                };
-
-                yield return new object[]
+                },
                 {
                     StringSegment.Empty,
                     new StringSegment("z"),
                     StringComparison.OrdinalIgnoreCase,
                     -1,
                     "The source element is empty"
-                };
-
-                yield return new object[]
+                },
                 {
                     new StringSegment("Firstname"),
                     new StringSegment("F"),
                     StringComparison.OrdinalIgnoreCase,
                     0,
                     "There is one occurrence of the search element in the string"
-                };
-
-                yield return new object[]
+                },
                 {
                     new StringSegment("zsasz"),
                     new StringSegment("z"),
                     StringComparison.OrdinalIgnoreCase,
                     4,
                     "There is 2 occurrences of the search element in the string"
-                };
-            }
-        }
+                }
+        };
 
         [Theory]
         [MemberData(nameof(LastOccurrenceCases))]
@@ -189,7 +164,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
             actual.Should()
                   .Be(expectation, reason);
         }
-        
+
         [Property]
         public void Given_source_is_not_null_When_search_is_empty_Then_LastOccurrence_returns_the_length_of_the_source(NonNull<string> sourceGenerator)
         {
@@ -218,13 +193,12 @@ namespace Candoumbe.MiscUtilities.UnitTests
             Action callingLastOccurrenceWhenSourceDoesNotHaveAValue = () =>  source.LastOccurrence(search);
 
             // Assert
-            
+
             callingLastOccurrenceWhenSourceDoesNotHaveAValue.Should()
                 .Throw<ArgumentOutOfRangeException>()
                 .WithParameterName("source");
         }
 
-        
         [Property]
         public void Given_source_has_a_value_When_search_does_not_have_a_value_Then_LastOccurrence_should_throw_ArgumentOutOfRangeException(NonNull<string> sourceGenerator)
         {
@@ -252,13 +226,11 @@ namespace Candoumbe.MiscUtilities.UnitTests
             Action callingFirstOccurrenceWhenSourceDoesNotHaveAValue = () =>  source.FirstOccurrence(search);
 
             // Assert
-            
             callingFirstOccurrenceWhenSourceDoesNotHaveAValue.Should()
                 .Throw<ArgumentOutOfRangeException>()
                 .WithParameterName("source");
         }
 
-        
         [Property]
         public void Given_source_has_a_value_When_search_does_not_have_a_value_Then_FirstOccurrence_should_throw_ArgumentOutOfRangeException(NonNull<string> sourceGenerator)
         {
