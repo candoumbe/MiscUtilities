@@ -315,7 +315,7 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
     private static readonly string[] separatorArray = ["&"];
 
     /// <summary>
-    /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString(IEnumerable{KeyValuePair{string, object}})"/>
+    /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString"/>
     /// </summary>
     /// <param name="keyValues">dictionary to turn into query</param>
     /// <param name="expectedString"></param>
@@ -366,16 +366,65 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
         string queryString = dictionary.ToQueryString();
 
         // Assert
-        switch (time)
+        _ = time switch
         {
-            case TimeOnly t when t.Millisecond == 0:
-                queryString.Should()
-                           .Be($"time-only={time:hh:mm:ss}");
-                break;
-            default:
-                queryString.Should()
-                           .Be($"time-only={time:hh:mm:ss.fffffff}");
-                break;
-        }
+            { Millisecond: 0 } => queryString.Should().Be($"time-only={time:hh:mm:ss}"),
+            _ => queryString.Should().Be($"time-only={time:hh:mm:ss.fffffff}")
+        };
+    }
+
+    public static TheoryData<Dictionary<string, object>, string, object, object, Dictionary<string, object>> GetOrAddCases
+        => new ()
+        {
+            {
+                [],
+                "A", "A value",
+                "A value",
+                new Dictionary<string, object>()
+                {
+                    {"A", "A value"}
+                }
+            },
+            {
+                new Dictionary<string, object>()
+                {
+                    {"A", "A value"}
+                },
+                "A", "Default value in case the key does not exist",
+                "A value",
+                new Dictionary<string, object>()
+                {
+                    {"A", "A value"}
+                }
+            },
+            {
+                new Dictionary<string, object>()
+                {
+                    {"A", "A value"}
+                },
+                "B", "Default value in case the key does not exist",
+                "Default value in case the key does not exist",
+                new Dictionary<string, object>()
+                {
+                    {"A", "A value"},
+                    {"B", "Default value in case the key does not exist"}
+                }
+            }
+        };
+
+    [Theory]
+    [MemberData(nameof(GetOrAddCases))]
+    public void Given_dictionary_When_calling_GetOrAdd_then_dictionary_should_have_expected_keys_and_values(
+        Dictionary<string, object> dictionary, string key, object value, object expectedValue, Dictionary<string, object> expectedDictionary)
+
+    {
+        // Act
+        object actualValue = dictionary.GetOrAdd(key, value);
+
+        // Assert
+        dictionary.Should()
+            .ContainKey(key);
+        actualValue.Should().Be(expectedValue);
+        dictionary.Should().BeEquivalentTo(expectedDictionary);
     }
 }
