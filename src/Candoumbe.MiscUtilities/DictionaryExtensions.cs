@@ -157,10 +157,40 @@ namespace System.Collections.Generic
                 },
                 DateOnly date => date.ToString("yyyy-MM-dd"),
 #endif
-                int intValue => Convert.ToString(intValue),
-                long longValue => Convert.ToString(longValue),
-                _ => Uri.EscapeDataString(value.ToString())
-            };
-        }
+            int intValue => Convert.ToString(intValue),
+            long longValue => Convert.ToString(longValue),
+            _ => Uri.EscapeDataString(value.ToString())
+        };
     }
+
+
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Retrieves the value associated with the specified key from the dictionary.
+    /// If the key does not exist, adds the key with the specified default value
+    /// and returns the default value.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    /// <param name="dictionary">The dictionary to search for the key.</param>
+    /// <param name="key">The key to locate in the dictionary.</param>
+    /// <param name="defaultValue">The value to add if the key does not exist.</param>
+    /// <returns>The value associated with the specified key, or the default value if the key does not exist.</returns>
+    public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
+    {
+        TValue value = defaultValue;
+
+        ref TValue val = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        if (!exists)
+        {
+            val = defaultValue;
+        }
+        else
+        {
+            value = val;
+        }
+
+        return value;
+    }
+#endif
 }
