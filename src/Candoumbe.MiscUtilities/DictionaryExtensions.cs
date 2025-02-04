@@ -56,25 +56,78 @@ namespace System.Collections.Generic
         {
             StringBuilder sb = new();
 
-            IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues is null
-                ? []
-                : keyValues.Where(kv => kv.Value != null)
-                           .OrderBy(kv => kv.Key)
-                           .ThenBy(kv => kv.Value);
+        IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues is null
+            ? []
+            : keyValues.Where(kv => kv.Value != null)
+                .OrderBy(kv => kv.Key)
+                .ThenBy(kv => kv.Value);
 
-            foreach (KeyValuePair<string, object> kv in localKeyValues)
+        foreach (KeyValuePair<string, object> kv in localKeyValues)
+        {
+            object value = transform is not null
+                ? transform.Invoke(kv.Key, kv.Value)
+                : kv.Value;
+            string key = kv.Key;
+            if (value is not null)
             {
-                object value = transform is not null
-                    ? transform.Invoke(kv.Key, kv.Value)
-                    : kv.Value;
-                string key = kv.Key;
-                if (value is not null)
+                Type valueType = value.GetType();
+                TypeInfo valueTypeInfo = valueType.GetTypeInfo();
+                //The type of the value is a "simple" object
+                if (valueTypeInfo.IsPrimitive || valueTypeInfo.IsEnum
+                                              || PrimitiveTypes.Any(x => x == valueType))
                 {
-                    Type valueType = value.GetType();
-                    TypeInfo valueTypeInfo = valueType.GetTypeInfo();
-                    //The type of the value is a "simple" object
-                    if (valueTypeInfo.IsPrimitive || valueTypeInfo.IsEnum
-                                                  || PrimitiveTypes.Any(x => x == valueType))
+                    if (sb.Length > 0)
+                    {
+                        sb.Append(Ampersand);
+                    }
+
+                    sb.Append(Uri.EscapeDataString(key))
+                        .Append('=')
+                        .Append(ConvertValueToString(value));
+                }
+                else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
+                {
+                    subDictionary = subDictionary
+                        .AsParallel()
+                        .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
+
+                    if (sb.Length > 0)
+                    {
+                        sb.Append(Ampersand);
+                    }
+                    sb.Append(ToQueryString(subDictionary, transform));
+                }
+                else if (value is IEnumerable enumerable)
+                {
+                    int itemPosition = 0;
+                    Type elementType;
+
+                    foreach (object item in enumerable)
+                    {
+                        if (item is not null)
+                        {
+                            elementType = item.GetType();
+                            TypeInfo elementTypeInfo = elementType.GetTypeInfo();
+                            if (elementTypeInfo.IsPrimitive || PrimitiveTypes.Any(x => x == elementType))
+                            {
+                                if (sb.Length > 0)
+                                {
+                                    sb.Append(Ampersand);
+                                }
+
+                                sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
+                                    .Append('=')
+                                    .Append(ConvertValueToString(item));
+
+                                itemPosition++;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    TypeConverter tc = TypeDescriptor.GetConverter(valueType);
+                    if (tc.CanConvertTo(typeof(string)))
                     {
                         if (sb.Length > 0)
                         {
@@ -82,73 +135,20 @@ namespace System.Collections.Generic
                         }
 
                         sb.Append(Uri.EscapeDataString(key))
-                          .Append('=')
-                          .Append(ConvertValueToString(value));
-                    }
-                    else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
-                    {
-                        subDictionary = subDictionary
-                                    .AsParallel()
-                                    .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
-
-                        if (sb.Length > 0)
-                        {
-                            sb.Append(Ampersand);
-                        }
-                        sb.Append(ToQueryString(subDictionary, transform));
-                    }
-                    else if (value is IEnumerable enumerable)
-                    {
-                        int itemPosition = 0;
-                        Type elementType;
-
-                        foreach (object item in enumerable)
-                        {
-                            if (item is not null)
-                            {
-                                elementType = item.GetType();
-                                TypeInfo elementTypeInfo = elementType.GetTypeInfo();
-                                if (elementTypeInfo.IsPrimitive || PrimitiveTypes.Any(x => x == elementType))
-                                {
-                                    if (sb.Length > 0)
-                                    {
-                                        sb.Append(Ampersand);
-                                    }
-
-                                    sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
-                                       .Append('=')
-                                       .Append(ConvertValueToString(item));
-
-                                    itemPosition++;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        TypeConverter tc = TypeDescriptor.GetConverter(valueType);
-                        if (tc.CanConvertTo(typeof(string)))
-                        {
-                            if (sb.Length > 0)
-                            {
-                                sb.Append(Ampersand);
-                            }
-
-                            sb.Append(Uri.EscapeDataString(key))
-                              .Append('=')
-                              .Append(tc.ConvertTo(value, typeof(string)));
-                        }
+                            .Append('=')
+                            .Append(tc.ConvertTo(value, typeof(string)));
                     }
                 }
             }
+        }
 
-            return sb.ToString();
+        return sb.ToString();
 
-            static string ConvertValueToString(in object value) => value switch
-            {
-                DateTime { Kind: DateTimeKind.Utc } dateTime => dateTime.ToString("u").Replace(' ', 'T'),
-                DateTime dateTime => dateTime.ToString("s").Replace(' ', 'T'),
-                DateTimeOffset dateTimeOffset => $"{dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-" : "+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
+        static string ConvertValueToString(in object value) => value switch
+        {
+            DateTime { Kind: DateTimeKind.Utc } dateTime => dateTime.ToString("u").Replace(' ', 'T'),
+            DateTime dateTime => dateTime.ToString("s").Replace(' ', 'T'),
+            DateTimeOffset dateTimeOffset => $"{dateTimeOffset:yyyy-MM-ddTHH:mm:ss}{(dateTimeOffset.Offset < TimeSpan.Zero ? "-" : "+")}{dateTimeOffset.Offset.Hours:00}:{dateTimeOffset.Offset.Minutes:00}",
 #if NET6_0_OR_GREATER
                 TimeOnly time => (time.Hour, time.Minute, time.Second, time.Millisecond) switch
                 {
@@ -162,7 +162,6 @@ namespace System.Collections.Generic
             _ => Uri.EscapeDataString(value.ToString())
         };
     }
-
 
 #if NET8_0_OR_GREATER
     /// <summary>
