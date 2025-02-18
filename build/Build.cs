@@ -25,7 +25,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
 
 [GitHubActions(
     "integration",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.Ubuntu2204,
     OnPushBranchesIgnore = [IHaveMainBranch.MainBranchName],
     AutoGenerate = false,
     FetchDepth = 0,
@@ -48,7 +48,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
 )]
 [GitHubActions(
     "delivery",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.Ubuntu2204,
     AutoGenerate = false,
     OnPushBranches = [IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*"],
     InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease)],
