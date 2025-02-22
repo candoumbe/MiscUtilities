@@ -33,7 +33,7 @@ public class OcurrencesTests
     {
         return Text.Split(" ")
                    .Where(word => word == Search)
-                   .Select((word, pos) => pos)
+                   .Select((_, pos) => pos)
                    .ToArray();
     }
 }

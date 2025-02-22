@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `setup-dotnet` task to install required SDK
 - Added missing code coverage badge
 - Added missing mutation testing code coverage badge
+- Refactored some unit tests
 
 ## [0.14.0] / 2024-12-03
 ### 🚀 New features
