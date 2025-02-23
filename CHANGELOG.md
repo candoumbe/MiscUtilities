@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🧹 Housekeeping
 - Reconfigured Renovate to never auto-approve update with major versions.
 - Added `setup-dotnet` task to install required SDK
+- Added `net9.0` support
 
 ## [0.14.0] / 2024-12-03
 ### 🚀 New features
@@ -28,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `Candoumbe.Pipelines` to `0.12.1`
 - Updated `GitVersion.tool` to `6.0.5`
 - Updated `Nuke.GlobalTool` to `9.0.1`
-- Added `net9.0` support
 
 ## [0.13.1] / 2024-10-05
 ### 🔧 Fixes
