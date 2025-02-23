@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `ReadOnlyMemoryExtensions.LastOccurrence<T>(ReadOnlyMemory<T> search, IEqualityComparer<T>)` extension method.
 - Added `ReadOnlyMemoryExtensions.Split(ReadOnlySpan<T> search)` extension method.
 
-### 🚨 Breaking changes
+### 💥 Breaking changes
 - Dropped `netstandard1.0`, `netstandard1.1` and `net6.0` support ([#272](https://github.com/candoumbe/MiscUtilities/issues/272))
   - Removed `DateOnlyJsonConverter`, `TimeOnlyJsonConverter`
   - Removed `T[] Enum.GetValues<T>()` extension method
@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `Candoumbe.Pipelines` to `0.12.1`
 - Updated `GitVersion.tool` to `6.0.5`
 - Updated `Nuke.GlobalTool` to `9.0.1`
+- Added `net9.0` support
 
 ## [0.13.1] / 2024-10-05
 ### 🔧 Fixes
@@ -41,7 +42,7 @@ instead of throwing `ArgumentOutOfRangeException` when both `source` and  `searc
 
 
 ## [0.13.0] / 2024-07-06
-### 🚨 Breaking changes
+### 💥 Breaking changes
 - Dropped `net7.0` support
 
 ### 🚀 New features
@@ -57,7 +58,7 @@ instead of throwing `ArgumentOutOfRangeException` when both `source` and  `searc
 - Removed `Format` step from build pipeline
 
 ## [0.11.0] / 2023-02-01
-### 🚨 Breaking changes
+### 💥 Breaking changes
 - Removed `DateOnlyRange` type
 - Removed `TimeOnlyRange` type
 - Removed `DateTimeRange` type
