@@ -2,6 +2,7 @@
 // Licenced under GNU General Public Licence, version 3.0"
 
 using Nuke.Common.Tools.GitHub;
+using Nuke.Common.Tools.ReportGenerator;
 
 namespace Utilities.ContinuousIntegration;
 
@@ -166,6 +167,9 @@ public class Build : EnhancedNukeBuild,
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
+
+    ///<inheritdoc/>
+    Configure<ReportGeneratorSettings> IReportCoverage.ReportGeneratorSettings => settings => settings.SetFramework("8.0"); 
 
     ///<inheritdoc/>
     protected override void OnBuildCreated()
