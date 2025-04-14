@@ -28,7 +28,7 @@ using Nuke.Common.Tools.DotNet;
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = [nameof(Tests), nameof(IPack.Pack)],
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IMutationTest.MutationTests), nameof(IPack.Pack)],
     CacheKeyFiles = ["global.json", "src/**/*.csproj"],
     ImportSecrets =
     [
@@ -48,11 +48,11 @@ using Nuke.Common.Tools.DotNet;
     GitHubActionsImage.Ubuntu2204,
     OnCronSchedule = "0 0 * * *",
     OnPushBranches = [IHaveDevelopBranch.DevelopBranchName],
-    AutoGenerate = true,
+    AutoGenerate = false,
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = [nameof(Tests), nameof(IPack.Pack)],
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IMutationTest.MutationTests), nameof(IPack.Pack)],
     CacheKeyFiles = [
         "global.json",
         "src/**/*.csproj",
