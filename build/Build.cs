@@ -7,9 +7,7 @@ namespace Utilities.ContinuousIntegration;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Candoumbe.Pipelines.Components;
-using Candoumbe.Pipelines.Components.Formatting;
 using Candoumbe.Pipelines.Components.GitHub;
 using Candoumbe.Pipelines.Components.NuGet;
 using Candoumbe.Pipelines.Components.Workflows;
@@ -21,7 +19,6 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-using static Nuke.Common.Tools.Git.GitTasks;
 
 [GitHubActions(
     "integration",
@@ -31,12 +28,43 @@ using static Nuke.Common.Tools.Git.GitTasks;
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPack.Pack)],
+    InvokedTargets = [nameof(Tests), nameof(IPack.Pack)],
     CacheKeyFiles = ["global.json", "src/**/*.csproj"],
     ImportSecrets =
     [
         nameof(NugetApiKey),
         nameof(IReportCoverage.CodecovToken)
+    ],
+    OnPullRequestExcludePaths =
+    [
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ]
+)]
+[GitHubActions(
+    "nightly",
+    GitHubActionsImage.Ubuntu2204,
+    OnCronSchedule = "0 0 * * *",
+    OnPushBranches = [IHaveDevelopBranch.DevelopBranchName],
+    AutoGenerate = true,
+    FetchDepth = 0,
+    PublishArtifacts = true,
+    EnableGitHubToken = true,
+    InvokedTargets = [nameof(Tests), nameof(IPack.Pack)],
+    CacheKeyFiles = [
+        "global.json",
+        "src/**/*.csproj",
+        "src/**/*.csproj",
+        "test/**/stryker-config.json",
+        "test/**/xunit.runner.json"
+    ],
+    ImportSecrets =
+    [
+        nameof(NugetApiKey),
+        nameof(IReportCoverage.CodecovToken),
+        nameof(IMutationTest.StrykerDashboardApiKey)
     ],
     OnPullRequestExcludePaths =
     [
@@ -86,7 +114,7 @@ public class Build : EnhancedNukeBuild,
     IBenchmark,
     IUnitTest,
     IMutationTest,
-    IReportCoverage,
+    IReportUnitTestCoverage,
     IPack,
     IPushNugetPackages,
     IGitFlowWithPullRequest,
@@ -133,8 +161,7 @@ public class Build : EnhancedNukeBuild,
     IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
 
     ///<inheritdoc/>
-    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
-        => [new MutationProjectConfiguration(Solution.GetProject("Candoumbe.MiscUtilities"), Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects))];
+    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects => [new (Solution.GetProject("Candoumbe.MiscUtilities"), this.Get<IUnitTest>().UnitTestsProjects) ];
 
     ///<inheritdoc/>
     IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
@@ -166,13 +193,4 @@ public class Build : EnhancedNukeBuild,
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
-
-    ///<inheritdoc/>
-    protected override void OnBuildCreated()
-    {
-        if (IsServerBuild)
-        {
-            EnvironmentInfo.SetVariable("DOTNET_ROLL_FORWARD", "LatestMajor");
-        }
-    }
 }
