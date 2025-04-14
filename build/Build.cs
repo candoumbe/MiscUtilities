@@ -1,6 +1,7 @@
 // "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using System.Linq;
 using Nuke.Common.Tools.GitHub;
 
 namespace Utilities.ContinuousIntegration;
@@ -161,7 +162,7 @@ public class Build : EnhancedNukeBuild,
     IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
 
     ///<inheritdoc/>
-    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects => [new (Solution.GetProject("Candoumbe.MiscUtilities"), this.Get<IUnitTest>().UnitTestsProjects) ];
+    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects => [new (Solution.AllProjects.Single(csproj => csproj.Name == "Candoumbe.MiscUtilities"), this.Get<IUnitTest>().UnitTestsProjects) ];
 
     ///<inheritdoc/>
     IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
