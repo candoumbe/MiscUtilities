@@ -7,7 +7,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
-
+using ZLinq;
+using ZLinq.Linq;
 using static System.Text.Json.JsonSerializer;
 
 // ReSharper disable once CheckNamespace
@@ -26,8 +27,8 @@ namespace System
         /// <returns>A deep copy of the object</returns>
         public static T DeepClone<T>(this T source)
         {
-            // Don't serialize a null object, simply return the default for that object
-            T clone = ReferenceEquals(source, default)
+            // Don't serialize a null object, return the default for that object
+            T clone = ReferenceEquals(source, default(T))
                 ? default
                 : Deserialize<T>(Serialize(source));
 
@@ -48,8 +49,8 @@ namespace System
                 if (obj is IEnumerable enumerable)
                 {
                     dictionary = new Dictionary<string, object>();
-                    IEnumerator enumerator = enumerable.GetEnumerator();
-                    using IDisposable disposable = enumerator as IDisposable;
+                    using ValueEnumerator<FromNonGenericEnumerable<object>, object> enumerator = enumerable.AsValueEnumerable().GetEnumerator();
+                    //using IDisposable disposable = enumerator as IDisposable;
                     int count = 0;
                     while (enumerator.MoveNext())
                     {
@@ -68,11 +69,12 @@ namespace System
                 }
                 else
                 {
-                    IEnumerable<PropertyInfo> properties = obj.GetType()
+                    IEnumerable<PropertyInfo> properties = [ .. obj.GetType()
                             .GetRuntimeProperties()
-                            .Where(pi => pi is { CanRead: true, GetMethod.IsStatic: false } && pi.GetValue(obj) != null);
+                            .AsValueEnumerable()
+                            .Where(pi => pi is { CanRead: true, GetMethod.IsStatic: false } && pi.GetValue(obj) != null)];
 
-                    dictionary = properties.ToDictionary(
+                    dictionary = properties.AsValueEnumerable().ToDictionary(
                         pi => pi.Name,
                         pi =>
                         {
@@ -91,6 +93,7 @@ namespace System
                 }
             }
             return dictionary
+                .AsValueEnumerable()
                 .OrderBy(x => x.Key)
                 .ToDictionary(x => x.Key, x => x.Value);
         }

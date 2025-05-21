@@ -15,8 +15,7 @@ namespace System.Collections.Generic
         /// <summary>
         /// List of all types that can be directly converted to their string representation
         /// </summary>
-        public static readonly IEnumerable<Type> PrimitiveTypes = new[]
-        {
+        public static readonly IEnumerable<Type> PrimitiveTypes = [
             typeof(string),
 
             typeof(int), typeof(int?),
@@ -33,19 +32,19 @@ namespace System.Collections.Generic
 #endif
             typeof(Guid), typeof(Guid?),
             typeof(bool), typeof(bool?)
-        };
+        ];
 
         /// <summary>
         /// Numeric types.
         /// </summary>
-        public static readonly IEnumerable<Type> NumericTypes = new[]
-        {
+        public static readonly IEnumerable<Type> NumericTypes =
+        [
             typeof(int), typeof(int?),
             typeof(long), typeof(long?),
             typeof(short), typeof(short?),
             typeof(decimal), typeof(decimal?),
-            typeof(float), typeof(float?),
-        };
+            typeof(float), typeof(float?)
+        ];
 
         /// <summary>
         /// Converts a collection of key/value pairs to a "URL" friendly representation.

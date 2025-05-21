@@ -1,6 +1,9 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using ZLinq;
+using ZLinq.Linq;
+
 namespace Microsoft.Extensions.Primitives
 {
     using System;
@@ -74,7 +77,8 @@ namespace Microsoft.Extensions.Primitives
             }
             else
             {
-                using IEnumerator<int> enumerator = source.Occurrences(search, stringComparison)
+                using ValueEnumerator<FromEnumerable<int>, int> enumerator = source.Occurrences(search, stringComparison)
+                    .AsValueEnumerable()
                     .GetEnumerator();
 
                 index =  enumerator.MoveNext()

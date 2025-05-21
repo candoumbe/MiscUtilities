@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using ZLinq;
 
 namespace System
 {
@@ -26,6 +26,7 @@ namespace System
         => givenType is not null && genericType is not null && givenType
                 .GetTypeInfo()
                 .GetInterfaces()
+                .AsValueEnumerable()
                 .Any(it => it.GetTypeInfo().IsGenericType && it.GetGenericTypeDefinition() == genericType);
 
         private static bool MapsToGenericTypeDefinition(this Type givenType, Type genericType)
@@ -42,7 +43,7 @@ namespace System
         public static bool IsAnonymousType(this Type type)
         {
             bool hasCompilerGeneratedAttribute = type?.GetTypeInfo()?.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false)?.AtLeastOnce() ?? false;
-            bool nameContainsAnonymousType = type?.FullName.Contains("AnonymousType") ?? false;
+            bool nameContainsAnonymousType = type?.FullName?.Contains("AnonymousType") ?? false;
 
             return hasCompilerGeneratedAttribute && nameContainsAnonymousType;
         }
