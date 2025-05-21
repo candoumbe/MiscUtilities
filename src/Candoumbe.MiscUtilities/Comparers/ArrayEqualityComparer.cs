@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Candoumbe.MiscUtilities.Comparers;
 
@@ -51,18 +52,5 @@ public class ArrayEqualityComparer<T> : IEqualityComparer<T[]>
     }
 
     ///<inheritdoc/>
-    public int GetHashCode(T[] obj)
-    {
-        int hash = 0;
-        if (obj != null)
-        {
-            hash = 17;
-            foreach (T item in obj)
-            {
-                hash = (hash * 31) + _elementComparer.GetHashCode(item);
-            }
-        }
-
-        return hash;
-    }
+    public int GetHashCode(T[] obj) => obj.Aggregate(17, (current, item) => (current * 31) + _elementComparer.GetHashCode(item));
 }
