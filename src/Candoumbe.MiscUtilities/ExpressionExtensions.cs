@@ -157,7 +157,7 @@ namespace System.Linq.Expressions
         /// <summary>
         /// Combines two expressions using the logical <c>&lt;</c> operator
         /// </summary>
-        /// <typeparam name="T">Type of the input of the two functions to combines</typeparam>
+        /// <typeparam name="T">Type of the input of the two functions to combine</typeparam>
         /// <param name="f">the first expression</param>
         /// <param name="g">the second expression</param>
         /// <returns>A new expression that represents <c>(T x) => f &lt; g</c></returns>

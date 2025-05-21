@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using static System.Linq.Expressions.ExpressionExtensions;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using ZLinq;
+using ZLinq.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace System.Collections.Generic
@@ -137,6 +139,7 @@ namespace System.Collections.Generic
 
             return items
                 .AsParallel()
+                .AsValueEnumerable()
                 .Any(predicate.Compile());
         }
 
@@ -200,9 +203,10 @@ namespace System.Collections.Generic
 #endif
 
             return count == 0
-                ? !source.Any()
+                ? !source.AsValueEnumerable().Any()
                 : source
                     .AsParallel()
+                    .AsValueEnumerable()
                     .Where(predicate.Compile()).Skip(count - 1).Any();
         }
 
@@ -243,8 +247,8 @@ namespace System.Collections.Generic
             }
 #endif
             return count == 0
-                ? !items.AsParallel().Any(predicate.Compile())
-                : items.AsParallel().Count(predicate.Compile()) == count;
+                ? !items.AsParallel().AsValueEnumerable().Any(predicate.Compile())
+                : items.AsParallel().AsValueEnumerable().Count(predicate.Compile()) == count;
         }
 
         /// <summary>
@@ -277,17 +281,17 @@ namespace System.Collections.Generic
 #endif
 
             return count == 0
-                ? !items.Any()
+                ? !items.AsValueEnumerable().Any()
 #if NET6_0_OR_GREATER
                 : items.TryGetNonEnumeratedCount(out int currentCount) ? currentCount == count
 #endif
-                : items.Count() == count;
+                : items.AsValueEnumerable().Count() == count;
         }
 
         /// <summary>
         /// Checks if there are <paramref name="count"/> elements at most that match <paramref name="predicate"/>.
         /// </summary>
-        /// <typeparam name="T">Type of the elements of the collection to test</typeparam>
+        /// <typeparam name="T">Type of the items in the collection to test</typeparam>
         /// <param name="items"></param>
         /// <param name="predicate">Filter that <paramref name="count"/> elements should match.</param>
         /// <param name="count">Number of elements that match <paramref name="predicate"/></param>
@@ -335,7 +339,7 @@ namespace System.Collections.Generic
 #else
                     conditionSatisfied = items.TryGetNonEnumeratedCount(out int currentCount)
                             ? currentCount <= count
-                            : items.Count(predicate.Compile()) <= count;
+                            : items.AsValueEnumerable().Count(predicate.Compile()) <= count;
 #endif
 
                     break;
@@ -536,7 +540,10 @@ namespace System.Collections.Generic
         /// <see langword="null"/>.</exception>
         public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source,
             Func<T, bool> predicate)
-            => (source.Where(predicate), source.Where(val => !predicate(val)));
+        {
+            ValueEnumerable<FromEnumerable<T>, T> localSource = source.AsValueEnumerable();
+            return ([.. localSource.Where(predicate)], [ .. localSource.Where(val => !predicate(val))]);
+        }
 
         /// <summary>
         /// Asynchronously iterates over each element of <paramref name="source"/> and applies the specified <paramref name="body"/> function.
