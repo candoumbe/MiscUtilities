@@ -217,7 +217,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
                 .Be(expected, reason);
         }
 
-        public static TheoryData<ReadOnlyMemory<char>, ReadOnlyMemory<char>, CharComparer, int, string> LastOccurrenceCases
+        public static TheoryData<ReadOnlyMemory<char>, ReadOnlyMemory<char>, IEqualityComparer<char>, int, string> LastOccurrenceCases
         => new()
             {
                 {
@@ -286,7 +286,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
             };
         }
 
-        public static TheoryData<ReadOnlyMemory<char>, ReadOnlyMemory<char>, CharComparer, int> FirstOccurrenceCases
+        public static TheoryData<ReadOnlyMemory<char>, ReadOnlyMemory<char>, IEqualityComparer<char>, int> FirstOccurrenceCases
             => new()
             {
                 {
