@@ -1,10 +1,12 @@
 {
   "stryker-config": {
+    "project-info":{
+      "name": "github.com/candoumbe/MiscUtilities"
+    },
     "reporters": [
       "progress",
       "html"
     ],
-    "target-framework": "net6.0",
     "mutation-level": "Advanced"
   }
 }
