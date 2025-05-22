@@ -162,7 +162,14 @@ public class Build : EnhancedNukeBuild,
     IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
 
     ///<inheritdoc/>
-    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects => [new (Solution.AllProjects.Single(csproj => csproj.Name == "Candoumbe.MiscUtilities"), this.Get<IUnitTest>().UnitTestsProjects) ];
+    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects => [
+        new (
+            Solution.AllProjects.Single(csproj => csproj.Name == "Candoumbe.MiscUtilities"),
+            this.Get<IUnitTest>().UnitTestsProjects,
+            configurationFile: this.Get<IHaveTestDirectory>().TestDirectory / "Candoumbe.MiscUtilities.UnitTests" /
+
+        )
+    ];
 
     ///<inheritdoc/>
     IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
