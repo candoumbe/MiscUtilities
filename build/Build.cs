@@ -166,8 +166,7 @@ public class Build : EnhancedNukeBuild,
         new (
             Solution.AllProjects.Single(csproj => csproj.Name == "Candoumbe.MiscUtilities"),
             this.Get<IUnitTest>().UnitTestsProjects,
-            configurationFile: this.Get<IHaveTestDirectory>().TestDirectory / "Candoumbe.MiscUtilities.UnitTests" /
-
+            configurationFile: this.Get<IHaveTestDirectory>().TestDirectory / "Candoumbe.MiscUtilities.UnitTests" / "stryker-config.json"
         )
     ];
 
