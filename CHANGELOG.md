@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use [ZLinq](https://github.com/Cysharp/ZLinq) to improve LinQ performances.
 - Added `GenericEqualityComparer`
 - Added `net9.0` support
+- Added `Dictionary.GetOrAdd` extension method.
 
 ### 🧹 Housekeeping
 - Reconfigured Renovate to never auto-approve update with major versions.
