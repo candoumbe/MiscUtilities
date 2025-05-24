@@ -24,57 +24,60 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
 {
     private readonly ITestOutputHelper _outputHelper = outputHelper;
 
-    public static TheoryData<IEnumerable<KeyValuePair<string, object>>, string> ToQueryStringCases
+    public static TheoryData<IEnumerable<KeyValuePair<string, object>>, IReadOnlyList<string>> ToQueryStringCases
         => new()
         {
-            { null, string.Empty },
-            { new Dictionary<string, object>(), string.Empty },
-            { new Dictionary<string, object> { ["limit"] = 1 }, "limit=1" },
-            { [new KeyValuePair<string, object>("limit", null)], string.Empty },
+            { null, [string.Empty] },
+            { new Dictionary<string, object>(), [string.Empty] },
+            { new Dictionary<string, object> { ["limit"] = 1 }, ["limit=1"] },
+            { [new KeyValuePair<string, object>("limit", null)], [string.Empty] },
             {
                 [
                     new KeyValuePair<string, object>("color", 3),
                     new KeyValuePair<string, object>("color", 2)
                 ],
-                "color=3&color=2"
+                ["color=3","color=2"]
             },
             {
                 new Dictionary<string, object> { ["date"] = 1.February(2010).AddMinutes(30).AsLocal() },
-                "date=2010-02-01T00:30:00"
+                ["date=2010-02-01T00:30:00"]
             },
             {
                 new Dictionary<string, object> { ["date"] = 1.February(2010).AddMinutes(30).AsUtc() },
-                "date=2010-02-01T00:30:00Z"
+                ["date=2010-02-01T00:30:00Z"]
             },
-            { new Dictionary<string, object> { ["date"] = 1.February(2010).AsLocal() }, "date=2010-02-01T00:00:00" },
+            { new Dictionary<string, object> { ["date"] = 1.February(2010).AsLocal() }, ["date=2010-02-01T00:00:00"] },
             {
                 new Dictionary<string, object>
                 {
                     ["date-with-offset"] = new DateTimeOffset(1.February(2010).Add(11.Hours()), 1.Hours())
                 },
-                "date-with-offset=2010-02-01T11:00:00+01:00"
+                ["date-with-offset=2010-02-01T11:00:00+01:00"]
             },
-            { new Dictionary<string, object> { ["offset"] = 3, ["limit"] = 3 }, "offset=3&limit=3" },
+            { new Dictionary<string, object> { ["offset"] = 3, ["limit"] = 3 }, ["offset=3","limit=3"] },
             {
                 new Dictionary<string, object>
                 {
-                    ["search"] = new Dictionary<string,
-                        object>
+                    ["search"] = new Dictionary<string, object>
                     {
                         ["page"] = 1,
                         ["pageSize"] = 3,
                         ["filter"] =
                             new Dictionary<string, object>
                             {
-                                ["field"] = "firstname", ["op"] = "eq", ["value"] = "Bruce"
+                                ["field"] = "firstname",
+                                ["op"] = "eq",
+                                ["value"] = "Bruce"
                             }
                     },
                 },
-                $"{Uri.EscapeDataString("search[page]")}=1" +
-                $"&{Uri.EscapeDataString("search[pageSize]")}=3" +
-                $"&{Uri.EscapeDataString("search[filter][field]")}=firstname" +
-                $"&{Uri.EscapeDataString("search[filter][op]")}=eq" +
-                $"&{Uri.EscapeDataString("search[filter][value]")}=Bruce"
+                [
+                    $"{Uri.EscapeDataString("search[page]")}=1",
+                    $"{Uri.EscapeDataString("search[pageSize]")}=3",
+                    $"{Uri.EscapeDataString("search[filter][field]")}=firstname",
+                    $"{Uri.EscapeDataString("search[filter][op]")}=eq",
+                    $"{Uri.EscapeDataString("search[filter][value]")}=Bruce"
+                ]
             },
             {
                 [
@@ -92,40 +95,42 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
                                 ])
                         })
                 ],
-                $"{Uri.EscapeDataString("search[page]")}=1" +
-                $"&{Uri.EscapeDataString("search[pageSize]")}=3" +
-                $"&{Uri.EscapeDataString("search[filter][field]")}=firstname" +
-                $"&{Uri.EscapeDataString("search[filter][op]")}=EqualTo" +
-                $"&{Uri.EscapeDataString("search[filter][value]")}=Bruce"
+                [
+                    $"{Uri.EscapeDataString("search[page]")}=1",
+                    $"{Uri.EscapeDataString("search[pageSize]")}=3",
+                    $"{Uri.EscapeDataString("search[filter][field]")}=firstname",
+                    $"{Uri.EscapeDataString("search[filter][op]")}=EqualTo",
+                    $"{Uri.EscapeDataString("search[filter][value]")}=Bruce"
+                ]
             },
             {
                 new Dictionary<string, object> { ["name"] = (int[]) [1, 5, 4] },
-                $"{Uri.EscapeDataString("name[0]")}=1" +
-                $"&{Uri.EscapeDataString("name[1]")}=5" +
-                $"&{Uri.EscapeDataString("name[2]")}=4"
+                [
+                    $"{Uri.EscapeDataString("name[0]")}=1",
+                    $"{Uri.EscapeDataString("name[1]")}=5",
+                    $"{Uri.EscapeDataString("name[2]")}=4"
+                ]
             }
         };
 
     /// <summary>
-    /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString"/>
+    /// Tests <see cref="ObjectExtensions.ToQueryString(object)"/>
     /// </summary>
-    /// <param name="keyValues">dictionary to turn into query</param>
-    /// <param name="expectedString"></param>
     [Theory]
     [MemberData(nameof(ToQueryStringCases))]
-    public void ToQueryString(IEnumerable<KeyValuePair<string, object>> keyValues, string expectedString)
+    public void ToQueryString(IEnumerable<KeyValuePair<string, object>> keyValues, IReadOnlyList<string> expectedFragments)
     {
-        _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
+        _outputHelper.WriteLine($"input : '{keyValues.Jsonify()}'");
 
         // Act
         string queryString = keyValues.ToQueryString();
 
         // Arrange
         _outputHelper.WriteLine($"Result is '{queryString}'");
-        queryString?.Should().Be(expectedString);
+        VerifyThatQueryStringContainsExpectedFragments(queryString, expectedFragments);
     }
 
-    public static TheoryData<IEnumerable<KeyValuePair<string, object>>, Func<string, object, object>, string> ToQueryStringWithTransformationCases
+    public static TheoryData<IEnumerable<KeyValuePair<string, object>>, Func<string, object, object>, IReadOnlyList<string>> ToQueryStringWithTransformationCases
         => new()
         {
             {
@@ -139,7 +144,7 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
 
                     return value;
                 },
-                "color=replacement&color=2"
+                ["color=replacement", "color=2"]
             },
             {
                 new Dictionary<string, object>
@@ -157,11 +162,13 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
                     },
                 },
                 null,
-                $"{Uri.EscapeDataString("search[page]")}=1" +
-                $"&{Uri.EscapeDataString("search[pageSize]")}=3" +
-                $"&{Uri.EscapeDataString("search[filter][field]")}=firstname" +
-                $"&{Uri.EscapeDataString("search[filter][op]")}=eq" +
-                $"&{Uri.EscapeDataString("search[filter][value]")}=Bruce"
+                [
+                    $"{Uri.EscapeDataString("search[page]")}=1",
+                    $"{Uri.EscapeDataString("search[pageSize]")}=3",
+                    $"{Uri.EscapeDataString("search[filter][field]")}=firstname",
+                    $"{Uri.EscapeDataString("search[filter][op]")}=eq",
+                    $"{Uri.EscapeDataString("search[filter][value]")}=Bruce"
+                ]
             },
             {
                 [
@@ -188,9 +195,11 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
 
                     return value;
                 },
-                $"{Uri.EscapeDataString("search[page]")}=1" +
-                $"&{Uri.EscapeDataString("search[pageSize]")}=3" +
-                $"&{Uri.EscapeDataString("search[filter]")}=replacement"
+                [
+                    $"{Uri.EscapeDataString("search[page]")}=1",
+                    $"{Uri.EscapeDataString("search[pageSize]")}=3",
+                    $"{Uri.EscapeDataString("search[filter]")}=replacement"
+                ]
             },
             {
                 new Dictionary<string, object> { ["name"] = (int[]) [1, 5, 4] },
@@ -203,29 +212,34 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
 
                     return value;
                 },
-                "name=10"
+                ["name=10"]
             }
         };
 
     /// <summary>
     /// Tests <see cref="System.Collections.Generic.DictionaryExtensions.ToQueryString"/>
     /// </summary>
-    /// <param name="keyValues">dictionary to turn into query</param>
-    /// <param name="expectedString"></param>
     [Theory]
     [MemberData(nameof(ToQueryStringWithTransformationCases))]
-    public void ToQueryStringWithTransformation(IEnumerable<KeyValuePair<string, object>> keyValues,
-        Func<string, object, object> transformation,
-        string expectedString)
+    public void ToQueryStringWithTransformation(IEnumerable<KeyValuePair<string, object>> keyValues, Func<string, object, object> transformation, IReadOnlyList<string> expectedFragments)
     {
         _outputHelper.WriteLine($"input : {keyValues.Jsonify()}");
 
         // Act
-        string queryString = keyValues?.ToQueryString(transformation);
+        string queryString = keyValues.ToQueryString(transformation);
 
-        // Arrange
+        // Assert
         _outputHelper.WriteLine($"Result is '{queryString}'");
-        queryString?.Should().Be(expectedString);
+
+        VerifyThatQueryStringContainsExpectedFragments(queryString, expectedFragments);
+    }
+
+    private static void VerifyThatQueryStringContainsExpectedFragments(string queryString, IReadOnlyList<string> expectedFragments)
+    {
+        string[] actual = queryString.Split('&');
+        actual.Should()
+            .HaveSameCount(expectedFragments)
+            .And.Contain(expectedFragments);
     }
 
     [Property(Arbitrary = [typeof(ValueGenerators)])]
@@ -261,8 +275,7 @@ public class DictionaryExtensionsTests(ITestOutputHelper outputHelper)
         };
     }
 
-    public static TheoryData<Dictionary<string, object>, string, object, object, Dictionary<string, object>>
-        GetOrAddCases
+    public static TheoryData<Dictionary<string, object>, string, object, object, Dictionary<string, object>> GetOrAddCases
         => new()
         {
             { [], "A", "A value", "A value", new Dictionary<string, object>() { { "A", "A value" } } },

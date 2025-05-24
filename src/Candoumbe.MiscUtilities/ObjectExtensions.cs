@@ -93,7 +93,7 @@ namespace System
                 }
             }
             return dictionary
-                .AsValueEnumerable()
+                //.AsValueEnumerable()
                 .OrderBy(x => x.Key)
                 .ToDictionary(x => x.Key, x => x.Value);
         }

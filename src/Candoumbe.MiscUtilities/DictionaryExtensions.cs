@@ -2,6 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using System.Text;
+#if NET8_0_OR_GREATER
+using System.Runtime.InteropServices;
+#endif
 
 namespace System.Collections.Generic
 {
@@ -40,7 +43,7 @@ namespace System.Collections.Generic
         /// </summary>
         /// <param name="keyValues">the dictionary to convert</param>
         /// <param name="transform">A delegate that can be used to customize the value associated with a field name.</param>
-        /// <returns>a string that can be directly and safely appended to a query string either after a <c>?</c> or <c>&</c> character.</returns>
+        /// <returns>a string that can be directly and safely appended to a query string either after a <c>?</c> or <c>&amp;</c> character.</returns>
         public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues, Func<string, object, object> transform)
         {
             StringBuilder sb = new();
