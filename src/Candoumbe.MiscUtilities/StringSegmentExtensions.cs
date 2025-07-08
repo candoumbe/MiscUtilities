@@ -1,13 +1,14 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using ZLinq;
+using ZLinq.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
-using ZLinq;
-using ZLinq.Linq;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.Primitives;
 
 /// <summary>
@@ -45,6 +46,13 @@ public static class StringSegmentExtensions
             i++;
         }
     }
+
+    /// <summary>
+    /// Removes diacritics from <paramref name="input"/>
+    /// </summary>
+    /// <param name="input">where to remove diacritics</param>
+    /// <returns></returns>
+    public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
 
     /// <summary>
     /// Report a zero-based index of the first occurrence of <paramref name="search"/> in <paramref name="source"/>
@@ -187,50 +195,50 @@ public static class StringSegmentExtensions
         } while (currentPos <= inputLength && index != -1);
     }
 
-    /// <summary>
-    /// Perfoms a VB "Like" comparison
-    /// </summary>
-    /// <param name="input">the <see cref="StringSegment"/> to test</param>
-    /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-    /// <param name="ignoreCase"><see langword="true"/> to ignore case</param>
-    /// <returns><see langword="true"/> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <see langword="false"/>
-    /// otherwise.
-    /// </returns>
-    /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
-    public static bool Like(this StringSegment input, string pattern, bool ignoreCase) => input.Value.Like(pattern, ignoreCase);
+        /// <summary>
+        /// Perfoms a VB "Like" comparison
+        /// </summary>
+        /// <param name="input">the <see cref="StringSegment"/> to test</param>
+        /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
+        /// <param name="ignoreCase"><see langword="true"/> to ignore case</param>
+        /// <returns><see langword="true"/> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <see langword="false"/>
+        /// otherwise.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
+        public static bool Like(this StringSegment input, string pattern, bool ignoreCase) => input.Value.Like(pattern, ignoreCase);
 
-    /// <summary>
-    /// Perfoms a VB "Like" comparison
-    /// </summary>
-    /// <param name="input">the <see cref="StringSegment"/> to test</param>
-    /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
-    /// <returns><see langword="true"/> if input is like <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
-    /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
-    public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
+        /// <summary>
+        /// Perfoms a VB "Like" comparison
+        /// </summary>
+        /// <param name="input">the <see cref="StringSegment"/> to test</param>
+        /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
+        /// <returns><see langword="true"/> if input is like <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
+        public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
 
-    /// <summary>
-    /// Converts <paramref name="source"/> to its <see cref="LambdaExpression"/> equivalent
-    /// </summary>
-    /// <typeparam name="TSource"></typeparam>
-    /// <param name="source"></param>
-    /// <returns><see cref="LambdaExpression"/></returns>
-    /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
-    public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
+        /// <summary>
+        /// Converts <paramref name="source"/> to its <see cref="LambdaExpression"/> equivalent
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <returns><see cref="LambdaExpression"/></returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
+        public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
 
-    /// <summary>
-    /// Converts the <paramref name="input"/> to its Title Case equivalent
-    /// </summary>
-    /// <param name="input">the string to convert</param>
-    /// <param name="cultureInfo">The <see cref="CultureInfo"/> to use when performing the casing conversion</param>
-    /// <returns>the string converted to Title case</returns>
-    /// <example>
-    /// <c>"cyrille-alexandre".ToTitleCase(); // "Cyrille-Alexandre" </c>
-    /// </example>
-    public static string ToTitleCase(this StringSegment input, CultureInfo cultureInfo = null)
-    {
-        TextInfo textInfo = cultureInfo?.TextInfo ?? CultureInfo.CurrentCulture.TextInfo;
-        return textInfo.ToTitleCase(input.Value);
-    }
+        /// <summary>
+        /// Converts the <paramref name="input"/> to its Title Case equivalent
+        /// </summary>
+        /// <param name="input">the string to convert</param>
+        /// <param name="cultureInfo">The <see cref="CultureInfo"/> to use when performing the casing conversion</param>
+        /// <returns>the string converted to Title case</returns>
+        /// <example>
+        /// <c>"cyrille-alexandre".ToTitleCase(); // "Cyrille-Alexandre" </c>
+        /// </example>
+        public static string ToTitleCase(this StringSegment input, CultureInfo cultureInfo = null)
+        {
+            TextInfo textInfo = cultureInfo?.TextInfo ?? CultureInfo.CurrentCulture.TextInfo;
+            return textInfo.ToTitleCase(input.Value);
+        }
 
 
     /// <summary>
@@ -260,6 +268,7 @@ public static class StringSegmentExtensions
 
             startsWith = !mismatchFound;
         }
+
         return startsWith;
     }
 }

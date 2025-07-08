@@ -42,35 +42,14 @@ public class GeneralArchitecturalTests
             .FollowCustomCondition(ConditionResult (member) =>
                                    {
                                        Namespace currentNamespace = member.Namespace;
-                                       ReadOnlySpan<char> name = member.Name.AsSpan();
-                                       int leftParenthesisIndex = name.IndexOf('(');
-                                       int rightParenthesisIndex = name.IndexOf(')');
-                                       bool isInExpectedNamespace = false;
-                                       ReadOnlySpan<char> expectedNamespace = [];
-                                       ReadOnlySpan<char> extendedType = [];
-                                       if (leftParenthesisIndex > -1 && rightParenthesisIndex > leftParenthesisIndex)
-                                       {
-                                           ReadOnlySpan<char> args = name[leftParenthesisIndex .. rightParenthesisIndex];
-                                           MemoryExtensions.SpanSplitEnumerator<char> enumerator = args.Split(',');
+                                       IType firstParamter = member.Parameters.First();
+                                       Namespace expectedNamespace =  firstParamter.Namespace;
+                                       bool isInExpectedNamespace = member.Namespace.Equals(expectedNamespace);
+                                       string extendedType = firstParamter.FullName;
 
-                                           if (enumerator.MoveNext())
-                                           {
-                                               int indexOfLastDot = args[enumerator.Current].IndexOf('`') switch
-                                               {
-                                                   var leftBracketIndex and >= 0 => args[(enumerator.Current.Start.Value + 1) .. leftBracketIndex].LastIndexOf('.'),
-                                                   _                             => args[enumerator.Current].LastIndexOf('.')
-                                               };
-                                               if (indexOfLastDot > enumerator.Current.Start.Value)
-                                               {
-                                                   expectedNamespace = args[(enumerator.Current.Start.Value + 1) .. indexOfLastDot];
-                                                   extendedType = args[(enumerator.Current.Start.Value + 1) .. enumerator.Current.End.Value];
-                                                   isInExpectedNamespace = expectedNamespace.SequenceEqual(currentNamespace.FullName);
-                                               }
-                                           }
-
-                                       }
-
-                                       return new ConditionResult(member, isInExpectedNamespace, $"should be in '{expectedNamespace}' as the '{extendedType}' type it extends (currently in '{currentNamespace.FullName}')");
+                                       return new ConditionResult(member,
+                                                                  isInExpectedNamespace,
+                                                                  $@"should be in ""{expectedNamespace}"" namespace as the ""{extendedType}"" type it extends (currently in ""{currentNamespace.FullName}"")");
                                    },
                                    "resides in the same namespace as the type it extends");
 

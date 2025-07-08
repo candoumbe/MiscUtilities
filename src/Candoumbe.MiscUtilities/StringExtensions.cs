@@ -1,15 +1,16 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-using System.Collections.Generic;
+
 using System.Globalization;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Primitives;
 using static System.Linq.Expressions.Expression;
 
+// ReSharper disable once CheckNamespace
 namespace System;
 
 /// <summary>
@@ -353,13 +354,6 @@ public static class StringExtensions
 
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
-
-    /// <summary>
-    /// Removes diacritics from <paramref name="input"/>
-    /// </summary>
-    /// <param name="input">where to remove diacritics</param>
-    /// <returns></returns>
-    public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
 
     /// <summary>
     /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
