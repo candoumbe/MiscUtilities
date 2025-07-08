@@ -17,10 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="xunit.runner.json" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\src\Candoumbe.MiscUtilities\Candoumbe.MiscUtilities.csproj" />
     </ItemGroup>
 
