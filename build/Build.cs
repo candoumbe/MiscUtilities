@@ -174,7 +174,8 @@ public class Build : EnhancedNukeBuild,
                                                           DotNetTest(s => s
                                                                          .SetConfiguration(Configuration.Debug)
                                                                          .CombineWith(ArchitecturalTestsProjects,
-                                                                                      (cs, project) => cs.SetProjectFile(project)));
+                                                                                      (cs, project) => cs.SetProjectFile(project)
+                                                                                          .CombineWith(project.GetTargetFrameworks(), (setting, frmk) => setting.SetFramework(frmk))));
                                                       });
 
     ///<inheritdoc/>
