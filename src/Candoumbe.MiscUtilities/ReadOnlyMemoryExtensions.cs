@@ -221,7 +221,7 @@ public static class ReadOnlyMemoryExtensions
     /// <summary>
     /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
     /// </summary>
-    /// <param name="input">The <see cref="StringSegment"/> where searching occurrences will be performed</param>
+    /// <param name="input">The <see cref="ReadOnlyMemory{T}"/> where searching occurrences will be performed</param>
     /// <param name="search">The searched element</param>
     /// <returns>
     /// A collection of all indexes in <paramref name="input"/> where <paramref name="search"/> is present.
@@ -302,7 +302,7 @@ public static class ReadOnlyMemoryExtensions
         else if (search.Length <= input.Length)
         {
             int i = input.Length - 1;
-            bool firstItemFound = false;
+            bool firstItemFound;
             T firstSearchItem = search.Span[0];
 
             Func<T, T, bool> predicate = comparer switch
@@ -345,7 +345,7 @@ public static class ReadOnlyMemoryExtensions
         else if (search.Length <= input.Length)
         {
             int i = 0;
-            bool firstItemFound = false;
+            bool firstItemFound;
             T firstSearchItem = search.Span[0];
 
             Func<T, T, bool> predicate = comparer switch

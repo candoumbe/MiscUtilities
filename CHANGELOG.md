@@ -14,12 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `net9.0` support
 - Added `Dictionary.GetOrAdd` extension method.
 
+### 💥 Breaking changes
+- Extension methods now resides in the same namespace as the type they extend
+
 ### 🧹 Housekeeping
 - Reconfigured Renovate to never auto-approve update with major versions.
 - Added `setup-dotnet` task to install required SDK
 - Added missing code coverage badge
 - Added missing mutation testing code coverage badge
 - Refactored some unit tests
+- Added architectural tests
 
 ## [0.14.0] / 2024-12-03
 ### 🚀 New features
