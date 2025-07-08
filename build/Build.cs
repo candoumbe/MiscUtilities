@@ -18,6 +18,8 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitHub;
+using static Nuke.Common.Tools.DotNet.DotNetTasks;
+
 
 namespace Utilities.ContinuousIntegration;
 [GitHubActions(
@@ -158,6 +160,22 @@ public class Build : EnhancedNukeBuild,
             this.Get<IReportCoverage>().CoverageReportHistoryDirectory,
             this.Get<IMutationTest>().MutationTestResultDirectory
         ];
+
+    /// <summary>
+    /// Projects that contain architectural tests.
+    /// </summary>
+    public IEnumerable<Project> ArchitecturalTestsProjects =>  Solution.GetAllProjects("*.ArchitecturalTests");
+
+    public Target ArchitecturalTests => _ => _
+                                            .TryTriggeredBy<IUnitTest>()
+                                            .Description("Runs all architectural tests")
+                                            .Executes(() =>
+                                                      {
+                                                          DotNetTest(s => s
+                                                                         .SetConfiguration(Configuration.Debug)
+                                                                         .CombineWith(ArchitecturalTestsProjects,
+                                                                                      (cs, project) => cs.SetProjectFile(project)));
+                                                      });
 
     ///<inheritdoc/>
     IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
