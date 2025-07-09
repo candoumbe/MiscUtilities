@@ -1,5 +1,6 @@
 ﻿using Candoumbe.MiscUtilities;
 
+// ReSharper disable once CheckNamespace
 namespace System.Linq.Expressions;
 
 /// <summary>
@@ -8,7 +9,7 @@ namespace System.Linq.Expressions;
 public static class ExpressionExtensions
 {
     /// <summary>
-    /// Creates a expression that f as <c>f(x) => true</c>.
+    /// Creates an expression that f as <c>f(x) => true</c>.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public static Expression<Func<T, bool>> True<T>() => _ => true;
@@ -16,8 +17,7 @@ public static class ExpressionExtensions
     /// <summary>
     /// Creates an expression f so that <c>f(x) => x</c>
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="T">Type for which to build the identity expression </typeparam>
     public static Expression<Func<T, T>> Identity<T>() => x => x;
 
     /// <summary>
@@ -27,7 +27,7 @@ public static class ExpressionExtensions
     /// <typeparam name="T2">Output type of the second function</typeparam>
     /// <typeparam name="T3"></typeparam>
     /// <param name="first">the first expression</param>
-    /// <param name="second">An expressions</param>
+    /// <param name="second">the other expression</param>
     /// <returns>The combined expression</returns>
     /// <exception cref="ArgumentNullException">if either <paramref name="first"/> or <paramref name="second"/> is <see langword="null"/>.</exception>
     public static Expression<Func<T1, T3>> Compose<T1, T2, T3>(this Expression<Func<T1, T2>> first, Expression<Func<T2, T3>> second)

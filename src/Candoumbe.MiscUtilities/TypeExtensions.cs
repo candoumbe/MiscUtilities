@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using ZLinq;
 
+// ReSharper disable once CheckNamespace
 namespace System;
 
 /// <summary>
