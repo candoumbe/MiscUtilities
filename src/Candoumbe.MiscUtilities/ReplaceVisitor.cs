@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Candoumbe.MiscUtilities
+namespace Candoumbe.MiscUtilities;
+
+/// <summary>
+/// <see cref="ExpressionVisitor"/> implementation that can be used to replace an expression with another
+/// </summary>
+public class ReplaceVisitor : ExpressionVisitor
 {
-    /// <summary>
-    /// <see cref="ExpressionVisitor"/> implementation that can be used to replace an expression with another
-    /// </summary>
-    public class ReplaceVisitor : ExpressionVisitor
-    {
-        private readonly Expression _from, _to;
+    private readonly Expression _from, _to;
 
     /// <summary>
     /// Builds a new <see cref="ReplaceVisitor"/> instance that can be used to replace <paramref name="from"/> expression with <paramref name="to"/>

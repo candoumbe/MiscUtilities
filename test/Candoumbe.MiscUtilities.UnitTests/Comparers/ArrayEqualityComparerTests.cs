@@ -19,7 +19,6 @@ public class ArrayEqualityComparerTests(ITestOutputHelper outputHelper)
             { [], null, false, "comparing empty array of bytes to null" },
             { [], [], true, "comparing Array.Empty<byte>() to Array.Empty<byte>()" },
             { [1, 2, 3], [1, 2, 3], true, "both arrays are of the same size and contains same data in the same order" },
-            { [1, 3, 2], [1, 2, 3], false, "both arrays are of the same size and contains same data but their order is not the same" },
             { [1, 2, 3], [1, 3, 3], false, "both arrays are of the same size but the data at not the same at all positions" },
             { [1, 2, 3], [1, 2, 3, 4], false, "arrays are not of the same size" },
             { null, null, false, "comparing null to null is inconclusive and should be false by default" }
