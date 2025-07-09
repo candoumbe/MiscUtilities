@@ -6,6 +6,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace System.Collections.Generic;
 
 /// <summary>

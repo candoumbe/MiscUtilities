@@ -29,7 +29,7 @@ public static class EnumerableExtensions
         this IEnumerable<IGrouping<TKey, TElement>> groups)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(groups);
+        ArgumentNullException.ThrowIfNull(groups);
 #else
         if (groups is null)
         {
@@ -58,9 +58,9 @@ public static class EnumerableExtensions
     public static bool None<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(items);
 
-            ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate);
 #else
         if (items is null)
         {
@@ -94,9 +94,9 @@ public static class EnumerableExtensions
     public static bool Once<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(items);
 
-            ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate);
 #else
         if (items is null)
         {
@@ -122,9 +122,9 @@ public static class EnumerableExtensions
     public static bool AtLeastOnce<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(items);
 
-            ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate);
 #else
         if (items is null)
         {
@@ -178,9 +178,9 @@ public static class EnumerableExtensions
     public static bool AtLeast<T>(this IEnumerable<T> source, Expression<Func<T, bool>> predicate, int count)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(source);
 
-            ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate);
 #else
         if (source is null)
         {
@@ -194,7 +194,7 @@ public static class EnumerableExtensions
 #endif
 
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
 #else
         if (count < 0)
         {
@@ -223,9 +223,9 @@ public static class EnumerableExtensions
     public static bool Exactly<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(items);
 
-            ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate);
 #else
         if (items is null)
         {
@@ -239,7 +239,7 @@ public static class EnumerableExtensions
 #endif
 
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
 #else
         if (count < 0)
         {
@@ -263,7 +263,7 @@ public static class EnumerableExtensions
     public static bool Exactly<T>(this IEnumerable<T> items, int count)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(items);
 #else
         if (items is null)
         {
@@ -272,7 +272,7 @@ public static class EnumerableExtensions
 #endif
 
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
 #else
         if (count < 0)
         {
@@ -283,9 +283,9 @@ public static class EnumerableExtensions
         return count == 0
                    ? !items.AsValueEnumerable().Any()
 #if NET6_0_OR_GREATER
-                : items.TryGetNonEnumeratedCount(out int currentCount) ? currentCount == count
+                   : items.TryGetNonEnumeratedCount(out int currentCount) ? currentCount == count
 #endif
-                   : items.AsValueEnumerable().Count() == count;
+                       : items.AsValueEnumerable().Count() == count;
     }
 
     /// <summary>
@@ -301,9 +301,9 @@ public static class EnumerableExtensions
     public static bool AtMost<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate, int count)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(items);
 
-            ArgumentNullException.ThrowIfNull(predicate);
+        ArgumentNullException.ThrowIfNull(predicate);
 
 #else
         if (items is null)
@@ -317,7 +317,7 @@ public static class EnumerableExtensions
         }
 #endif
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(count, 0);
 #else
         if (count < 0)
         {
@@ -337,9 +337,9 @@ public static class EnumerableExtensions
 #if !NET
                 conditionSatisfied = items.Count(predicate.Compile()) <= count;
 #else
-                    conditionSatisfied = items.TryGetNonEnumeratedCount(out int currentCount)
-                            ? currentCount <= count
-                            : items.AsValueEnumerable().Count(predicate.Compile()) <= count;
+                conditionSatisfied = items.TryGetNonEnumeratedCount(out int currentCount)
+                                         ? currentCount <= count
+                                         : items.AsValueEnumerable().Count(predicate.Compile()) <= count;
 #endif
 
                 break;
@@ -482,11 +482,11 @@ public static class EnumerableExtensions
     public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> source, int bucketSize)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(source);
 #endif
 
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfLessThan(bucketSize, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(bucketSize, 0);
 #else
         if (source is null)
         {
@@ -599,7 +599,7 @@ public static class EnumerableExtensions
     public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IEnumerable<T> source, int millisecondsDelay = 1)
     {
 #if NET
-            ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(source);
 #else
         if (source is null)
         {
@@ -607,7 +607,7 @@ public static class EnumerableExtensions
         }
 #endif
 #if NET8_0_OR_GREATER
-            ArgumentOutOfRangeException.ThrowIfLessThan(millisecondsDelay, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(millisecondsDelay, 0);
 #else
         if (millisecondsDelay < 0)
         {

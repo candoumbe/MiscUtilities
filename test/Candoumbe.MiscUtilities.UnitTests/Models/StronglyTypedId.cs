@@ -19,8 +19,8 @@ public static class StronglyTypedIdHelper
         where TValue : notnull
     {
         return (Func<TValue, object>)s_stronglyTypedIdFactories.GetOrAdd(
-                                                                         stronglyTypedIdType,
-                                                                         CreateFactory<TValue>);
+                                                                       stronglyTypedIdType,
+                                                                       CreateFactory<TValue>);
     }
 
     private static Func<TValue, object> CreateFactory<TValue>(Type stronglyTypedIdType)
