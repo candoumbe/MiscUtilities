@@ -21,10 +21,13 @@ namespace System.Collections.Generic
         {
             public static readonly EmptyAsyncEnumerator<T> Instance = new();
 
+            /// <inheritdoc />
             public T Current => default!;
 
+            /// <inheritdoc />
             public ValueTask DisposeAsync() => default;
 
+            /// <inheritdoc />
             public ValueTask<bool> MoveNextAsync() => new(false);
         }
 
