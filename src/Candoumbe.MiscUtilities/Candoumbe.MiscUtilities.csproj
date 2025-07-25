@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="9.0.7"/>
-    <PackageReference Include="Zlinq" Version="1.5.1"/>
+    <PackageReference Include="Zlinq" Version="1.5.2"/>
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.7"/>
   </ItemGroup>
 
