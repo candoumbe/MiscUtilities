@@ -1,24 +1,21 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using ArchUnitNET.Domain;
-using ArchUnitNET.Domain.Extensions;
 using ArchUnitNET.Fluent;
 using ArchUnitNET.Fluent.Conditions;
 using ArchUnitNET.Loader;
 using ArchUnitNET.xUnitV3;
-using Xunit.Abstractions;
 using Xunit.Categories;
 using Assembly = System.Reflection.Assembly;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
-namespace Candoumbe.MiscUtilties.ArchitecturalTests;
+namespace Candoumbe.MiscUtilities.ArchitecturalTests;
 
 [UnitTest]
 public class GeneralArchitecturalTests
 {
-    private readonly ITestOutputHelper _outputHelper;
-
-    public GeneralArchitecturalTests(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
-
     private static readonly Assembly s_miscUtilitiesAssembly = typeof(ArrayExtensions).Assembly;
 
     private static readonly Architecture s_architecture = new ArchLoader().LoadAssemblies(s_miscUtilitiesAssembly)
