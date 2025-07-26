@@ -44,7 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{FA04
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candoumbe.MiscUtilities.PerformanceTests", "test\Candoumbe.MiscUtilities.PerformanceTests\Candoumbe.MiscUtilities.PerformanceTests.csproj", "{76F9C8D8-2F84-4C96-99F4-F71FF016368A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candoumbe.MiscUtilties.ArchitecturalTests", "test\Candoumbe.MiscUtilties.ArchitecturalTests\Candoumbe.MiscUtilties.ArchitecturalTests.csproj", "{BDCE204A-E19E-469E-AE39-A7BF7A660C77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candoumbe.MiscUtilities.ArchitecturalTests", "test\Candoumbe.MiscUtilities.ArchitecturalTests\Candoumbe.MiscUtilities.ArchitecturalTests.csproj", "{BDCE204A-E19E-469E-AE39-A7BF7A660C77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
