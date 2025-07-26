@@ -33,19 +33,19 @@ public class FisherYatesShuffler<T> : IShuffler<T>
         switch (count)
         {
             case 0:
-                shuffled = Enumerable.Empty<T>();
+                shuffled = [];
                 break;
             case 1:
                 shuffled = original;
                 break;
             case 2:
-                shuffled = new[] { original.Last(), original.First() };
+                shuffled = [original.Last(), original.First()];
                 break;
 
             default:
                 if (original is not T[] unshuffled)
                 {
-                    unshuffled = original.ToArray();
+                    unshuffled = [.. original];
                 }
 
                 for (int i = unshuffled.Length - 1; i > 0; --i)

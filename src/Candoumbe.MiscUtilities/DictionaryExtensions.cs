@@ -19,7 +19,7 @@ public static class DictionaryExtensions
     /// <summary>
     /// List of all types that can be directly converted to their string representation
     /// </summary>
-    public static readonly IEnumerable<Type> PrimitiveTypes =
+    public static readonly IReadOnlyList<Type> PrimitiveTypes =
     [
         typeof(string),
 
@@ -82,7 +82,8 @@ public static class DictionaryExtensions
                 {
                     subDictionary = subDictionary
                         .AsParallel()
-                        .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
+                        .ToDictionary(x => $"{key}[{x.Key}]",
+                                      x => x.Value);
 
                     if (sb.Length > 0)
                     {
@@ -160,8 +161,8 @@ public static class DictionaryExtensions
 #if NET8_0_OR_GREATER
     /// <summary>
     /// Retrieves the value associated with the specified key from the dictionary.
-    /// If the key does not exist, adds the key with the specified default value
-    /// and returns the default value.
+    /// If the key does not exist, adds the key with the specified <paramref name="defaultValue"/>
+    /// and returns <paramref name="defaultValue"/>.
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
