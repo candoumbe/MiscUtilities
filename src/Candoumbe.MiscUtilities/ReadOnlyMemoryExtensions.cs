@@ -2,15 +2,15 @@
 // Licenced under GNU General Public Licence, version 3.0"
 
 
-using ZLinq.Linq;
 // ReSharper disable once CheckNamespace
-using ZLinq;
-
-namespace Microsoft.Extensions.Primitives;
-
+using System;
 using System;
 using System.Collections.Generic;
+using System.Collections.Generic;
+using ZLinq;
+using ZLinq.Linq;
 
+namespace Microsoft.Extensions.Primitives;
 /// <summary>
 /// Provides extension methods for ReadOnlyMemory&lt;char&gt; type to perform string operations like finding occurrences,
 /// checking start patterns, and searching for substrings. Includes methods for finding first/last occurrences
@@ -46,7 +46,7 @@ public static class ReadOnlyMemoryExtensions
 
         while (i < input.Length)
         {
-            if (comparer?.Equals(input.Span[i], search) is true || Equals(input.Span[i],search))
+            if (comparer?.Equals(input.Span[i], search) is true || Equals(input.Span[i], search))
             {
                 yield return i;
             }
@@ -130,7 +130,7 @@ public static class ReadOnlyMemoryExtensions
             int currentPos = source.LastIndexOf(search, comparer);
             int remainingCharactersInSource = source.Length - currentPos;
 
-            if(remainingCharactersInSource >= search.Length)
+            if (remainingCharactersInSource >= search.Length)
             {
                 int offset = 0;
                 while (!found && currentPos >= 0)
@@ -184,7 +184,7 @@ public static class ReadOnlyMemoryExtensions
             int currentPos = source.IndexOf(search, comparer);
             int remainingCharactersInSource = source.Length - currentPos;
 
-            if(remainingCharactersInSource >= search.Length)
+            if (remainingCharactersInSource >= search.Length)
             {
                 int offset = 0;
                 while (!found && currentPos >= 0)
@@ -273,7 +273,7 @@ public static class ReadOnlyMemoryExtensions
         {
             startsWith = true;
         }
-        else if(search.Length <= input.Length)
+        else if (search.Length <= input.Length)
         {
             int i = 0;
             bool mismatchFound;
@@ -285,7 +285,7 @@ public static class ReadOnlyMemoryExtensions
 
             do
             {
-                mismatchFound =  !predicate.Invoke(input.Span[i], search.Span[i]);
+                mismatchFound = !predicate.Invoke(input.Span[i], search.Span[i]);
                 i++;
             } while (!mismatchFound && i < search.Length);
 
@@ -317,7 +317,7 @@ public static class ReadOnlyMemoryExtensions
             do
             {
                 T currentItem = input.Span[i];
-                firstItemFound =  predicate.Invoke(currentItem, firstSearchItem);
+                firstItemFound = predicate.Invoke(currentItem, firstSearchItem);
                 if (!firstItemFound)
                 {
                     i--;
@@ -360,7 +360,7 @@ public static class ReadOnlyMemoryExtensions
             do
             {
                 T currentItem = input.Span[i];
-                firstItemFound =  predicate.Invoke(currentItem, firstSearchItem);
+                firstItemFound = predicate.Invoke(currentItem, firstSearchItem);
                 if (!firstItemFound)
                 {
                     i++;

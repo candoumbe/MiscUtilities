@@ -21,7 +21,7 @@ public static class GuidExtensions
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
         return enc[..22];
 #else
-            return enc.Substring(0, 22);
+        return enc.Substring(0, 22);
 #endif
     }
 }

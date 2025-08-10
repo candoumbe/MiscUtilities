@@ -1,13 +1,13 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Expressions;
-using static System.Linq.Expressions.ExpressionExtensions;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
 using ZLinq;
 using ZLinq.Linq;
+using static System.Linq.Expressions.ExpressionExtensions;
 
 // ReSharper disable once CheckNamespace
 namespace System.Collections.Generic
@@ -542,7 +542,7 @@ namespace System.Collections.Generic
             Func<T, bool> predicate)
         {
             ValueEnumerable<FromEnumerable<T>, T> localSource = source.AsValueEnumerable();
-            return ([.. localSource.Where(predicate)], [ .. localSource.Where(val => !predicate(val))]);
+            return ([.. localSource.Where(predicate)], [.. localSource.Where(val => !predicate(val))]);
         }
 
         /// <summary>

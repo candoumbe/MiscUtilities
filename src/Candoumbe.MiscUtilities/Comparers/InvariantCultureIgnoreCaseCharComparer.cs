@@ -10,7 +10,7 @@ public class InvariantCultureIgnoreCaseCharComparer : GenericEqualityComparer<ch
     /// <summary>
     /// Builds a new <see cref="InvariantCultureIgnoreCaseCharComparer"/> instance.
     /// </summary>
-    public InvariantCultureIgnoreCaseCharComparer(): base((x, y) => char.Equals(char.ToUpperInvariant(x), char.ToUpperInvariant(y)))
+    public InvariantCultureIgnoreCaseCharComparer() : base((x, y) => char.Equals(char.ToUpperInvariant(x), char.ToUpperInvariant(y)))
     {
     }
 

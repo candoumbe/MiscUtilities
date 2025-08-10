@@ -1,14 +1,11 @@
 // "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-using System.Linq;
-using Nuke.Common.Tools.GitHub;
-
-namespace Utilities.ContinuousIntegration;
-
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Candoumbe.Pipelines.Components;
+using Candoumbe.Pipelines.Components.Formatting;
 using Candoumbe.Pipelines.Components.GitHub;
 using Candoumbe.Pipelines.Components.NuGet;
 using Candoumbe.Pipelines.Components.Workflows;
@@ -20,7 +17,9 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.GitHub;
 
+namespace Utilities.ContinuousIntegration;
 [GitHubActions(
     "integration",
     GitHubActionsImage.Ubuntu2204,
@@ -111,6 +110,7 @@ public class Build : EnhancedNukeBuild,
     IHaveGitVersion,
     IClean,
     IRestore,
+    IDotnetFormat,
     ICompile,
     IBenchmark,
     IUnitTest,
@@ -123,7 +123,7 @@ public class Build : EnhancedNukeBuild,
 {
     public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
 
-    [Required] [Solution] public readonly Solution Solution;
+    [Required][Solution] public readonly Solution Solution;
 
     ///<inheritdoc/>
     Solution IHaveSolution.Solution => Solution;
@@ -131,14 +131,15 @@ public class Build : EnhancedNukeBuild,
     /// <summary>
     /// Token to interact with Nuget's API
     /// </summary>
-    [Parameter("Token to interact with Nuget's API")] [Secret]
+    [Parameter("Token to interact with Nuget's API")]
+    [Secret]
     public readonly string NugetApiKey;
 
     [CI] public readonly GitHubActions GitHubActions;
 
     ///<inheritdoc/>
     IEnumerable<AbsolutePath> IClean.DirectoriesToDelete =>
-        [ 
+        [
             ..this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj"),
             ..this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj")
         ];
@@ -200,4 +201,7 @@ public class Build : EnhancedNukeBuild,
 
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
+
+    /// <inheritdoc />
+    bool IDotnetFormat.VerifyNoChanges => IsLocalBuild;
 }

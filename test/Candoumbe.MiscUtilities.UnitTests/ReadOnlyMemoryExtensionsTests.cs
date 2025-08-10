@@ -123,7 +123,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
                        .Match(expectation, reason);
         }
 
-        public static TheoryData<ReadOnlyMemory<char>, Func<char,bool>, Expression<Func<IEnumerable<int>, bool>>, string> OccurrencesWithPredicateCases
+        public static TheoryData<ReadOnlyMemory<char>, Func<char, bool>, Expression<Func<IEnumerable<int>, bool>>, string> OccurrencesWithPredicateCases
             => new()
             {
                 {
@@ -172,8 +172,8 @@ namespace Candoumbe.MiscUtilities.UnitTests
             occurrences.Should()
                 .Match(expectation, reason);
         }
-        
-        public static TheoryData<ReadOnlyMemory<char>, Func<char,bool>, int, string> FirstOccurrenceWithPredicateCases
+
+        public static TheoryData<ReadOnlyMemory<char>, Func<char, bool>, int, string> FirstOccurrenceWithPredicateCases
             => new()
             {
                 {
@@ -276,7 +276,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
             StringSegment source = sourceGenerator.Item;
 
             // Act
-            int lastIndex =  source.LastOccurrence(StringSegment.Empty);
+            int lastIndex = source.LastOccurrence(StringSegment.Empty);
 
             // Assert
             _ = source.Length switch

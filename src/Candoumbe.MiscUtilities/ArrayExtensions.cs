@@ -1,11 +1,11 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+
+using System.Collections.Generic;
+using System.Linq;
+
 namespace System;
-
-using Collections.Generic;
-using Linq;
-
 /// <summary>
 /// Sets of extension methods for <see cref="Array"/> type.
 /// </summary>

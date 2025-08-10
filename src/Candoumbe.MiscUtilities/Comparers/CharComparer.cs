@@ -17,6 +17,6 @@ namespace Candoumbe.MiscUtilities.Comparers
         /// Gets an instance of <see cref="InvariantCultureIgnoreCaseCharComparer"/>
         /// that performs a case-insensitive comparison using the invariant culture.
         /// </summary>
-        public static InvariantCultureIgnoreCaseCharComparer InvariantCultureIgnoreCase { get; } = new ();
+        public static InvariantCultureIgnoreCaseCharComparer InvariantCultureIgnoreCase { get; } = new();
     }
 }

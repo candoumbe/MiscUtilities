@@ -172,7 +172,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
             StringSegment source = sourceGenerator.Item;
 
             // Act
-            int lastIndex =  source.LastOccurrence(StringSegment.Empty);
+            int lastIndex = source.LastOccurrence(StringSegment.Empty);
 
             // Assert
             _ = source.Length switch
@@ -186,11 +186,11 @@ namespace Candoumbe.MiscUtilities.UnitTests
         public void Given_source_does_not_have_a_value_When_search_has_a_value_Then_LastOccurrence_should_throw_ArgumentOutOfRangeException(NonNull<string> searchGenerator)
         {
             // Arrange
-            StringSegment source = (string) null;
+            StringSegment source = (string)null;
             StringSegment search = searchGenerator.Item;
 
             // Act
-            Action callingLastOccurrenceWhenSourceDoesNotHaveAValue = () =>  source.LastOccurrence(search);
+            Action callingLastOccurrenceWhenSourceDoesNotHaveAValue = () => source.LastOccurrence(search);
 
             // Assert
 
@@ -204,10 +204,10 @@ namespace Candoumbe.MiscUtilities.UnitTests
         {
             // Arrange
             StringSegment source = sourceGenerator.Item;
-            StringSegment search = (string) null;
+            StringSegment search = (string)null;
 
             // Act
-            Action callingLastOccurrenceWhenSourceDoesNotHaveAValue = () =>  source.LastOccurrence(search);
+            Action callingLastOccurrenceWhenSourceDoesNotHaveAValue = () => source.LastOccurrence(search);
 
             // Assert
             callingLastOccurrenceWhenSourceDoesNotHaveAValue.Should()
@@ -223,7 +223,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
             StringSegment search = searchGenerator.Item;
 
             // Act
-            Action callingFirstOccurrenceWhenSourceDoesNotHaveAValue = () =>  source.FirstOccurrence(search);
+            Action callingFirstOccurrenceWhenSourceDoesNotHaveAValue = () => source.FirstOccurrence(search);
 
             // Assert
             callingFirstOccurrenceWhenSourceDoesNotHaveAValue.Should()
@@ -236,10 +236,10 @@ namespace Candoumbe.MiscUtilities.UnitTests
         {
             // Arrange
             StringSegment source = sourceGenerator.Item;
-            StringSegment search = (string) null;
+            StringSegment search = (string)null;
 
             // Act
-            Action callingFirstOccurrenceWhenSourceDoesNotHaveAValue = () =>  source.FirstOccurrence(search);
+            Action callingFirstOccurrenceWhenSourceDoesNotHaveAValue = () => source.FirstOccurrence(search);
 
             // Assert
             callingFirstOccurrenceWhenSourceDoesNotHaveAValue.Should()
@@ -247,7 +247,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
                 .WithParameterName("search");
         }
 
-        
+
         public static TheoryData<StringSegment, StringSegment, StringComparison, int> FirstOccurrenceCases
             => new()
             {
