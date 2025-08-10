@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Candoumbe.MiscUtilities.Comparers;
 
 /// <summary>

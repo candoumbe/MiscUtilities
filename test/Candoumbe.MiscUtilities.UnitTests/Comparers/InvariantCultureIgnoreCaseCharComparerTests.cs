@@ -2,7 +2,6 @@ using System.Globalization;
 using Candoumbe.MiscUtilities.Comparers;
 using FluentAssertions;
 using FsCheck.Xunit;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Candoumbe.MiscUtilities.UnitTests.Comparers

@@ -4,7 +4,6 @@
 using System;
 using Candoumbe.MiscUtilities.UnitTests.Generators;
 using FluentAssertions;
-using FluentAssertions.Equivalency;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit.Categories;

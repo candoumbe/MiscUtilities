@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using Candoumbe.MiscUtilities.UnitTests.Generators;
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -11,7 +10,6 @@ using FsCheck.Xunit;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
-using static System.StringSplitOptions;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
 

@@ -21,7 +21,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Collections
     {
         private readonly ITestOutputHelper _outputHelper = outputHelper;
         private readonly FisherYatesShuffler<int> _sut = new();
-        private static readonly Faker Faker = new();
+        private static readonly Faker s_faker = new();
 
         [Property]
         public async Task Given_a_collection_of_items_Shuffle_should_shuffle_the_collection(NonEmptySet<int> original)
@@ -32,7 +32,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Collections
 
             _outputHelper.WriteLine($"Input : {input.Jsonify()}");
 
-            int runCount = Faker.Random.Int(10, 100);
+            int runCount = s_faker.Random.Int(10, 100);
 
             // Act
             IReadOnlyList<Task<IEnumerable<int>>> tasks = [.. Enumerable.Range(0, runCount)
@@ -41,14 +41,14 @@ namespace Candoumbe.MiscUtilities.UnitTests.Collections
 
             await Task.WhenAll(tasks);
 
-            (IEnumerable<IEnumerable<int>> Thruthy, IEnumerable<IEnumerable<int>> Falsy) = tasks.Select(tsk => tsk.Result)
+            (_, IEnumerable<IEnumerable<int>> falsy) = tasks.Select(tsk => tsk.Result)
                                                                                                 .SortBy(items => items.SequenceEqual(input));
 
-            // Assert                   
+            // Assert
             _ = input.Count switch
             {
-                < 2 => Falsy.Should().BeEmpty("Fisher-Yates algorithm does not shuffle empty or random imput"),
-                _ => Falsy.Should().NotBeEmpty("Fisher-Yates algorithm should produces at least one output that is not in same order as the input").And
+                < 2 => falsy.Should().BeEmpty("Fisher-Yates algorithm does not shuffle empty or random imput"),
+                _ => falsy.Should().NotBeEmpty("Fisher-Yates algorithm should produces at least one output that is not in same order as the input").And
                           .OnlyContain(output => !output.SequenceEqual(input))
             };
         }

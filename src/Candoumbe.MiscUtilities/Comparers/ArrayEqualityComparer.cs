@@ -15,7 +15,7 @@ namespace Candoumbe.MiscUtilities.Comparers;
 public class ArrayEqualityComparer<T> : IEqualityComparer<T[]>
 {
     // You could make this a per-instance field with a constructor parameter
-    private static readonly EqualityComparer<T> _elementComparer = EqualityComparer<T>.Default;
+    private static readonly EqualityComparer<T> s_elementComparer = EqualityComparer<T>.Default;
 
     ///<inheritdoc/>
     public bool Equals(T[] x, T[] y)
@@ -39,7 +39,7 @@ public class ArrayEqualityComparer<T> : IEqualityComparer<T[]>
 
                         do
                         {
-                            equals = _elementComparer.Equals(x[i], y[i]);
+                            equals = s_elementComparer.Equals(x[i], y[i]);
                             i++;
                         } while (i < x.Length && equals);
 
@@ -52,5 +52,5 @@ public class ArrayEqualityComparer<T> : IEqualityComparer<T[]>
     }
 
     ///<inheritdoc/>
-    public int GetHashCode(T[] obj) => obj.Aggregate(17, (current, item) => (current * 31) + _elementComparer.GetHashCode(item));
+    public int GetHashCode(T[] obj) => obj.Aggregate(17, (current, item) => (current * 31) + s_elementComparer.GetHashCode(item));
 }
