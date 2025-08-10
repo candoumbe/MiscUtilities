@@ -24,7 +24,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
     public class EnumerableExtensionsTests(ITestOutputHelper outputHelper)
     {
         private readonly ITestOutputHelper _outputHelper = outputHelper;
-        private static readonly Faker Faker = new();
+        private static readonly Faker s_faker = new();
 
         /// <summary>
         /// <see cref="Once(IEnumerable{int},System.Linq.Expressions.Expression{System.Func{int,bool}},bool,string)"/> tests cases
@@ -349,7 +349,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
         public void AtLeastShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int min, int max, IEnumerable<int> items)
         {
             // Arrange
-            int count = Faker.Random.Int(min, max);
+            int count = s_faker.Random.Int(min, max);
 
             // Act
             Action action = () => items.AtLeast(count);
@@ -387,7 +387,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
         public void AtMost_Should_Throw_ArgumentOutOfRangeException_When_Count_Is_Negative(int min, int max, IEnumerable<int> items)
         {
             // Arrange
-            int count = Faker.Random.Int(min, max);
+            int count = s_faker.Random.Int(min, max);
 
             // Act
             Action action = () => items.AtMost(count);
@@ -454,7 +454,7 @@ namespace Candoumbe.MiscUtilities.UnitTests
         public void ExactlyShouldThrowArgumentOutOfRangeExceptionWhenParameterCountIsNegative(int count)
         {
             // Act
-            Action action = () => items.Exactly(x => x == 2, count);
+            Action action = () => s_items.Exactly(x => x == 2, count);
 
             // Assert
             action.Should().Throw<ArgumentOutOfRangeException>($"{count} is not a valid value").Which
@@ -794,8 +794,8 @@ namespace Candoumbe.MiscUtilities.UnitTests
                     (Expression<Func<IDictionary<bool, IEnumerable<int>>, bool>>)(dictionary => dictionary.Exactly(2)
                                                                                                 && dictionary.Once(kv => kv.Key)
                                                                                                 && dictionary.Once(kv => !kv.Key)
-                                                                                                && dictionary[true].SequenceEqual(second)
-                                                                                                && dictionary[false].SequenceEqual(secondArray)
+                                                                                                && dictionary[true].SequenceEqual(s_second)
+                                                                                                && dictionary[false].SequenceEqual(s_secondArray)
                     )
                 };
 
@@ -821,9 +821,9 @@ namespace Candoumbe.MiscUtilities.UnitTests
             }
         }
 
-        private static readonly int[] items = [1, 3, 5];
-        private static readonly int[] second = [2, 4, 6, 8, 10];
-        private static readonly int[] secondArray = [1, 3, 5, 7, 9];
+        private static readonly int[] s_items = [1, 3, 5];
+        private static readonly int[] s_second = [2, 4, 6, 8, 10];
+        private static readonly int[] s_secondArray = [1, 3, 5, 7, 9];
 
         [Theory]
         [MemberData(nameof(ToDictionaryCases))]

@@ -2,7 +2,6 @@
 // Licenced under GNU General Public Licence, version 3.0"
 
 using System;
-using System.Collections.Generic;
 using Candoumbe.MiscUtilities.Comparers;
 using FluentAssertions;
 using Xunit;

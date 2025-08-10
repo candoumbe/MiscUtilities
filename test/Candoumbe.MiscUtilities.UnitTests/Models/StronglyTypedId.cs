@@ -13,12 +13,12 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     [ExcludeFromCodeCoverage]
     public static class StronglyTypedIdHelper
     {
-        private static readonly ConcurrentDictionary<Type, Delegate> StronglyTypedIdFactories = new();
+        private static readonly ConcurrentDictionary<Type, Delegate> s_stronglyTypedIdFactories = new();
 
         public static Func<TValue, object> GetFactory<TValue>(Type stronglyTypedIdType)
             where TValue : notnull
         {
-            return (Func<TValue, object>)StronglyTypedIdFactories.GetOrAdd(
+            return (Func<TValue, object>)s_stronglyTypedIdFactories.GetOrAdd(
                 stronglyTypedIdType,
                 CreateFactory<TValue>);
         }
@@ -68,7 +68,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     [ExcludeFromCodeCoverage]
     public class StronglyTypedIdConverter<TValue>(Type type) : TypeConverter where TValue : notnull
     {
-        private static readonly TypeConverter IdValueConverter = GetIdValueConverter();
+        private static readonly TypeConverter s_idValueConverter = GetIdValueConverter();
 
         private static TypeConverter GetIdValueConverter()
         {
@@ -99,7 +99,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
         {
             if (value is string s)
             {
-                value = IdValueConverter.ConvertFrom(s);
+                value = s_idValueConverter.ConvertFrom(s);
             }
 
             switch (value)
@@ -135,10 +135,10 @@ namespace Candoumbe.MiscUtilities.UnitTests.Models
     [ExcludeFromCodeCoverage]
     public class StronglyTypedIdConverter(Type stronglyTypedIdType) : TypeConverter
     {
-        private static readonly ConcurrentDictionary<Type, TypeConverter> ActualConverters = new();
+        private static readonly ConcurrentDictionary<Type, TypeConverter> s_actualConverters = new();
 
         private readonly TypeConverter _innerConverter =
-            ActualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
+            s_actualConverters.GetOrAdd(stronglyTypedIdType, CreateActualConverter);
 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
             _innerConverter.CanConvertFrom(context, sourceType);
