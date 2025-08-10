@@ -14,73 +14,72 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Candoumbe.MiscUtilities.UnitTests.Collections
+namespace Candoumbe.MiscUtilities.UnitTests.Collections;
+
+[UnitTest]
+public class FisherYatesShufflerTests(ITestOutputHelper outputHelper)
 {
-    [UnitTest]
-    public class FisherYatesShufflerTests(ITestOutputHelper outputHelper)
+    private readonly ITestOutputHelper _outputHelper = outputHelper;
+    private readonly FisherYatesShuffler<int> _sut = new();
+    private static readonly Faker s_faker = new();
+
+    [Property]
+    public async Task Given_a_collection_of_items_Shuffle_should_shuffle_the_collection(NonEmptySet<int> original)
     {
-        private readonly ITestOutputHelper _outputHelper = outputHelper;
-        private readonly FisherYatesShuffler<int> _sut = new();
-        private static readonly Faker s_faker = new();
+        // Arrange
+        List<int> input = new(original.Item.Count);
+        original.Item.ForEach(val => input.Add(val));
 
-        [Property]
-        public async Task Given_a_collection_of_items_Shuffle_should_shuffle_the_collection(NonEmptySet<int> original)
+        _outputHelper.WriteLine($"Input : {input.Jsonify()}");
+
+        int runCount = s_faker.Random.Int(10, 100);
+
+        // Act
+        IReadOnlyList<Task<IEnumerable<int>>> tasks = [.. Enumerable.Range(0, runCount)
+            .Select(_ => Task.Run(() => _sut.Shuffle(input)))
+        ];
+
+        await Task.WhenAll(tasks);
+
+        (_, IEnumerable<IEnumerable<int>> falsy) = tasks.Select(tsk => tsk.Result)
+            .SortBy(items => items.SequenceEqual(input));
+
+        // Assert
+        _ = input.Count switch
         {
-            // Arrange
-            List<int> input = new(original.Item.Count);
-            original.Item.ForEach(val => input.Add(val));
+            < 2 => falsy.Should().BeEmpty("Fisher-Yates algorithm does not shuffle empty or random imput"),
+            _ => falsy.Should().NotBeEmpty("Fisher-Yates algorithm should produces at least one output that is not in same order as the input").And
+                .OnlyContain(output => !output.SequenceEqual(input))
+        };
+    }
 
-            _outputHelper.WriteLine($"Input : {input.Jsonify()}");
+    [Fact]
+    public void Given_an_empty_collection_Shuffle_should_returns_an_empty_output()
+    {
+        // Arrange
+        IEnumerable<int> input = [];
+        FisherYatesShuffler<int> shuffler = new();
 
-            int runCount = s_faker.Random.Int(10, 100);
+        // Act
+        IEnumerable<int> output = shuffler.Shuffle(input);
 
-            // Act
-            IReadOnlyList<Task<IEnumerable<int>>> tasks = [.. Enumerable.Range(0, runCount)
-                                                                  .Select(_ => Task.Run(() => _sut.Shuffle(input)))
-                ];
+        // Assert
+        output.Should()
+            .BeEmpty("there is no item to shuffle");
+    }
 
-            await Task.WhenAll(tasks);
+    [Property]
+    public void Given_an_collection_with_two_element_Shuffle_should_returns_same_result_as_reverse()
+    {
+        // Arrange
+        IEnumerable<int> input = [1, 2];
+        FisherYatesShuffler<int> shuffler = new();
 
-            (_, IEnumerable<IEnumerable<int>> falsy) = tasks.Select(tsk => tsk.Result)
-                                                                                                .SortBy(items => items.SequenceEqual(input));
+        // Act
+        IEnumerable<int> output = shuffler.Shuffle(input);
 
-            // Assert
-            _ = input.Count switch
-            {
-                < 2 => falsy.Should().BeEmpty("Fisher-Yates algorithm does not shuffle empty or random imput"),
-                _ => falsy.Should().NotBeEmpty("Fisher-Yates algorithm should produces at least one output that is not in same order as the input").And
-                          .OnlyContain(output => !output.SequenceEqual(input))
-            };
-        }
-
-        [Fact]
-        public void Given_an_empty_collection_Shuffle_should_returns_an_empty_output()
-        {
-            // Arrange
-            IEnumerable<int> input = [];
-            FisherYatesShuffler<int> shuffler = new();
-
-            // Act
-            IEnumerable<int> output = shuffler.Shuffle(input);
-
-            // Assert
-            output.Should()
-                  .BeEmpty("there is no item to shuffle");
-        }
-
-        [Property]
-        public void Given_an_collection_with_two_element_Shuffle_should_returns_same_result_as_reverse()
-        {
-            // Arrange
-            IEnumerable<int> input = [1, 2];
-            FisherYatesShuffler<int> shuffler = new();
-
-            // Act
-            IEnumerable<int> output = shuffler.Shuffle(input);
-
-            // Assert
-            output.Should()
-                  .BeEquivalentTo(input.Reverse());
-        }
+        // Assert
+        output.Should()
+            .BeEquivalentTo(input.Reverse());
     }
 }
