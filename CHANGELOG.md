@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.15.0] / 2025-08-10
 ### 🚀 New features
 - Use [ZLinq](https://github.com/Cysharp/ZLinq) to improve LinQ performances.
 - Added `GenericEqualityComparer`
@@ -152,7 +154,8 @@ instead of throwing `ArgumentOutOfRangeException` when both `source` and  `searc
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.14.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.15.0...HEAD
+[0.15.0]: https://github.com/candoumbe/MiscUtilities/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/candoumbe/MiscUtilities/compare/0.13.1...0.14.0
 [0.13.1]: https://github.com/candoumbe/MiscUtilities/compare/0.13.0...0.13.1
 [0.13.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.13.0
