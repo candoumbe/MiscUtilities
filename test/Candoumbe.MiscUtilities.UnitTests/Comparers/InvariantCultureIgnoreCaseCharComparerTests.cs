@@ -38,7 +38,7 @@ namespace Candoumbe.MiscUtilities.UnitTests.Comparers
         public void Given_two_characters_When_they_are_equal_Then_comparing_should_be_true(char x, char y, CultureInfo cultureInfo)
         {
             // Arrange
-            using CultureSwitcher cultureSwitcher = new ();
+            using CultureSwitcher cultureSwitcher = new();
             bool actual = false;
             bool expected = char.ToLowerInvariant(x).Equals(char.ToLowerInvariant(y));
 

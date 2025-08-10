@@ -1,16 +1,15 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq.Expressions;
 using ZLinq;
 using ZLinq.Linq;
 
 namespace Microsoft.Extensions.Primitives
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq.Expressions;
-
     /// <summary>
     /// Extension methods for <see cref="StringSegment"/> types
     /// </summary>
@@ -81,7 +80,7 @@ namespace Microsoft.Extensions.Primitives
                     .AsValueEnumerable()
                     .GetEnumerator();
 
-                index =  enumerator.MoveNext()
+                index = enumerator.MoveNext()
                     ? enumerator.Current
                     : -1;
             }
@@ -129,7 +128,7 @@ namespace Microsoft.Extensions.Primitives
                 int currentPos = source.LastIndexOf(search[0]);
                 int remainingCharactersInSource = source.Length - currentPos;
 
-                if(remainingCharactersInSource >= search.Length)
+                if (remainingCharactersInSource >= search.Length)
                 {
                     while (!found && currentPos >= 0)
                     {
@@ -249,7 +248,7 @@ namespace Microsoft.Extensions.Primitives
             {
                 startsWith = true;
             }
-            else if(search.Length < input.Length)
+            else if (search.Length < input.Length)
             {
                 int i = 0;
                 bool mismatchFound;

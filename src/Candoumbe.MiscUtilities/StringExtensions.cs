@@ -1,16 +1,16 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-namespace System;
-
-using Globalization;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Primitives;
-using Collections.Generic;
-using Linq;
-using Linq.Expressions;
-using Text;
-using Text.RegularExpressions;
-using static Linq.Expressions.Expression;
+using static System.Linq.Expressions.Expression;
+
+namespace System;
 
 /// <summary>
 /// Extension methods for <see langword="string"/> type

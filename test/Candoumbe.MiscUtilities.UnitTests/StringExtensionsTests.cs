@@ -50,7 +50,7 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
             }
         }
     }
-    
+
     [Theory]
     [MemberData(nameof(ToTitleCases))]
     public void ToTitleCase(string cultureName, string input, string expectedString)
@@ -415,7 +415,7 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
         string source = sourceGenerator.Item;
 
         // Act
-        int lastIndex =  source.LastOccurrence(string.Empty);
+        int lastIndex = source.LastOccurrence(string.Empty);
 
         // Assert
         lastIndex.Should().Be(source.Length);
@@ -455,7 +455,7 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
         string source = sourceGenerator.Item;
 
         // Act
-        int actual= source.FirstOccurrence(string.Empty);
+        int actual = source.FirstOccurrence(string.Empty);
 
         // Assert
         actual.Should().Be(0);
