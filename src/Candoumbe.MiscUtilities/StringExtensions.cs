@@ -427,7 +427,7 @@ public static class StringExtensions
 #endif
 
         int index;
-        if (search.Length == 0)
+        if (search.Length is 0)
         {
             index = 0;
         }

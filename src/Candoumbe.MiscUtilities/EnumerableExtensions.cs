@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using static System.Linq.Expressions.ExpressionExtensions;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using ZLinq;
+using ZLinq.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace System.Collections.Generic
@@ -23,7 +25,8 @@ namespace System.Collections.Generic
         /// <param name="groups"></param>
         /// <returns>a dictionary</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="groups"/> is <see langword="null"/>.</exception>
-        public static IDictionary<TKey, IEnumerable<TElement>> ToDictionary<TKey, TElement>(this IEnumerable<IGrouping<TKey, TElement>> groups)
+        public static IDictionary<TKey, IEnumerable<TElement>> ToDictionary<TKey, TElement>(
+            this IEnumerable<IGrouping<TKey, TElement>> groups)
         {
 #if NET
             ArgumentNullException.ThrowIfNull(groups);
@@ -51,7 +54,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="predicate">re</param>
-        /// <returns><see langword="true"/> if <paramref name="items"/> does not contain any element that fullfills <paramref name="predicate"/> and <see langword="false"/> otherwise.</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> does not contain any element that fulfills <paramref name="predicate"/> and <see langword="false"/> otherwise.</returns>
         public static bool None<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
 #if NET
@@ -87,7 +90,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="predicate">re</param>
-        /// <returns><see langword="true"/> if <paramref name="items"/> contains exactly one element that fullfills <paramref name="predicate"/></returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains exactly one element that fulfills <paramref name="predicate"/></returns>
         public static bool Once<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
 #if NET
@@ -115,7 +118,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="predicate">predicate to use</param>
-        /// <returns><see langword="true"/> if <paramref name="items"/> contains one or more one element that fullfills <paramref name="predicate"/></returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains one or more one element that fulfills <paramref name="predicate"/></returns>
         public static bool AtLeastOnce<T>(this IEnumerable<T> items, Expression<Func<T, bool>> predicate)
         {
 #if NET
@@ -136,6 +139,7 @@ namespace System.Collections.Generic
 
             return items
                 .AsParallel()
+                .AsValueEnumerable()
                 .Any(predicate.Compile());
         }
 
@@ -154,7 +158,7 @@ namespace System.Collections.Generic
         /// <typeparam name="T">Type of the </typeparam>
         /// <param name="items">Collection to test</param>
         /// <param name="count"></param>
-        /// <returns><see langword="true"/> if <paramref name="items"/> contains <paramref name="count"/> or more one elements.</returns>
+        /// <returns><see langword="true"/> if <paramref name="items"/> contains <paramref name="count"/> or more elements.</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="items"/>  <see langword="null"/></exception>
         public static bool AtLeast<T>(this IEnumerable<T> items, int count) => AtLeast(items, True<T>(), count);
 
@@ -199,9 +203,10 @@ namespace System.Collections.Generic
 #endif
 
             return count == 0
-                ? !source.Any()
+                ? !source.AsValueEnumerable().Any()
                 : source
                     .AsParallel()
+                    .AsValueEnumerable()
                     .Where(predicate.Compile()).Skip(count - 1).Any();
         }
 
@@ -241,9 +246,9 @@ namespace System.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value");
             }
 #endif
-            return count == default
-                ? !items.AsParallel().Any(predicate.Compile())
-                : items.AsParallel().Count(predicate.Compile()) == count;
+            return count == 0
+                ? !items.AsParallel().AsValueEnumerable().Any(predicate.Compile())
+                : items.AsParallel().AsValueEnumerable().Count(predicate.Compile()) == count;
         }
 
         /// <summary>
@@ -275,18 +280,18 @@ namespace System.Collections.Generic
             }
 #endif
 
-            return count == default
-                ? !items.Any()
+            return count == 0
+                ? !items.AsValueEnumerable().Any()
 #if NET6_0_OR_GREATER
                 : items.TryGetNonEnumeratedCount(out int currentCount) ? currentCount == count
 #endif
-                : items.Count() == count;
+                : items.AsValueEnumerable().Count() == count;
         }
 
         /// <summary>
         /// Checks if there are <paramref name="count"/> elements at most that match <paramref name="predicate"/>.
         /// </summary>
-        /// <typeparam name="T">Type of the elements of the collection to test</typeparam>
+        /// <typeparam name="T">Type of the items in the collection to test</typeparam>
         /// <param name="items"></param>
         /// <param name="predicate">Filter that <paramref name="count"/> elements should match.</param>
         /// <param name="count">Number of elements that match <paramref name="predicate"/></param>
@@ -319,7 +324,28 @@ namespace System.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(count), $"{count} is not a valid value.");
             }
 #endif
-            return (count == 0 && !items.Any()) || items.Count(predicate.Compile()) <= count;
+
+            bool conditionSatisfied;
+
+            switch (count)
+            {
+                case 0:
+                    conditionSatisfied = !items.Any();
+                    break;
+                default:
+
+#if !NET
+                    conditionSatisfied = items.Count(predicate.Compile()) <= count;
+#else
+                    conditionSatisfied = items.TryGetNonEnumeratedCount(out int currentCount)
+                            ? currentCount <= count
+                            : items.AsValueEnumerable().Count(predicate.Compile()) <= count;
+#endif
+
+                    break;
+            }
+
+            return conditionSatisfied;
         }
 
         /// <summary>
@@ -334,18 +360,19 @@ namespace System.Collections.Generic
         public static bool AtMost<T>(this IEnumerable<T> items, int count) => AtMost(items, True<T>(), count);
 
         /// <summary>
-        /// Performs a cartesian product beetwen <paramref name="first"/> and <paramref name="second"/>.
+        /// Performs a cartesian product between <paramref name="first"/> and <paramref name="second"/>.
         /// </summary>
         /// <typeparam name="TFirst">Type of element in <paramref name="first"/> collection.</typeparam>
         /// <typeparam name="TSecond">Type of element in <paramref name="second"/> collection.</typeparam>
         /// <param name="first">the first collection of the cross join</param>
         /// <param name="second">the second collection</param>
         /// <returns></returns>
-        public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second)
+        public static IEnumerable<(TFirst, TSecond)> CrossJoin<TFirst, TSecond>(this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second)
             => CrossJoin(first, second, (t1, t2) => (t1, t2));
 
         /// <summary>
-        /// Performs a cartesian product beetwen <paramref name="first"/> and <paramref name="second"/>.
+        /// Performs a cartesian product between <paramref name="first"/> and <paramref name="second"/>.
         /// </summary>
         /// <typeparam name="TFirst">Type of element in <paramref name="first"/> collection.</typeparam>
         /// <typeparam name="TSecond">Type of element in <paramref name="second"/> collection.</typeparam>
@@ -354,13 +381,12 @@ namespace System.Collections.Generic
         /// <param name="second">the second collection</param>
         /// <param name="selector">projection to perform on each</param>
         /// <returns></returns>
-        public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> selector)
-#pragma warning disable RCS1163 // Unused parameter.
-            => first?.SelectMany(t1 => second, selector);
-#pragma warning restore RCS1163 // Unused parameter.
+        public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> selector)
+            => first?.SelectMany(_ => second, selector);
 
         /// <summary>
-        /// Performs a cartesian product beetwen <paramref name="first"/> and <paramref name="second"/>.
+        /// Performs a cartesian product between <paramref name="first"/> and <paramref name="second"/>.
         /// </summary>
         /// <typeparam name="TFirst">Type of element in <paramref name="first"/> collection.</typeparam>
         /// <typeparam name="TSecond">Type of element in <paramref name="second"/> collection.</typeparam>
@@ -369,7 +395,8 @@ namespace System.Collections.Generic
         /// <param name="second">the second collection</param>
         /// <param name="third">the third collection</param>
         /// <returns>The cartesian product of <paramref name="first"/>.<paramref name="second"/>.<paramref name="third"/>></returns>
-        public static IEnumerable<(TFirst, TSecond, TThird)> CrossJoin<TFirst, TSecond, TThird>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third)
+        public static IEnumerable<(TFirst, TSecond, TThird)> CrossJoin<TFirst, TSecond, TThird>(
+            this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third)
             => CrossJoin(first, second, third, (x, y, z) => (x, y, z));
 
         /// <summary>
@@ -384,7 +411,8 @@ namespace System.Collections.Generic
         /// <param name="third">the third collection</param>
         /// <param name="selector">projection to perform</param>
         /// <returns></returns>
-        public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TThird, TResult>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second, IEnumerable<TThird> third, Func<TFirst, TSecond, TThird, TResult> selector) =>
+        public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TThird, TResult>(this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second, IEnumerable<TThird> third, Func<TFirst, TSecond, TThird, TResult> selector) =>
 #pragma warning disable RCS1163 // Unused parameter.
             first.SelectMany(x => second.SelectMany(_ => third, (y, z) => selector(x, y, z)));
 #pragma warning restore RCS1163 // Unused parameter.
@@ -396,7 +424,7 @@ namespace System.Collections.Generic
         /// <param name="source">
         /// </param>
         /// <param name="body">
-        ///     code to be execute the <paramref name="body"/> action on each item of the <paramref name="source" />
+        ///     instructions to be executed on each item of the <paramref name="source" />.
         /// </param>
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> body)
         {
@@ -414,7 +442,7 @@ namespace System.Collections.Generic
         /// <param name="source">
         /// </param>
         /// <param name="body">
-        ///     code to be execute the <paramref name="body"/> action on each item of the <paramref name="source" />
+        ///     instructions to be executed on each item of the <paramref name="source" />.
         /// </param>
         public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> body)
         {
@@ -467,7 +495,8 @@ namespace System.Collections.Generic
 
             if (bucketSize < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(bucketSize), bucketSize, "Bucket size must be greater than 0");
+                throw new ArgumentOutOfRangeException(nameof(bucketSize), bucketSize,
+                    "Bucket size must be greater than 0");
             }
 #endif
             return PartitionInternal();
@@ -503,20 +532,24 @@ namespace System.Collections.Generic
         /// <returns>
         /// A tuple that contains two <see cref="IEnumerable{T}"/> parts :
         /// <list type="bullet">
-        /// <item><c>Truthy</c> : that contains all items from <paramref name="source"/> that satifies <paramref name="predicate"/>.</item>
-        /// <item><c>Falsy</c> : that contains all items from <paramref name="source"/> that do not satifies <paramref name="predicate"/>.</item>
+        /// <item><c>Truthy</c> : that contains all items from <paramref name="source"/> that satisfies <paramref name="predicate"/>.</item>
+        /// <item><c>Falsy</c> : that contains all items from <paramref name="source"/> that do not satisfy <paramref name="predicate"/>.</item>
         /// </list>
         /// </returns>
         /// <exception cref="ArgumentNullException">if either <paramref name="source"/> or <paramref name="predicate"/>is
         /// <see langword="null"/>.</exception>
-        public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source, Func<T, bool> predicate)
-            => (source.Where(predicate), source.Where(val => !predicate(val)));
+        public static (IEnumerable<T> Thruthy, IEnumerable<T> Falsy) SortBy<T>(this IEnumerable<T> source,
+            Func<T, bool> predicate)
+        {
+            ValueEnumerable<FromEnumerable<T>, T> localSource = source.AsValueEnumerable();
+            return ([.. localSource.Where(predicate)], [ .. localSource.Where(val => !predicate(val))]);
+        }
 
         /// <summary>
         /// Asynchronously iterates over each element of <paramref name="source"/> and applies the specified <paramref name="body"/> function.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="degreeOfParallelism"/> is not provided, this method will relies on the value returned by <see cref="Environment.ProcessorCount"/>
+        /// If <paramref name="degreeOfParallelism"/> is not provided, this method will rely on the value returned by <see cref="Environment.ProcessorCount"/>
         /// in order to run <paramref name="body"/> in a concurrent manner.
         /// </remarks>
         /// <typeparam name="T">The type of elements <paramref name="source"/> contains</typeparam>
@@ -526,7 +559,8 @@ namespace System.Collections.Generic
         /// <returns>A <see cref="Task"/> that will be completed as soon as <paramref name="source"/> was fully iterated</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="degreeOfParallelism"/> is negative or <c>0</c></exception>
         /// <exception cref="ArgumentNullException">either <paramref name="source"/> or <paramref name="body"/> is <see langword="null"/></exception>
-        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body, int? degreeOfParallelism = null)
+        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body,
+            int? degreeOfParallelism = null)
         {
             return Task.WhenAll(
                 from partition in Partitioner.Create(source)

@@ -4,7 +4,7 @@ tab_width = 4
 indent_size = 4
 indent_style = space
 
-[{*.xml,*.yaml,*.yml}]
+[{*.xml,*.yaml,*.yml,*.csproj,*.json}]
 indent_size = 2
 
 

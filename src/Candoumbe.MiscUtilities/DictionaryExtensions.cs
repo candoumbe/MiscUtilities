@@ -2,6 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using System.Text;
+#if NET8_0_OR_GREATER
+using System.Runtime.InteropServices;
+#endif
 
 namespace System.Collections.Generic
 {
@@ -15,8 +18,8 @@ namespace System.Collections.Generic
         /// <summary>
         /// List of all types that can be directly converted to their string representation
         /// </summary>
-        public static readonly IEnumerable<Type> PrimitiveTypes = new[]
-        {
+        public static readonly IEnumerable<Type> PrimitiveTypes =
+        [
             typeof(string),
 
             typeof(int), typeof(int?),
@@ -33,26 +36,14 @@ namespace System.Collections.Generic
 #endif
             typeof(Guid), typeof(Guid?),
             typeof(bool), typeof(bool?)
-        };
-
-        /// <summary>
-        /// Numeric types.
-        /// </summary>
-        public static readonly IEnumerable<Type> NumericTypes = new[]
-        {
-            typeof(int), typeof(int?),
-            typeof(long), typeof(long?),
-            typeof(short), typeof(short?),
-            typeof(decimal), typeof(decimal?),
-            typeof(float), typeof(float?),
-        };
+        ];
 
         /// <summary>
         /// Converts a collection of key/value pairs to a "URL" friendly representation.
         /// </summary>
         /// <param name="keyValues">the dictionary to convert</param>
         /// <param name="transform">A delegate that can be used to customize the value associated with a field name.</param>
-        /// <returns></returns>
+        /// <returns>a string that can be directly and safely appended to a query string either after a <c>?</c> or <c>&amp;</c> character.</returns>
         public static string ToQueryString(this IEnumerable<KeyValuePair<string, object>> keyValues, Func<string, object, object> transform)
         {
             StringBuilder sb = new();
@@ -60,8 +51,8 @@ namespace System.Collections.Generic
             IEnumerable<KeyValuePair<string, object>> localKeyValues = keyValues is null
                 ? []
                 : keyValues.Where(kv => kv.Value != null)
-                           .OrderBy(kv => kv.Key)
-                           .ThenBy(kv => kv.Value);
+                    .OrderBy(kv => kv.Key)
+                    .ThenBy(kv => kv.Value);
 
             foreach (KeyValuePair<string, object> kv in localKeyValues)
             {
@@ -83,19 +74,20 @@ namespace System.Collections.Generic
                         }
 
                         sb.Append(Uri.EscapeDataString(key))
-                          .Append('=')
-                          .Append(ConvertValueToString(value));
+                            .Append('=')
+                            .Append(ConvertValueToString(value));
                     }
                     else if (value is IEnumerable<KeyValuePair<string, object>> subDictionary)
                     {
                         subDictionary = subDictionary
-                                    .AsParallel()
-                                    .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
+                            .AsParallel()
+                            .ToDictionary(x => $"{key}[{x.Key}]", x => x.Value);
 
                         if (sb.Length > 0)
                         {
                             sb.Append(Ampersand);
                         }
+
                         sb.Append(ToQueryString(subDictionary, transform));
                     }
                     else if (value is IEnumerable enumerable)
@@ -117,8 +109,8 @@ namespace System.Collections.Generic
                                     }
 
                                     sb.Append(Uri.EscapeDataString($"{key}[{itemPosition}]"))
-                                       .Append('=')
-                                       .Append(ConvertValueToString(item));
+                                        .Append('=')
+                                        .Append(ConvertValueToString(item));
 
                                     itemPosition++;
                                 }
@@ -136,8 +128,8 @@ namespace System.Collections.Generic
                             }
 
                             sb.Append(Uri.EscapeDataString(key))
-                              .Append('=')
-                              .Append(tc.ConvertTo(value, typeof(string)));
+                                .Append('=')
+                                .Append(tc.ConvertTo(value, typeof(string)));
                         }
                     }
                 }
@@ -156,12 +148,42 @@ namespace System.Collections.Generic
                     (_, _, _, > 0) => time.ToString("hh:mm:ss.fffffff"),
                     _ => time.ToString("hh:mm:ss"),
                 },
-                DateOnly date => date.ToString("yyyy-MM-dd"),
+                DateOnly date => date.ToString("O"),
 #endif
                 int intValue => Convert.ToString(intValue),
                 long longValue => Convert.ToString(longValue),
                 _ => Uri.EscapeDataString(value.ToString())
             };
         }
+
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Retrieves the value associated with the specified key from the dictionary.
+    /// If the key does not exist, adds the key with the specified default value
+    /// and returns the default value.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    /// <param name="dictionary">The dictionary to search for the key.</param>
+    /// <param name="key">The key to locate in the dictionary.</param>
+    /// <param name="defaultValue">The value to add if the key does not exist.</param>
+    /// <returns>The value associated with the specified key, or the default value if the key does not exist.</returns>
+    public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
+    {
+        TValue value = defaultValue;
+
+        ref TValue val = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        if (!exists)
+        {
+            val = defaultValue;
+        }
+        else
+        {
+            value = val;
+        }
+
+        return value;
+    }
+#endif
     }
 }
