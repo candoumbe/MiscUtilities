@@ -1,13 +1,11 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-
-using System;
 using System.Collections.Generic;
 using ZLinq;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.Primitives;
+namespace System;
 /// <summary>
 /// Provides extension methods for ReadOnlyMemory&lt;char&gt; type to perform string operations like finding occurrences,
 /// checking start patterns, and searching for substrings. Includes methods for finding first/last occurrences
