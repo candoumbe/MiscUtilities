@@ -164,10 +164,11 @@ public class Build : EnhancedNukeBuild,
     /// <summary>
     /// Projects that contain architectural tests.
     /// </summary>
-    public IEnumerable<Project> ArchitecturalTestsProjects =>  Solution.GetAllProjects("*.ArchitecturalTests");
+    private IEnumerable<Project> ArchitecturalTestsProjects =>  Solution.GetAllProjects("*.ArchitecturalTests");
 
     public Target ArchitecturalTests => _ => _
                                             .TryTriggeredBy<IUnitTest>()
+                                            .TryBefore<IMutationTest>()
                                             .Description("Runs all architectural tests")
                                             .Executes(() =>
                                                       {
@@ -175,7 +176,8 @@ public class Build : EnhancedNukeBuild,
                                                                          .SetConfiguration(Configuration.Debug)
                                                                          .CombineWith(ArchitecturalTestsProjects,
                                                                                       (cs, project) => cs.SetProjectFile(project)
-                                                                                          .CombineWith(project.GetTargetFrameworks(), (setting, frmk) => setting.SetFramework(frmk))));
+                                                                                          .CombineWith(project.GetTargetFrameworks(),
+                                                                                                       (setting, framework) => setting.SetFramework(framework))));
                                                       });
 
     ///<inheritdoc/>
