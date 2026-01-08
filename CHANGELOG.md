@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### 🚀 New features
+- Added [`CultureSwitcher`](./src/Candoumbe.MiscUtilities/CultureSwitcher.cs)
+
+### 🧹 Housekeeping
+- Replaced `Xunit.Categories` with `Xunit.OpenCategories.V3` and tidied imports.
+- Enabled central package management.
+- Added `Chore` target to build and updated dependencies.
 
 ## [0.15.0] / 2025-08-10
 ### 🚀 New features
