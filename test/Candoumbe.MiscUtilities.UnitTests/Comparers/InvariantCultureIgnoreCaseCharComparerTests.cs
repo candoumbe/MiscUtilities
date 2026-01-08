@@ -37,7 +37,7 @@ public class InvariantCultureIgnoreCaseCharComparerTests(ITestOutputHelper outpu
     public void Given_two_characters_When_they_are_equal_Then_comparing_should_be_true(char x, char y, CultureInfo cultureInfo)
     {
         // Arrange
-        using CultureSwitcher cultureSwitcher = new();
+        CultureSwitcher cultureSwitcher = new();
         bool actual = false;
         bool expected = char.ToLowerInvariant(x).Equals(char.ToLowerInvariant(y));
 
