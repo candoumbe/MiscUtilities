@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using AutoFixture.Xunit2;
+using AutoFixture.Xunit3;
 using Bogus;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 using static System.Linq.Expressions.ExpressionExtensions;
 using static Newtonsoft.Json.JsonConvert;
 

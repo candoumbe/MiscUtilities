@@ -14,8 +14,7 @@ using FluentAssertions.Json;
 using FsCheck.Xunit;
 using Newtonsoft.Json.Linq;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 using static Newtonsoft.Json.JsonConvert;
 
 namespace Candoumbe.MiscUtilities.UnitTests;

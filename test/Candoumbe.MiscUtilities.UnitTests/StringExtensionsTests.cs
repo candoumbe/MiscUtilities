@@ -12,8 +12,7 @@ using FsCheck.Fluent;
 using FsCheck.Xunit;
 using Microsoft.Extensions.Primitives;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
 
@@ -61,7 +60,7 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
         _outputHelper.WriteLine($"Input : {input}");
         _outputHelper.WriteLine($"expected : {expectedString}");
 
-        using CultureSwitcher cultureSwitcher = new();
+        CultureSwitcher cultureSwitcher = new();
 
         cultureSwitcher.Run(cultureName, () =>
         {
@@ -245,7 +244,7 @@ public class StringExtensionsTests(ITestOutputHelper outputHelper)
     public void Slugify(string culture, string input, string expectedOutput)
     {
         _outputHelper.WriteLine($"input : '{input}'");
-        using CultureSwitcher cultureSwitcher = new();
+        CultureSwitcher cultureSwitcher = new();
 
         cultureSwitcher.Run(culture, () =>
         {

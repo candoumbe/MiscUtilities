@@ -6,7 +6,7 @@ using Candoumbe.MiscUtilities.UnitTests.Generators;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
 

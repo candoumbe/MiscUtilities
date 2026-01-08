@@ -2,10 +2,12 @@ using System.Globalization;
 using Candoumbe.MiscUtilities.Comparers;
 using FluentAssertions;
 using FsCheck.Xunit;
-using Xunit.Abstractions;
+using Xunit;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests.Comparers;
 
+[UnitTest]
 public class InvariantCultureIgnoreCaseCharComparerTests(ITestOutputHelper outputHelper)
 {
     private readonly InvariantCultureIgnoreCaseCharComparer _sut = new();

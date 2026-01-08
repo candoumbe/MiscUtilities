@@ -4,13 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FsCheck.Xunit;
-using Xunit.Abstractions;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
 
 [UnitTest]
-public class CultureSwitcherShould(ITestOutputHelper outputHelper)
+public class CultureSwitcherShould
 {
     [Property]
     public void Change_the_culture_inside_the_action(CultureInfo cultureInfo)

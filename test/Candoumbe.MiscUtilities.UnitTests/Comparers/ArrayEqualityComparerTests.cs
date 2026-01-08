@@ -5,8 +5,7 @@ using System;
 using Candoumbe.MiscUtilities.Comparers;
 using FluentAssertions;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests.Comparers;
 

@@ -30,7 +30,7 @@ public sealed class CultureSwitcher
     public CultureSwitcher() => _currentCulture = CultureInfo.CurrentCulture;
 
     /// <summary>
-    /// Performs the specified <see cref="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
+    /// Performs the specified <paramref name="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
     /// to the specified <paramref name="newCultureName"/>.
     /// </summary>
     /// <param name="newCultureName">Name of the culture under which </param>
@@ -45,7 +45,7 @@ public sealed class CultureSwitcher
     public async Task RunAsync(string newCultureName, Action<CancellationToken> action, CancellationToken cancellationToken = default) => await RunAsync(CultureInfo.CreateSpecificCulture(newCultureName), action, cancellationToken);
 
    /// <summary>
-    /// Performs the specified <see cref="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
+    /// Performs the specified <paramref name="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
     /// to the specified <paramref name="newCultureName"/>.
     /// </summary>
     /// <param name="newCultureName">Name of the culture under which </param>
@@ -59,7 +59,7 @@ public sealed class CultureSwitcher
     public void Run(string newCultureName, Action action) => Run(CultureInfo.CreateSpecificCulture(newCultureName), action);
 
     /// <summary>
-    /// Performs the specified <see cref="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
+    /// Performs the specified <paramref name="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
     /// to the specified <paramref name="culture"/>.
     /// </summary>
     /// <param name="culture">Culture to use when running <paramref name="action"/>.</param>
@@ -85,7 +85,7 @@ public sealed class CultureSwitcher
     }
 
     /// <summary>
-    /// Performs the specified <see cref="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
+    /// Performs the specified <paramref name="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
     /// to the specified <paramref name="culture"/>.
     /// </summary>
     /// <param name="culture">Culture to use when running <paramref name="action"/>.</param>
