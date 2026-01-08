@@ -2,7 +2,7 @@
 using FsCheck;
 using FsCheck.Fluent;
 using FsCheck.Xunit;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
 

@@ -7,7 +7,7 @@ using ArchUnitNET.Fluent;
 using ArchUnitNET.Fluent.Conditions;
 using ArchUnitNET.Loader;
 using ArchUnitNET.xUnitV3;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 using Assembly = System.Reflection.Assembly;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
 

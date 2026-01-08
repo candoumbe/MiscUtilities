@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
 

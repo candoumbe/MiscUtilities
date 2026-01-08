@@ -1,0 +1,30 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="AutoFixture.Xunit3" Version="4.19.0" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="Bogus" Version="35.6.5" />
+    <PackageVersion Include="Candoumbe.Pipelines" Version="1.2.1" />
+    <PackageVersion Include="coverlet.msbuild" Version="6.0.4" />
+    <PackageVersion Include="FakeItEasy" Version="8.3.0" />
+    <PackageVersion Include="FluentAssertions" Version="7.2.0" />
+    <PackageVersion Include="FluentAssertions.Json" Version="6.1.0" />
+    <PackageVersion Include="FsCheck.Xunit.v3" Version="3.3.2" />
+    <PackageVersion Include="Microsoft.Extensions.Primitives" Version="9.0.11" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="ReportGenerator" Version="5.3.11" />
+    <PackageVersion Include="Roslynator.Analyzers" Version="4.15.0" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.11" />
+    <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.1" />
+    <PackageVersion Include="Xunit.OpenCategories.V3" Version="2.4.0.18" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+    <PackageVersion Include="Zlinq" Version="1.5.4" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsTestProject)' == 'false'">
+    <PackageVersion Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
+</Project>

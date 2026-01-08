@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\core.props"/>
+  <Import Project="..\..\core.props" />
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0</TargetFrameworks>
     <Description>Usefull extension methods for collections/string/dictionary manipulation</Description>
@@ -17,9 +17,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="9.0.11"/>
-    <PackageReference Include="Zlinq" Version="1.5.4"/>
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.11"/>
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="Zlinq" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" />
   </ItemGroup>
 
 </Project>

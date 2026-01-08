@@ -1,12 +1,12 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-using ZLinq;
-using ZLinq.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
+using ZLinq;
+using ZLinq.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.Primitives;
@@ -204,7 +204,7 @@ public static class StringSegmentExtensions
         /// <returns><see langword="true"/> when <paramref name="input"/> is like the specified <paramref name="pattern"/> and <see langword="false"/>
         /// otherwise.
         /// </returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
+        /// <exception cref="System.ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         public static bool Like(this StringSegment input, string pattern, bool ignoreCase) => input.Value.Like(pattern, ignoreCase);
 
         /// <summary>
@@ -213,7 +213,7 @@ public static class StringSegmentExtensions
         /// <param name="input">the <see cref="StringSegment"/> to test</param>
         /// <param name="pattern">the pattern to test <paramref name="input"/> against</param>
         /// <returns><see langword="true"/> if input is like <paramref name="pattern"/> and <see langword="false"/> otherwise.</returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
+        /// <exception cref="System.ArgumentNullException">if <paramref name="input"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         public static bool Like(this StringSegment input, string pattern) => input.Like(pattern, ignoreCase: true);
 
         /// <summary>
@@ -222,7 +222,7 @@ public static class StringSegmentExtensions
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
         /// <returns><see cref="LambdaExpression"/></returns>
-        /// <exception cref="ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
+        /// <exception cref="System.ArgumentNullException">if <paramref name="source"/> is <see langword="null"/>.</exception>
         public static LambdaExpression ToLambda<TSource>(this StringSegment source) => source.Value.ToLambda<TSource>();
 
         /// <summary>
@@ -232,12 +232,14 @@ public static class StringSegmentExtensions
         /// <param name="cultureInfo">The <see cref="CultureInfo"/> to use when performing the casing conversion</param>
         /// <returns>the string converted to Title case</returns>
         /// <example>
-        /// <c>"cyrille-alexandre".ToTitleCase(); // "Cyrille-Alexandre" </c>
+        /// <code>"cyrille-alexandre".ToTitleCase(); // "Cyrille-Alexandre" </code>
         /// </example>
         public static string ToTitleCase(this StringSegment input, CultureInfo cultureInfo = null)
         {
             TextInfo textInfo = cultureInfo?.TextInfo ?? CultureInfo.CurrentCulture.TextInfo;
-            return textInfo.ToTitleCase(input.Value);
+            return input.HasValue
+                ? textInfo.ToTitleCase(input.Value!)
+                : null;
         }
 
 

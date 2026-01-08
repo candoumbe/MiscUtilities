@@ -8,8 +8,7 @@ using FluentAssertions;
 using FluentAssertions.Extensions;
 using FsCheck.Xunit;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Categories;
+using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
 
