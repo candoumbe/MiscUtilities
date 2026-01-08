@@ -34,7 +34,7 @@ namespace Utilities.ContinuousIntegration;
     CacheKeyFiles = ["global.json", "src/**/*.csproj"],
     ImportSecrets =
     [
-        nameof(NugetApiKey),
+        nameof(IPushNugetPackages.NuGetApiKey),
         nameof(IReportCoverage.CodecovToken)
     ],
     OnPullRequestExcludePaths =
@@ -64,7 +64,7 @@ namespace Utilities.ContinuousIntegration;
     ],
     ImportSecrets =
     [
-        nameof(NugetApiKey),
+        nameof(IPushNugetPackages.NuGetApiKey),
         nameof(IReportCoverage.CodecovToken),
         nameof(IMutationTest.StrykerDashboardApiKey)
     ],
@@ -88,7 +88,7 @@ namespace Utilities.ContinuousIntegration;
     PublishArtifacts = true,
     ImportSecrets =
     [
-        nameof(NugetApiKey),
+        nameof(IPushNugetPackages.NuGetApiKey),
         nameof(IReportCoverage.CodecovToken)
     ],
     OnPullRequestExcludePaths =
@@ -130,12 +130,6 @@ public class Build : EnhancedNukeBuild,
     ///<inheritdoc/>
     Solution IHaveSolution.Solution => Solution;
 
-    /// <summary>
-    /// Token to interact with Nuget's API
-    /// </summary>
-    [Parameter("Token to interact with Nuget's API")]
-    [Secret]
-    public readonly string NugetApiKey;
 
     [CI] public readonly GitHubActions GitHubActions;
 
@@ -205,9 +199,9 @@ public class Build : EnhancedNukeBuild,
     IEnumerable<PushNugetPackageConfiguration> IPushNugetPackages.PublishConfigurations =>
     [
         new NugetPushConfiguration(
-            apiKey: NugetApiKey,
+            apiKey: this.As<IPushNugetPackages>()?.NuGetApiKey,
             source: new Uri("https://api.nuget.org/v3/index.json"),
-            canBeUsed: () => NugetApiKey is not null
+            canBeUsed: () => this.As<IPushNugetPackages>()?.NuGetApiKey is not null
         ),
         new GitHubPushNugetConfiguration(
             githubToken: this.Get<ICreateGithubRelease>()?.GitHubToken,
