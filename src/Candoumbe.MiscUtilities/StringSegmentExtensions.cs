@@ -237,7 +237,9 @@ public static class StringSegmentExtensions
         public static string ToTitleCase(this StringSegment input, CultureInfo cultureInfo = null)
         {
             TextInfo textInfo = cultureInfo?.TextInfo ?? CultureInfo.CurrentCulture.TextInfo;
-            return textInfo.ToTitleCase(input.Value);
+            return input.HasValue
+                ? textInfo.ToTitleCase(input.Value!)
+                : null;
         }
 
 

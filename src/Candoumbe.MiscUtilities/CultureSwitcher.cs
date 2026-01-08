@@ -65,7 +65,9 @@ public sealed class CultureSwitcher
     /// <param name="culture">Culture to use when running <paramref name="action"/>.</param>
     /// <param name="action">The action that will be performed under the specified <paramref name="culture"/></param>
     /// <param name="cancellationToken"></param>
-    public async Task RunAsync(CultureInfo culture, Action<CancellationToken> action, CancellationToken cancellationToken = default)
+    public async Task RunAsync(CultureInfo culture,
+                               Action<CancellationToken> action,
+                               CancellationToken cancellationToken = default)
     {
         await Task.Factory.StartNew(() =>
         {
@@ -74,7 +76,6 @@ public sealed class CultureSwitcher
                 Thread.CurrentThread.CurrentCulture = culture;
                 Thread.CurrentThread.CurrentUICulture = culture;
                 action.Invoke(cancellationToken);
-
             }
             finally
             {
@@ -90,6 +91,30 @@ public sealed class CultureSwitcher
     /// </summary>
     /// <param name="culture">Culture to use when running <paramref name="action"/>.</param>
     /// <param name="action">The action that will be performed under the specified <paramref name="culture"/></param>
+    /// <param name="cancellationToken"></param>
+    public async Task RunAsync(CultureInfo culture,
+                               Func<CancellationToken, Task> action,
+                               CancellationToken cancellationToken = default)
+    {
+        try
+        {
+          Thread.CurrentThread.CurrentCulture = culture;
+          Thread.CurrentThread.CurrentUICulture = culture;
+          await action.Invoke(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+          CultureInfo.CurrentCulture = _currentCulture;
+          CultureInfo.CurrentUICulture = _currentCulture;
+        }
+    }
+
+    /// <summary>
+    /// Performs the specified <paramref name="action"/> <strong>AFTER</strong> switching <see cref="CultureInfo.CurrentCulture"/>
+    /// to the specified <paramref name="culture"/>.
+    /// </summary>
+    /// <param name="culture">Culture to use when running <paramref name="action"/>.</param>
+    /// <param name="action">The action that will be performed under the specified <paramref name="culture"/></param>
     public void Run(CultureInfo culture, Action action)
     {
         try
@@ -97,7 +122,6 @@ public sealed class CultureSwitcher
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
             action.Invoke();
-
         }
         finally
         {

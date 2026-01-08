@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FsCheck.Xunit;
+using Xunit;
 using Xunit.OpenCategories.V3;
 
 namespace Candoumbe.MiscUtilities.UnitTests;
@@ -33,6 +34,27 @@ public class CultureSwitcherShould
     }
 
     [Property]
+    public async Task Change_the_culture_inside_the_task(CultureInfo cultureInfo)
+    {
+        // Arrange
+        string cultureInsideAction = null;
+        string cultureUiInsideAction = null;
+
+        CultureSwitcher cultureSwitcher = new();
+
+        // Act
+        await cultureSwitcher.RunAsync(cultureInfo, _ => Task.Run(() =>
+        {
+            cultureInsideAction = Thread.CurrentThread.CurrentCulture.Name;
+            cultureUiInsideAction = Thread.CurrentThread.CurrentUICulture.Name;
+
+            // Assert
+            cultureInsideAction.Should().Be(cultureInfo.Name, """the culture inside the action was changed to the culture specified when calling "Run" method""");
+            cultureUiInsideAction.Should().Be(cultureInfo.Name, """the culture UI inside the action was changed to the culture specified when calling "Run" method""");
+        }, TestContext.Current.CancellationToken));
+    }
+
+    [Property]
     public void Run_action_on_the_same_thread_as_the_calling_thread(CultureInfo cultureInfo)
     {
         // Arrange
@@ -58,14 +80,16 @@ public class CultureSwitcherShould
         CultureSwitcher cultureSwitcher = new();
 
         // Act
-        await cultureSwitcher.RunAsync(cultureInfo, _ => actionThreadId = Environment.CurrentManagedThreadId);
+        await cultureSwitcher.RunAsync(cultureInfo,
+                                       action: _ => actionThreadId = Environment.CurrentManagedThreadId,
+                                       cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         actionThreadId.Should().NotBe(currentThreadId, "the action is executed on a different thread than the caller's thread");
     }
 
     [Property]
-    public async Task BubbleException_to_the_caller(CultureInfo cultureInfo)
+    public async Task Bubble_exception_to_the_caller(CultureInfo cultureInfo)
     {
         // Arrange
         CultureSwitcher cultureSwitcher = new();
