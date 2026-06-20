@@ -8,8 +8,9 @@ namespace Candoumbe.MiscUtilities.PerformanceTests;
 
 [MemoryDiagnoser]
 [RPlotExporter]
-[SimpleJob(RuntimeMoniker.Net90)]
 [SimpleJob(RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net90)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
 public class OcurrencesTests
 {
 
@@ -26,14 +27,13 @@ public class OcurrencesTests
     }
 
     [Benchmark()]
-    public int[] Occurrences_extension() => Text.Occurrences(Search).ToArray();
+    public int[] Occurrences_extension() => [.. Text.Occurrences(Search)];
 
     [Benchmark(Baseline = true)]
     public int[] Occurences_with_Linq()
     {
-        return Text.Split(" ")
+        return [.. Text.Split(" ")
                    .Where(word => word == Search)
-                   .Select((_, pos) => pos)
-                   .ToArray();
+                   .Select((_, pos) => pos)];
     }
 }
