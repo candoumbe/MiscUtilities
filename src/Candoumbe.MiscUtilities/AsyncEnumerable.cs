@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace System.Collections.Generic
 {
     /// <summary>
@@ -20,10 +21,13 @@ namespace System.Collections.Generic
         {
             public static readonly EmptyAsyncEnumerator<T> Instance = new();
 
+            /// <inheritdoc />
             public T Current => default!;
 
+            /// <inheritdoc />
             public ValueTask DisposeAsync() => default;
 
+            /// <inheritdoc />
             public ValueTask<bool> MoveNextAsync() => new(false);
         }
 

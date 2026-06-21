@@ -1,18 +1,14 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-#if NET8_0_OR_GREATER
-using System.Linq;
-#endif
-
-namespace Microsoft.Extensions.Primitives;
-
-using System;
 using System.Collections.Generic;
+using ZLinq;
 
+// ReSharper disable once CheckNamespace
+namespace System;
 /// <summary>
 /// Provides extension methods for ReadOnlyMemory&lt;char&gt; type to perform string operations like finding occurrences,
-/// checking start patterns and searching for substrings. Includes methods for finding first/last occurrences
+/// checking start patterns, and searching for substrings. Includes methods for finding first/last occurrences
 /// and all occurrences of characters or character sequences.
 /// </summary>
 /// <remarks>
@@ -45,7 +41,7 @@ public static class ReadOnlyMemoryExtensions
 
         while (i < input.Length)
         {
-            if (comparer?.Equals(input.Span[i], search) is true || Equals(input.Span[i],search))
+            if (comparer?.Equals(input.Span[i], search) is true || Equals(input.Span[i], search))
             {
                 yield return i;
             }
@@ -65,6 +61,7 @@ public static class ReadOnlyMemoryExtensions
     /// </returns>
     /// <exception cref="ArgumentNullException">if <paramref name="predicate"/> is <see langword="null"/>.</exception>
     public static IEnumerable<int> Occurrences<T>(this ReadOnlyMemory<T> input, Func<T, bool> predicate)
+#if !NET9_0_OR_GREATER
     {
         int i = 0;
 
@@ -83,6 +80,17 @@ public static class ReadOnlyMemoryExtensions
             i++;
         }
     }
+#else
+        => input switch
+        {
+            {IsEmpty:true} => [],
+            _ => [.. input.Span.AsValueEnumerable()
+                    .Select((item, index) => (item, index))
+                    .Where(tuple => predicate(tuple.item))
+                    .Select(tuple => tuple.index)
+                ]
+        };
+#endif
 
     /// <summary>
     /// Reports a zero-based index of the last occurrence of <paramref name="search"/> span within <paramref name="source"/> span.
@@ -117,7 +125,7 @@ public static class ReadOnlyMemoryExtensions
             int currentPos = source.LastIndexOf(search, comparer);
             int remainingCharactersInSource = source.Length - currentPos;
 
-            if(remainingCharactersInSource >= search.Length)
+            if (remainingCharactersInSource >= search.Length)
             {
                 int offset = 0;
                 while (!found && currentPos >= 0)
@@ -171,7 +179,7 @@ public static class ReadOnlyMemoryExtensions
             int currentPos = source.IndexOf(search, comparer);
             int remainingCharactersInSource = source.Length - currentPos;
 
-            if(remainingCharactersInSource >= search.Length)
+            if (remainingCharactersInSource >= search.Length)
             {
                 int offset = 0;
                 while (!found && currentPos >= 0)
@@ -204,23 +212,14 @@ public static class ReadOnlyMemoryExtensions
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown when either <paramref name="source"/> or <paramref name="predicate"/> is <see langword="null"/>.</exception>
     public static int FirstOccurrence<T>(this ReadOnlyMemory<T> source, Func<T, bool> predicate)
-#if NET8_0_OR_GREATER
         => source.Occurrences(predicate)
+                 .AsValueEnumerable()
                  .FirstOrDefault(-1);
-    #else
-    {
-            using IEnumerator<int> enumerator = source.Occurrences(predicate).GetEnumerator();
-
-            return enumerator.MoveNext()
-                ? enumerator.Current
-                : -1;
-    }
-#endif
 
     /// <summary>
     /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
     /// </summary>
-    /// <param name="input">The <see cref="StringSegment"/> where searching occurrences will be performed</param>
+    /// <param name="input">The <see cref="ReadOnlyMemory{T}"/> where searching occurrences will be performed</param>
     /// <param name="search">The searched element</param>
     /// <returns>
     /// A collection of all indexes in <paramref name="input"/> where <paramref name="search"/> is present.
@@ -243,7 +242,7 @@ public static class ReadOnlyMemoryExtensions
         int index;
         do
         {
-            index = input.Slice(currentPos).Span.IndexOf(search.Span);
+            index = input[currentPos..].Span.IndexOf(search.Span);
             if (index != -1)
             {
                 yield return index + currentPos;
@@ -269,7 +268,7 @@ public static class ReadOnlyMemoryExtensions
         {
             startsWith = true;
         }
-        else if(search.Length <= input.Length)
+        else if (search.Length <= input.Length)
         {
             int i = 0;
             bool mismatchFound;
@@ -281,7 +280,7 @@ public static class ReadOnlyMemoryExtensions
 
             do
             {
-                mismatchFound =  !predicate.Invoke(input.Span[i], search.Span[i]);
+                mismatchFound = !predicate.Invoke(input.Span[i], search.Span[i]);
                 i++;
             } while (!mismatchFound && i < search.Length);
 
@@ -301,7 +300,7 @@ public static class ReadOnlyMemoryExtensions
         else if (search.Length <= input.Length)
         {
             int i = input.Length - 1;
-            bool firstItemFound = false;
+            bool firstItemFound;
             T firstSearchItem = search.Span[0];
 
             Func<T, T, bool> predicate = comparer switch
@@ -313,7 +312,7 @@ public static class ReadOnlyMemoryExtensions
             do
             {
                 T currentItem = input.Span[i];
-                firstItemFound =  predicate.Invoke(currentItem, firstSearchItem);
+                firstItemFound = predicate.Invoke(currentItem, firstSearchItem);
                 if (!firstItemFound)
                 {
                     i--;
@@ -332,7 +331,7 @@ public static class ReadOnlyMemoryExtensions
 
         return lastIndex;
     }
-    
+
     private static int IndexOf<T>(this ReadOnlyMemory<T> input, ReadOnlyMemory<T> search, IEqualityComparer<T> comparer = null)
     {
         int firstIndex = -1;
@@ -344,7 +343,7 @@ public static class ReadOnlyMemoryExtensions
         else if (search.Length <= input.Length)
         {
             int i = 0;
-            bool firstItemFound = false;
+            bool firstItemFound;
             T firstSearchItem = search.Span[0];
 
             Func<T, T, bool> predicate = comparer switch
@@ -356,7 +355,7 @@ public static class ReadOnlyMemoryExtensions
             do
             {
                 T currentItem = input.Span[i];
-                firstItemFound =  predicate.Invoke(currentItem, firstSearchItem);
+                firstItemFound = predicate.Invoke(currentItem, firstSearchItem);
                 if (!firstItemFound)
                 {
                     i++;

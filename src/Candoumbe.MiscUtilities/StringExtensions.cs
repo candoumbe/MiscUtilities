@@ -1,16 +1,17 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-namespace System;
 
-using Globalization;
-using Microsoft.Extensions.Primitives;
-using Collections.Generic;
-using Linq;
-using Linq.Expressions;
-using Text;
-using Text.RegularExpressions;
-using static Linq.Expressions.Expression;
+using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Text.RegularExpressions;
+using static System.Linq.Expressions.Expression;
+
+// ReSharper disable once CheckNamespace
+namespace System;
 
 /// <summary>
 /// Extension methods for <see langword="string"/> type
@@ -355,13 +356,6 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Removes diacritics from <paramref name="input"/>
-    /// </summary>
-    /// <param name="input">where to remove diacritics</param>
-    /// <returns></returns>
-    public static string RemoveDiacritics(this StringSegment input) => input.Value.RemoveDiacritics();
-
-    /// <summary>
     /// Reports all zero-based indexes of all occurrences of <paramref name="search"/> in the <paramref name="input"/>
     /// </summary>
     /// <param name="input">The <see cref="string"/> onto which searching occurrences will be performed</param>
@@ -427,7 +421,7 @@ public static class StringExtensions
 #endif
 
         int index;
-        if (search.Length == 0)
+        if (search.Length is 0)
         {
             index = 0;
         }

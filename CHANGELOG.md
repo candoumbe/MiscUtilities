@@ -6,8 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.15.0] / 2025-08-10
+### 🚀 New features
+- Use [ZLinq](https://github.com/Cysharp/ZLinq) to improve LinQ performances.
+- Added `GenericEqualityComparer`
+- Added `net9.0` support
+- Added `Dictionary.GetOrAdd` extension method.
+
+### 💥 Breaking changes
+- Extension methods now resides in the same namespace as the type they extend
+
 ### 🧹 Housekeeping
 - Reconfigured Renovate to never auto-approve update with major versions.
+- Added `setup-dotnet` task to install required SDK
+- Added missing code coverage badge
+- Added missing mutation testing code coverage badge
+- Refactored some unit tests
+- Added architectural tests
 
 ## [0.14.0] / 2024-12-03
 ### 🚀 New features
@@ -17,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `ReadOnlyMemoryExtensions.LastOccurrence<T>(ReadOnlyMemory<T> search, IEqualityComparer<T>)` extension method.
 - Added `ReadOnlyMemoryExtensions.Split(ReadOnlySpan<T> search)` extension method.
 
-### 🚨 Breaking changes
+### 💥 Breaking changes
 - Dropped `netstandard1.0`, `netstandard1.1` and `net6.0` support ([#272](https://github.com/candoumbe/MiscUtilities/issues/272))
   - Removed `DateOnlyJsonConverter`, `TimeOnlyJsonConverter`
   - Removed `T[] Enum.GetValues<T>()` extension method
@@ -40,7 +56,7 @@ instead of throwing `ArgumentOutOfRangeException` when both `source` and  `searc
 
 
 ## [0.13.0] / 2024-07-06
-### 🚨 Breaking changes
+### 💥 Breaking changes
 - Dropped `net7.0` support
 
 ### 🚀 New features
@@ -56,7 +72,7 @@ instead of throwing `ArgumentOutOfRangeException` when both `source` and  `searc
 - Removed `Format` step from build pipeline
 
 ## [0.11.0] / 2023-02-01
-### 🚨 Breaking changes
+### 💥 Breaking changes
 - Removed `DateOnlyRange` type
 - Removed `TimeOnlyRange` type
 - Removed `DateTimeRange` type
@@ -142,7 +158,8 @@ instead of throwing `ArgumentOutOfRangeException` when both `source` and  `searc
 - Fixed `ToSnakeCase` to take into account characters like `-`
 - Made [ReplaceVisitor](./src/Candoumbe.MiscUtilities/ReplaceVisitor.cs) public
 
-[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.14.0...HEAD
+[Unreleased]: https://github.com/candoumbe/MiscUtilities/compare/0.15.0...HEAD
+[0.15.0]: https://github.com/candoumbe/MiscUtilities/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/candoumbe/MiscUtilities/compare/0.13.1...0.14.0
 [0.13.1]: https://github.com/candoumbe/MiscUtilities/compare/0.13.0...0.13.1
 [0.13.0]: https://github.com/candoumbe/MiscUtilities/compare/0.11.0...0.13.0

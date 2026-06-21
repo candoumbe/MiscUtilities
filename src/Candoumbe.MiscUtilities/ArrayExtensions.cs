@@ -1,10 +1,10 @@
 ﻿// "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
-namespace System;
+using System.Collections.Generic;
 
-using Collections.Generic;
-using Linq;
+// ReSharper disable once CheckNamespace
+namespace System;
 
 /// <summary>
 /// Sets of extension methods for <see cref="Array"/> type.

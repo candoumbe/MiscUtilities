@@ -22,17 +22,20 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-using static Nuke.Common.Tools.Git.GitTasks;
+using Nuke.Common.Tools.GitHub;
+using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
+
+namespace Utilities.ContinuousIntegration;
 [GitHubActions(
     "integration",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.Ubuntu2204,
     OnPushBranchesIgnore = [IHaveMainBranch.MainBranchName],
     AutoGenerate = false,
     FetchDepth = 0,
     PublishArtifacts = true,
     EnableGitHubToken = true,
-    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPack.Pack)],
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IMutationTest.MutationTests), nameof(IPack.Pack)],
     CacheKeyFiles = ["global.json", "src/**/*.csproj"],
     ImportSecrets =
     [
@@ -48,8 +51,39 @@ using static Nuke.Common.Tools.Git.GitTasks;
     ]
 )]
 [GitHubActions(
+    "nightly",
+    GitHubActionsImage.Ubuntu2204,
+    OnCronSchedule = "0 0 * * *",
+    OnPushBranches = [IHaveDevelopBranch.DevelopBranchName],
+    AutoGenerate = false,
+    FetchDepth = 0,
+    PublishArtifacts = true,
+    EnableGitHubToken = true,
+    InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IMutationTest.MutationTests), nameof(IPack.Pack)],
+    CacheKeyFiles = [
+        "global.json",
+        "src/**/*.csproj",
+        "src/**/*.csproj",
+        "test/**/stryker-config.json",
+        "test/**/xunit.runner.json"
+    ],
+    ImportSecrets =
+    [
+        nameof(NugetApiKey),
+        nameof(IReportCoverage.CodecovToken),
+        nameof(IMutationTest.StrykerDashboardApiKey)
+    ],
+    OnPullRequestExcludePaths =
+    [
+        "docs/*",
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE"
+    ]
+)]
+[GitHubActions(
     "delivery",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.Ubuntu2204,
     AutoGenerate = false,
     OnPushBranches = [IHaveMainBranch.MainBranchName, IGitFlow.ReleaseBranch + "/*"],
     InvokedTargets = [nameof(IUnitTest.UnitTests), nameof(IPushNugetPackages.Publish), nameof(ICreateGithubRelease.AddGithubRelease)],
@@ -83,11 +117,12 @@ public class Build : EnhancedNukeBuild,
     IHaveGitVersion,
     IClean,
     IRestore,
+    IDotnetFormat,
     ICompile,
     IBenchmark,
     IUnitTest,
     IMutationTest,
-    IReportCoverage,
+    IReportUnitTestCoverage,
     IPack,
     IPushNugetPackages,
     IGitFlowWithPullRequest,
@@ -95,7 +130,7 @@ public class Build : EnhancedNukeBuild,
 {
     public static int Main() => Execute<Build>(x => ((ICompile)x).Compile);
 
-    [Required] [Solution] public readonly Solution Solution;
+    [Required][Solution] public readonly Solution Solution;
 
     ///<inheritdoc/>
     Solution IHaveSolution.Solution => Solution;
@@ -103,14 +138,15 @@ public class Build : EnhancedNukeBuild,
     /// <summary>
     /// Token to interact with Nuget's API
     /// </summary>
-    [Parameter("Token to interact with Nuget's API")] [Secret]
+    [Parameter("Token to interact with Nuget's API")]
+    [Secret]
     public readonly string NugetApiKey;
 
     [CI] public readonly GitHubActions GitHubActions;
 
     ///<inheritdoc/>
     IEnumerable<AbsolutePath> IClean.DirectoriesToDelete =>
-        [ 
+        [
             ..this.Get<IHaveSourceDirectory>().SourceDirectory.GlobDirectories("**/bin", "**/obj"),
             ..this.Get<IHaveTestDirectory>().TestDirectory.GlobDirectories("**/bin", "**/obj")
         ];
@@ -130,12 +166,36 @@ public class Build : EnhancedNukeBuild,
             this.Get<IMutationTest>().MutationTestResultDirectory
         ];
 
+    /// <summary>
+    /// Projects that contain architectural tests.
+    /// </summary>
+    private IEnumerable<Project> ArchitecturalTestsProjects =>  Solution.GetAllProjects("*.ArchitecturalTests");
+
+    public Target ArchitecturalTests => _ => _
+                                            .TryTriggeredBy<IUnitTest>()
+                                            .TryBefore<IMutationTest>()
+                                            .Description("Runs all architectural tests")
+                                            .Executes(() =>
+                                                      {
+                                                          DotNetTest(s => s
+                                                                         .SetConfiguration(Configuration.Debug)
+                                                                         .CombineWith(ArchitecturalTestsProjects,
+                                                                                      (cs, project) => cs.SetProjectFile(project)
+                                                                                          .CombineWith(project.GetTargetFrameworks(),
+                                                                                                       (setting, framework) => setting.SetFramework(framework))));
+                                                      });
+
     ///<inheritdoc/>
     IEnumerable<Project> IUnitTest.UnitTestsProjects => Partition.GetCurrent(Solution.GetAllProjects("*.UnitTests"));
 
     ///<inheritdoc/>
-    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects
-        => [new MutationProjectConfiguration(Solution.GetProject("Candoumbe.MiscUtilities"), Partition.GetCurrent(this.Get<IUnitTest>().UnitTestsProjects))];
+    IEnumerable<MutationProjectConfiguration> IMutationTest.MutationTestsProjects => [
+        new (
+            Solution.AllProjects.Single(csproj => csproj.Name == "Candoumbe.MiscUtilities"),
+            this.Get<IUnitTest>().UnitTestsProjects,
+            configurationFile: this.Get<IHaveTestDirectory>().TestDirectory / "Candoumbe.MiscUtilities.UnitTests" / "stryker-config.json"
+        )
+    ];
 
     ///<inheritdoc/>
     IEnumerable<Project> IBenchmark.BenchmarkProjects => Solution.GetAllProjects("*.PerformanceTests");
@@ -179,4 +239,6 @@ public class Build : EnhancedNukeBuild,
             EnvironmentInfo.SetVariable("DOTNET_ROLL_FORWARD", "LatestMajor");
         }
     }
+    /// <inheritdoc />
+    bool IDotnetFormat.VerifyNoChanges => IsLocalBuild;
 }

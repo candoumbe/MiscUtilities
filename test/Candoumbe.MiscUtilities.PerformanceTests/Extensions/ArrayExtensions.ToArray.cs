@@ -3,39 +3,38 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace Candoumbe.MiscUtilities.PerformanceTests.Extensions
+namespace Candoumbe.MiscUtilities.PerformanceTests.Extensions;
+
+internal class ToArrayTests
 {
-    internal class ToArrayTests
+
+    [Params(1, 10, 1_000, 10_000)]
+    public int Count { get; set; }
+
+    private readonly Array _array;
+    private readonly int[] _genericArray;
+
+    private readonly IList<int> _numbers;
+
+    public ToArrayTests()
     {
+        _numbers = Enumerable.Range(0, Count)
+            .ToArray();
+        _array = Array.CreateInstance(typeof(int), Count);
+        _genericArray = new int[Count];
+    }
 
-        [Params(1, 10, 1_000, 10_000)]
-        public int Count { get; set; }
+    [Benchmark(Baseline = true)]
+    public int[] ToArrayExtension() => _array.ToArray<int>();
 
-        private readonly Array _array;
-        private readonly int[] _genericArray;
-
-        private readonly IList<int> _numbers;
-
-        public ToArrayTests()
+    [Benchmark]
+    public int[] ToArray_Using_ref()
+    {
+        for (int i = 0; i < Count; i++)
         {
-            _numbers = Enumerable.Range(0, Count)
-                      .ToArray();
-            _array = Array.CreateInstance(typeof(int), Count);
-            _genericArray = new int[Count];
+            _genericArray[i] = _numbers[i];
         }
 
-        [Benchmark(Baseline = true)]
-        public int[] ToArrayExtension() => _array.ToArray<int>();
-
-        [Benchmark]
-        public int[] ToArray_Using_ref()
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                _genericArray[i] = _numbers[i];
-            }
-
-            return [.. _genericArray];
-        }
+        return [.. _genericArray];
     }
 }

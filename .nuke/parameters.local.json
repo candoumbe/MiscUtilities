@@ -1,4 +1,6 @@
 {
-  "GitHubToken": "v1:6WJRsrPDdx4wdz1oJfqtD0XJc4jY4GW/BHS0CrGAlyh60pj2coDHc8Fdple98tFO9C76LWK3HMf+hLIrpX9UgBr/n3yYLndFCm9tTk12umpytP9tmZDw0KyyZumnWnPR",
-  "NugetApiKey": "v1:jOFL6Gq5sdAAm1ukzheAqP6UPQLJ0KqbmJIWSiNf+xZhmdYqKuI2YkNU+RiXoahA"
+  "$schema": "./build.schema.json",
+  "CodecovToken": "v1:QsZBz7D0wFz79Q0zPBVWJgruQByHajUVBbReebsCSmh+pWE9SZA4ZX/Uc13btXAc",
+  "GitHubToken": "v1:Hn+LFd5oOo+rYmYeOz+R5qtJGAa4NCh7dcgpNA2yScOlfjG3ZTNmjdcV6zW7TxG/WkVypF45arjBp4ZVPzrKc/CrE9UgHSprcrwsxQlblhK4AS6uEVIaPQfQ8FaiMHBC",
+  "NugetApiKey": "v1:dwmwHk+56lCa5+SarupTjV3cJWCY1h7usAHlomWgo9ZhoRpZJCp8KHy2n371qy88"
 }
