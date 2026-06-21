@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### 🚀 New features
+- Added `net10.0` support to the library and test projects.
+
+### 🧹 Housekeeping
+- Updated the .NET SDK to `10.0.301`.
 
 ## [0.15.0] / 2025-08-10
 ### 🚀 New features
