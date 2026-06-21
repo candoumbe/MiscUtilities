@@ -1,6 +1,11 @@
 // "Copyright (c) Cyrille NDOUMBE.
 // Licenced under GNU General Public Licence, version 3.0"
 
+using Nuke.Common.Tools.GitHub;
+using Nuke.Common.Tools.ReportGenerator;
+
+namespace Utilities.ContinuousIntegration;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -223,6 +228,17 @@ public class Build : EnhancedNukeBuild,
     ///<inheritdoc/>
     bool IReportCoverage.ReportToCodeCov => this.Get<IReportCoverage>().CodecovToken is not null;
 
+    ///<inheritdoc/>
+    Configure<ReportGeneratorSettings> IReportCoverage.ReportGeneratorSettings => settings => settings.SetFramework("8.0"); 
+
+    ///<inheritdoc/>
+    protected override void OnBuildCreated()
+    {
+        if (IsServerBuild)
+        {
+            EnvironmentInfo.SetVariable("DOTNET_ROLL_FORWARD", "LatestMajor");
+        }
+    }
     /// <inheritdoc />
     bool IDotnetFormat.VerifyNoChanges => IsLocalBuild;
 }
