@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `net10.0` support to the library and test projects.
 
 ### 🧹 Housekeeping
+- Migrated the build pipeline from Nuke to Fallout.
 - Updated the .NET SDK to `10.0.301`.
+- Upgraded `Candoumbe.Pipelines` and `dotnet-stryker` to support the new build toolchain.
 
 ## [0.15.0] / 2025-08-10
 ### 🚀 New features
