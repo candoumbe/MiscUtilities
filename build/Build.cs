@@ -9,19 +9,20 @@ using Candoumbe.Pipelines.Components.Formatting;
 using Candoumbe.Pipelines.Components.GitHub;
 using Candoumbe.Pipelines.Components.NuGet;
 using Candoumbe.Pipelines.Components.Workflows;
-using Nuke.Common;
-using Nuke.Common.CI;
-using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.Execution;
-using Nuke.Common.IO;
-using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
-using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.GitHub;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using Fallout.Common;
+using Fallout.Common.CI;
+using Fallout.Common.CI.GitHubActions;
+using Fallout.Common.Execution;
+using Fallout.Common.IO;
+using Fallout.Common.ProjectModel;
+using Fallout.Common.Tooling;
+using Fallout.Common.Tools.DotNet;
+using Fallout.Common.Tools.GitHub;
+using static Fallout.Common.Tools.DotNet.DotNetTasks;
 
 
 namespace Utilities.ContinuousIntegration;
+
 [GitHubActions(
     "integration",
     GitHubActionsImage.Ubuntu2204,
@@ -101,7 +102,7 @@ namespace Utilities.ContinuousIntegration;
 )]
 [UnsetVisualStudioEnvironmentVariables]
 [DotNetVerbosityMapping]
-public class Build : EnhancedNukeBuild,
+public class Build : EnhancedBuild,
     IHaveArtifacts,
     IHaveConfiguration,
     IHaveSolution,
@@ -164,7 +165,7 @@ public class Build : EnhancedNukeBuild,
     /// <summary>
     /// Projects that contain architectural tests.
     /// </summary>
-    private IEnumerable<Project> ArchitecturalTestsProjects =>  Solution.GetAllProjects("*.ArchitecturalTests");
+    private IEnumerable<Project> ArchitecturalTestsProjects => Solution.GetAllProjects("*.ArchitecturalTests");
 
     public Target ArchitecturalTests => _ => _
                                             .TryTriggeredBy<IUnitTest>()

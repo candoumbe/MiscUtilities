@@ -28,6 +28,7 @@
         "ArchitecturalTests",
         "Benchmarks",
         "Changelog",
+        "Chore",
         "Clean",
         "Coldfix",
         "Compile",
@@ -54,7 +55,7 @@
         "Quiet"
       ]
     },
-    "NukeBuild": {
+    "FalloutBuild": {
       "properties": {
         "Continue": {
           "type": "boolean",
@@ -119,6 +120,10 @@
           "type": "boolean",
           "description": "Indicates if any changes should be stashed automatically prior to switching branch (Default : true)"
         },
+        "ChoreBranchPrefix": {
+          "type": "string",
+          "description": "The name of the chore branch prefix"
+        },
         "CodecovToken": {
           "type": "string",
           "description": "The API key used to push code coverage to CodeCov",
@@ -147,6 +152,10 @@
         "Draft": {
           "type": "boolean",
           "description": "Indicates to open the pull request as 'draft'"
+        },
+        "Filter": {
+          "type": "string",
+          "description": "Filter benchmarks to run by their full name (namespace.typeName.methodName) using glob pattern"
         },
         "Formatters": {
           "type": "array",
@@ -189,6 +198,11 @@
           "description": "Token to interact with Nuget's API",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
+        "NuGetApiKey": {
+          "type": "string",
+          "description": "API Key to use for accessing the NuGet repository",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
         "SkipConfirmation": {
           "type": "boolean",
           "description": "Set to true to not ask any confirmation to the end user (default: false)"
@@ -209,7 +223,7 @@
       }
     },
     {
-      "$ref": "#/definitions/NukeBuild"
+      "$ref": "#/definitions/FalloutBuild"
     }
   ]
 }
