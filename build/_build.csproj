@@ -1,21 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace></RootNamespace>
     <NoWarn>CS0649;CS0169</NoWarn>
-    <NukeRootDirectory>..</NukeRootDirectory>
-    <NukeScriptDirectory>..</NukeScriptDirectory>
-    <NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <FalloutRootDirectory>..</FalloutRootDirectory>
+    <FalloutScriptDirectory>..</FalloutScriptDirectory>
+    <FalloutTelemetryVersion>1</FalloutTelemetryVersion>
     <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Candoumbe.Pipelines" Version="0.13.4"/>
+    <PackageReference Include="Candoumbe.Pipelines" Version="3.0.0"/>
     <PackageReference Include="ReportGenerator" Version="5.3.11" />
     <PackageDownload Include="GitVersion.Tool" Version="[6.0.5]" />
     <PackageDownload Include="CodecovUploader" Version="[0.8.0]" />
-    <PackageDownload Include="dotnet-stryker" Version="[4.14.2]" />
+    <PackageDownload Include="dotnet-stryker" Version="[4.15.0]" />
   </ItemGroup>
 </Project>
